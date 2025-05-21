@@ -3,14 +3,17 @@ package com.multikube_rest_service.controllers;
 import com.multikube_rest_service.common.HttpConstants;
 import com.multikube_rest_service.dtos.auth.JwtResponse;
 import com.multikube_rest_service.dtos.auth.LoginRequest;
+import com.multikube_rest_service.dtos.auth.RegisterRequest; //
 import com.multikube_rest_service.rest.RestMessageResponse;
 import com.multikube_rest_service.services.UserAuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement; // Import for Swagger
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // Import PreAuthorize
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,19 +27,23 @@ public class AuthController {
         this.userAuthService = userAuthService;
     }
 
-    //TODO Rework to reuse for create user by admin
-//    @Operation(
-//            summary = "Register a new user",
-//            description = "Register a new user in the system by providing user details"
-//    )
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "User registered successfully")
-//    })
-//    @PostMapping("/register")
-//    public ResponseEntity<RestMessageResponse> register(@RequestBody RegisterRequest request) {
-//        userAuthService.register(request);
-//        return ResponseEntity.ok(new RestMessageResponse("User registered successfully"));
-//    }
+    @Operation(
+            summary = "Register a new user (Admin Only)", // Updated summary
+            description = "Register a new user in the system. This endpoint can only be accessed by users with the 'PROVIDER_ADMIN' role.", // Updated description
+            security = @SecurityRequirement(name = "bearerAuth") // If you set up bearerAuth in Swagger OpenAPI config
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User registered successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - Missing or invalid token"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - User does not have PROVIDER_ADMIN role")
+    })
+    @PostMapping("/register")
+    @PreAuthorize("hasAuthority('PROVIDER_ADMIN')") // Secure this endpoint
+    public ResponseEntity<RestMessageResponse> register(@RequestBody RegisterRequest request) { //
+        userAuthService.register(request);
+        return ResponseEntity.ok(new RestMessageResponse("User registered successfully"));
+    }
 
     @Operation(
             summary = "Login and receive JWT token",
@@ -47,15 +54,14 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest request, HttpServletResponse response) {
-        JwtResponse jwtToken = userAuthService.login(request); // Obtain the JWT token
+        JwtResponse jwtToken = userAuthService.login(request);
 
-        // Set the JWT token as an HTTP-only secure cookie
         ResponseCookie jwtCookie = ResponseCookie.from(HttpConstants.JWT_TOKEN, jwtToken.getToken())
-                .httpOnly(true) // Prevent access from JavaScript
-                .secure(true) // Use HTTPS
-                .sameSite("Strict") // SameSite policy for CSRF protection
-                .path("/") // Available for all paths
-                .maxAge(10 * 60 * 60) // 10 hours
+                .httpOnly(true)
+                .secure(true) // Should be true in production with HTTPS
+                .sameSite("Strict")
+                .path("/")
+                .maxAge(10 * 60 * 60)
                 .build();
 
         response.addHeader("Set-Cookie", jwtCookie.toString());
@@ -71,13 +77,12 @@ public class AuthController {
     })
     @PostMapping("/logout")
     public ResponseEntity<RestMessageResponse> logout(HttpServletResponse response) {
-        // Clear the JWT cookie by setting maxAge to 0
         ResponseCookie jwtCookie = ResponseCookie.from(HttpConstants.JWT_TOKEN, "")
                 .httpOnly(true)
-                .secure(true)
+                .secure(true) // Should be true in production with HTTPS
                 .sameSite("Strict")
                 .path("/")
-                .maxAge(0) // Clear cookie
+                .maxAge(0)
                 .build();
 
         response.addHeader("Set-Cookie", jwtCookie.toString());

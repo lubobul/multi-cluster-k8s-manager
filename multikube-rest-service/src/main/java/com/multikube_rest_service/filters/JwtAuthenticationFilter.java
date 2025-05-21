@@ -8,11 +8,15 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections; // Import Collections
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -29,32 +33,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String cookieHeader = request.getHeader("Cookie");
 
         if (cookieHeader != null) {
-            // Split cookies into individual key-value pairs
             String[] cookies = cookieHeader.split(";");
+            String jwtToken = null;
 
             for (String cookie : cookies) {
                 String[] cookiePair = cookie.trim().split("=", 2);
-                String cookieName = cookiePair[0];
-                String cookieValue = cookiePair.length > 1 ? cookiePair[1] : "";
-
-                // Check if the JWT_TOKEN cookie exists
-                if (HttpConstants.JWT_TOKEN.equals(cookieName)) {
-                    String jwtToken = cookieValue;
-
-                    // Validate and process the token
-                    if (jwtUtil.validateToken(jwtToken)) {
-                        String email = jwtUtil.extractEmail(jwtToken);
-                        Long userId = jwtUtil.extractClaim(jwtToken, "userId", Long.class); // Extract userId
-
-
-                        // Create an Authentication object and set it in the SecurityContext
-                        JwtUserDetails userDetails = new JwtUserDetails(email, userId);
-                        JwtAuthenticationToken authentication = new JwtAuthenticationToken(userDetails);
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
-
-                    break; // No need to process further cookies
+                if (cookiePair.length == 2 && HttpConstants.JWT_TOKEN.equals(cookiePair[0])) {
+                    jwtToken = cookiePair[1];
+                    break;
                 }
+            }
+
+            if (jwtToken != null && jwtUtil.validateToken(jwtToken)) {
+                String email = jwtUtil.extractEmail(jwtToken);
+                Long userId = jwtUtil.extractClaim(jwtToken, "userId", Long.class);
+                List<String> rolesClaim = jwtUtil.extractRoles(jwtToken); // Extract roles from token
+
+                List<SimpleGrantedAuthority> authorities;
+                if (rolesClaim != null) { // Check if the roles claim is not null
+                    authorities = rolesClaim.stream()
+                            .map(SimpleGrantedAuthority::new)
+                            .collect(Collectors.toList());
+                } else {
+                    authorities = Collections.emptyList(); // Default to an empty list if no roles claim
+                }
+
+                JwtUserDetails userDetails = new JwtUserDetails(email, userId, authorities);
+                JwtAuthenticationToken authentication = new JwtAuthenticationToken(userDetails);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
 

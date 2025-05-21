@@ -5,21 +5,30 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections; // Import Collections
 
 public class JwtUserDetails implements UserDetails {
     private final String email;
     @Getter
     private final Long userId;
+    private final Collection<? extends GrantedAuthority> authorities; // Added authorities
 
-    public JwtUserDetails(String email, Long userId) {
+    public JwtUserDetails(String email, Long userId, Collection<? extends GrantedAuthority> authorities) {
         this.email = email;
         this.userId = userId;
+        this.authorities = authorities != null ? authorities : Collections.emptyList(); // Store authorities
     }
+
+    // Constructor without authorities for cases where they might not be immediately available or needed
+    // However, for role-based security, you'll primarily use the one with authorities.
+    public JwtUserDetails(String email, Long userId) {
+        this(email, userId, Collections.emptyList());
+    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // If you have roles or permissions, you can return them here
-        return null; // No roles/authorities in this example
+        return authorities; // Return stored authorities
     }
 
     @Override
@@ -32,6 +41,7 @@ public class JwtUserDetails implements UserDetails {
         return email; // Email is treated as the username
     }
 
+    // Account status methods - adjust based on your 'isActive' field in User entity if needed
     @Override
     public boolean isAccountNonExpired() {
         return true; // Adjust based on your business logic
@@ -49,6 +59,6 @@ public class JwtUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true; // Adjust based on your business logic
+        return true; // Consider linking this to user.getIsActive() if you load the full User entity
     }
 }
