@@ -4,7 +4,7 @@ CREATE TABLE users
     username   VARCHAR(50)  NOT NULL UNIQUE, -- Added UNIQUE constraint for username
     email      VARCHAR(100) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted    BOOLEAN   DEFAULT FALSE
+    is_active    BOOLEAN   DEFAULT TRUE
 );
 
 CREATE TABLE user_secrets
@@ -12,7 +12,6 @@ CREATE TABLE user_secrets
     id       BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id  BIGINT       NOT NULL,
     password VARCHAR(255) NOT NULL,
-    deleted  BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
