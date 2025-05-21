@@ -1,1 +1,3 @@
-# multi-cluster-k8s-manager
+# Multikube - Kubernetes Multi-Cluster Manager
+
+This project provides a platform for managing multiple Kubernetes clusters from a central interface. It enables providers to register and oversee their Kubernetes infrastructure and provision resources to tenants in an isolated and user-friendly manner. The platform aims to simplify multi-cluster management and offer an abstraction layer for tenants to deploy and manage applications without needing direct Kubernetes expertise. Key features include multi-tenancy support (in design), Kubernetes cluster registration, namespace-based resource isolation, and a basic UI for resource management. This project serves as a demonstration of multi-cluster management principles and Kubernetes API integration.
