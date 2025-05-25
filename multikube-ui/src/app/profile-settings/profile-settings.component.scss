@@ -1,0 +1,36 @@
+:host{
+    margin: 0 0.6rem 0 0.6rem;
+    display: flex;
+    flex-flow: column;
+}
+.avatar-selection{
+    margin-top: 1.2rem;
+    .select-avatar-container{
+        .button-select-avatar{
+            border: none;
+        }
+        margin-top: 0.2rem;
+        .avatar-display{
+            padding: 0.2rem;            /* Add padding */
+            width: 3rem;                /* Set a fixed width */
+            height: 3rem;               /* Set a fixed height */
+            border-radius: 50%;         /* Make it circular */
+            object-fit: cover;
+        }
+    }
+
+}
+
+
+.profile-actions{
+    display: flex;
+    flex-flow: row;
+    margin-top: 2rem;
+    .delete-profile-btn{
+        margin-left: auto;
+    }
+
+    .logout-profile-btn{
+        margin-left: 0.6rem;
+    }
+}

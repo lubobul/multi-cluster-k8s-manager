@@ -1,0 +1,49 @@
+<div class="login-container">
+    <h1 class="welcome-message">
+        <span class="highlight">Welcome Back to Multikube!</span> Please login to your account.
+    </h1>
+    <div class="card login-card">
+        <div class="card-header">
+            <h3 class="title">Login into Multikube</h3>
+        </div>
+        <div class="card-block">
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                @if(errorMessage){
+                    <clr-alert class="danger-alert" [clrAlertType]="'danger'" [clrAlertSizeSmall]="true" [(clrAlertClosed)]="alertClosed">
+                        <clr-alert-item>
+                            <span class="alert-text">{{errorMessage}}</span>
+                        </clr-alert-item>
+                    </clr-alert>
+                }
+                <clr-input-container>
+                    <label>Email</label>
+                    <input clrInput type="email" formControlName="email" placeholder="Enter your email" />
+                    <clr-control-error *clrIfError="'email'">
+                        Please enter a valid email.
+                    </clr-control-error>
+                    <clr-control-error *clrIfError="'required'">
+                        Email field is required.
+                    </clr-control-error>
+                </clr-input-container>
+
+                <clr-password-container>
+                    <label>Password</label>
+                    <input clrPassword type="password" formControlName="password" placeholder="Enter your password" />
+                    <clr-control-error *clrIfError="'required'">
+                        Password field is required.
+                    </clr-control-error>
+                    <clr-control-helper>
+                        Password rules - Min 6 characters, at least 1 numeric and at least one alphabetic character.
+                    </clr-control-helper>
+                </clr-password-container>
+
+                <button type="submit" [disabled]="loginForm.invalid" class="btn btn-primary btn-form-action">Login</button>
+            </form>
+        </div>
+        <div class="card-footer">
+            <a routerLink="/register">Don't have an account? Register here.</a>
+        <div>
+    </div>
+</div>
+    </div>
+</div>

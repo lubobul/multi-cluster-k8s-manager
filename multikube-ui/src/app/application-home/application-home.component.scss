@@ -1,0 +1,70 @@
+.main-container{
+    .content-container{
+        .content-area{
+            padding: 0;
+            overflow: hidden;
+        }
+    }
+}
+
+.branding-icon{
+    color: var(--clr-color-neutral-100) !important;
+}
+
+.chat-application-dynamic-content{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.application-home-outlet{
+    flex-grow: 1;
+}
+
+.message-nav{
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-width: 12rem;
+    height: 100vh;
+    .button-new-chat{
+        margin-left: 0.6rem;
+        width: 6rem;
+    }
+    clr-vertical-nav{
+        height: 100%;
+    }
+}
+
+.user-nav-button{
+    cursor: pointer;
+}
+
+.no-margin{
+    margin: 0;
+}
+
+label{
+    font-weight: bold;
+}
+
+.unfriend-button{
+    margin-right: auto;
+}
+
+.avatar-display{
+    padding: 0.2rem;            /* Add padding */
+    width: 2rem;                /* Set a fixed width */
+    height: 2rem;               /* Set a fixed height */
+    border-radius: 50%;         /* Make it circular */
+    object-fit: cover;
+}
+
+.view-user-avatar-container{
+    margin-bottom: 1rem;
+}
+
+.loading-container{
+    display: flex;
+    margin-left: 1.2rem;
+    align-items: center;
+}

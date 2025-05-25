@@ -1,0 +1,31 @@
+.create-account-container {
+    .welcome-message{
+        margin-bottom: 4rem;
+        animation: fadeIn 0.5s ease-in; /* Add fade-in animation */
+
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0; /* Start fully transparent */
+            transform: translateY(-20px); /* Optional: slight upward movement */
+        }
+        to {
+            opacity: 1; /* End fully visible */
+            transform: translateY(0); /* Set to original position */
+        }
+    }
+
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    .login-card{
+        max-width: 30rem;
+    }
+}
+
+.btn-form-action{
+    margin-top: 1rem;
+}

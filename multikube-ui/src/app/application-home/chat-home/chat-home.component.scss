@@ -1,0 +1,45 @@
+.chat-home-container {
+
+    display: flex;
+    flex-flow: column;
+    height: 100vh; /* Ensure it takes up full viewport height */
+    width: 100%;
+    min-width: 36rem;
+    overflow: hidden; /* Prevent scrolling issues */
+
+    .subnav {
+        .loading-container{
+            display: flex;
+            margin-left: 1.2rem;
+        }
+        flex-shrink: 0; /* Prevent it from shrinking */
+        flex-grow: 0; /* Allow it to take only the required space */
+        .nav-chat-links {
+            .channel-nav-item {
+                cursor: pointer;
+            }
+
+            flex: 0;
+            padding-right: 1.2rem;
+        }
+
+        .chat-title {
+            font-size: 0.8rem;
+            text-decoration: none;
+            color: var(--clr-color-action-600);
+            width: 20rem;
+            margin: 0 0 0 1.2rem;
+            overflow: hidden; /* Hide overflow content */
+            text-overflow: ellipsis; /* Add ellipsis (...) for overflowed text */
+            white-space: nowrap; /* Prevent text wrapping */
+            &:hover {
+                color: var(--clr-color-action-400);
+
+            }
+        }
+    }
+}
+
+
+
+

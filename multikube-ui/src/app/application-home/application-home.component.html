@@ -1,0 +1,145 @@
+<div class="main-container">
+    <header class="header-6">
+        <div class="branding">
+            <a [routerLink]="''" [routerLinkActive]="['active']">
+                <cds-icon class="branding-icon" shape="block" solid="true"></cds-icon>
+                <span class="title">Multikube</span>
+            </a>
+        </div>
+        <div class="header-nav">
+            <a href="javascript://" class="nav-link nav-text">Home</a>
+            <a href="javascript://" class="nav-link nav-text">About</a>
+        </div>
+        <div class="settings">
+            <a [routerLink]="CHAT_ROUTE_PATHS.PROFILE_SETTINGS" [routerLinkActive]="['active']"
+               class="nav-link nav-icon">
+                @if (!!currentUser?.avatar) {
+                    <img class="avatar-display" src="{{currentUser.avatar}}">
+                } @else {
+                    <cds-icon shape="user"></cds-icon>
+                }
+                <span>{{ currentUser?.username }}</span>
+            </a>
+        </div>
+    </header>
+    <nav class="subnav">
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="CHAT_ROUTE_PATHS.KUBE_CLUSTERS">Kubernetes Clusters</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="CHAT_ROUTE_PATHS.TENANT_PROFILES">Tenants</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="content-container">
+        <div class="content-area">
+            <div class="chat-application-dynamic-content">
+<!--                <nav class="message-nav">-->
+<!--                    <clr-vertical-nav [clrVerticalNavCollapsible]="false">-->
+<!--                        <button class="btn btn-primary button-new-chat">-->
+<!--                            <cds-icon shape="chat-bubble"></cds-icon>-->
+<!--                            New chat-->
+<!--                        </button>-->
+<!--                        <clr-vertical-nav-group routerLinkActive="active" [clrVerticalNavGroupExpanded]="true">-->
+<!--                            <cds-icon shape="chat-bubble" clrVerticalNavIcon></cds-icon>-->
+<!--                            Direct messages-->
+<!--                            <clr-vertical-nav-group-children>-->
+<!--                                <form class="clr-form">-->
+<!--                                    <input type="text"-->
+<!--                                           id="directChatSearch"-->
+<!--                                           placeholder="Search for messages..."-->
+<!--                                           class="clr-input"-->
+<!--                                           [formControl]="chatSearchControl"-->
+<!--                                    />-->
+<!--                                </form>-->
+<!--                            </clr-vertical-nav-group-children>-->
+
+<!--                        </clr-vertical-nav-group>-->
+<!--                        <clr-vertical-nav-group routerLinkActive="active" [clrVerticalNavGroupExpanded]="true">-->
+<!--                            <cds-icon shape="talk-bubbles" clrVerticalNavIcon></cds-icon>-->
+<!--                            Channels-->
+<!--                            <clr-vertical-nav-group-children>-->
+<!--                                <form class="clr-form">-->
+<!--                                    <input type="text"-->
+<!--                                           id="channelChatSearch"-->
+<!--                                           placeholder="Search for channels..."-->
+<!--                                           class="clr-input"-->
+<!--                                           [formControl]="channelSearchControl"-->
+<!--                                    />-->
+<!--                                </form>-->
+<!--                            </clr-vertical-nav-group-children>-->
+<!--&lt;!&ndash;                            <clr-vertical-nav-group-children>&ndash;&gt;-->
+<!--&lt;!&ndash;                                @if (loadingChannels) {&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <div class="loading-container">&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <clr-spinner clrInline>Loading...</clr-spinner>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <span class="chat-title">Loading...</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                                } @else {&ndash;&gt;-->
+<!--&lt;!&ndash;                                    @if (!!channels?.length) {&ndash;&gt;-->
+<!--&lt;!&ndash;                                        @for (channel of channels; track channel.id) {&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <a [routerLinkActive]="['active']"&ndash;&gt;-->
+<!--&lt;!&ndash;                                               [routerLink]="'/' +CHAT_ROUTE_PATHS.HOME+ '/' + CHAT_ROUTE_PATHS.CHAT + '/' + channel.id"&ndash;&gt;-->
+<!--&lt;!&ndash;                                               class="user-nav-button"&ndash;&gt;-->
+<!--&lt;!&ndash;                                               clrVerticalNavLink>{{ channel.title }}</a>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        }&ndash;&gt;-->
+<!--&lt;!&ndash;                                    } @else {&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <span clrVerticalNavLink>No channels</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    }&ndash;&gt;-->
+<!--&lt;!&ndash;                                }&ndash;&gt;-->
+<!--&lt;!&ndash;                            </clr-vertical-nav-group-children>&ndash;&gt;-->
+<!--                        </clr-vertical-nav-group>-->
+<!--                    </clr-vertical-nav>-->
+<!--                </nav>-->
+
+                <div class="application-home-outlet">
+                    @if (errorMessage) {
+                        <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertClosed">
+                            <clr-alert-item>
+                                <span class="alert-text">{{ errorMessage }}</span>
+                            </clr-alert-item>
+                        </clr-alert>
+                    }
+                    <router-outlet></router-outlet>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<clr-modal [(clrModalOpen)]="openViewUserModal">
+    <h3 class="modal-title">User Info</h3>
+    <div class="modal-body">
+                        <span class="clr-row">
+                            <label class="clr-col-3">Avatar:</label>
+                            <div class="clr-col-9 view-user-avatar-container">
+                                @if (!!selectedFriend.avatar) {
+                                    <img class="avatar-display" src="{{selectedFriend.avatar}}">
+                                } @else {
+                                    <cds-icon shape="user"></cds-icon>
+                                }
+                            </div>
+                            <label class="clr-col-3">Username:</label>
+                            <p class="clr-col-9 no-margin">{{ selectedFriend.username }}</p>
+                            <br><br>
+                            <label class="clr-col-3">Email:</label>
+                            <p class="clr-col-9 no-margin">{{ selectedFriend.email }}</p>
+                            <br><br>
+                            <label class="clr-col-3">Active since:</label>
+                            <p class="clr-col-9 no-margin">{{ selectedFriend.createdAt | date }}</p>
+                        </span>
+        @if (friendActionLoading) {
+            <clr-spinner>Loading...</clr-spinner>
+        }
+    </div>
+    <div class="modal-footer">
+        <button [disabled]="friendActionLoading" type="button"
+                class="btn btn-danger-outline unfriend-button">Unfriend
+        </button>
+        <button type="button" class="btn btn-outline" (click)="openViewUserModal = false">Cancel
+        </button>
+        <button [disabled]="friendActionLoading" type="button" class="btn btn-primary">Message
+        </button>
+    </div>
+</clr-modal>
