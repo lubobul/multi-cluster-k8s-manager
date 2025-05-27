@@ -1,6 +1,6 @@
 package com.multikube_rest_service.entities.provider;
 
-import com.multikube_rest_service.common.enums.ClusterStatus; // Make sure this enum is created
+import com.multikube_rest_service.common.enums.ClusterStatus;
 import com.multikube_rest_service.entities.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
