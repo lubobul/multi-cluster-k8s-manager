@@ -4,7 +4,7 @@ import com.multikube_rest_service.common.SecurityContextHelper; //
 import com.multikube_rest_service.common.encryption.KubeconfigEncryptor;
 import com.multikube_rest_service.common.enums.ClusterStatus;
 import com.multikube_rest_service.dtos.requests.provider.ClusterRegistrationRequest;
-import com.multikube_rest_service.dtos.responses.provider.ClusterResponse;
+import com.multikube_rest_service.dtos.responses.provider.ClusterDto;
 import com.multikube_rest_service.entities.User;
 import com.multikube_rest_service.entities.provider.KubernetesCluster;
 import com.multikube_rest_service.exceptions.ResourceNotFoundException;
@@ -12,7 +12,6 @@ import com.multikube_rest_service.mappers.provider.KubernetesClusterMapper;
 import com.multikube_rest_service.repositories.UserRepository; //
 import com.multikube_rest_service.repositories.provider.KubernetesClusterRepository;
 import io.kubernetes.client.openapi.ApiClient;
-import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1NamespaceList;
 import io.kubernetes.client.util.ClientBuilder;
@@ -67,7 +66,7 @@ public class ProviderClusterService {
      * @throws IllegalArgumentException if the cluster name or kubeconfig is invalid or if a cluster with the same name already exists.
      */
     @Transactional
-    public ClusterResponse registerCluster(ClusterRegistrationRequest request) {
+    public ClusterDto registerCluster(ClusterRegistrationRequest request) {
         Long providerUserId = SecurityContextHelper.getAuthenticatedUserId();
         User providerUser = userRepository.findById(providerUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Provider user not found with ID: " + providerUserId));
