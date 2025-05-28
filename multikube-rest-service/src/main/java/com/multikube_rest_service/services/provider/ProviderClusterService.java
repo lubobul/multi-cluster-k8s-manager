@@ -18,10 +18,14 @@ import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.KubeConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.StringReader;
+import java.util.Map;
 
 /**
  * Service layer for managing Kubernetes cluster registration and related operations
@@ -160,5 +164,65 @@ public class ProviderClusterService {
             // the status update needs to be saved.
             clusterRepository.save(cluster);
         }
+    }
+
+    /**
+     * Retrieves details of a specific cluster registered by the currently authenticated provider.
+     *
+     * @param clusterId The ID of the cluster to retrieve.
+     * @return A DTO representing the cluster.
+     */
+    @Transactional(readOnly = true)
+    public ClusterDto getCluster(Long clusterId) {
+        Long providerUserId = SecurityContextHelper.getAuthenticatedUserId();
+        KubernetesCluster cluster = clusterRepository.findByIdAndProviderUser_Id(clusterId, providerUserId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Cluster not found with ID: " + clusterId + " for the current provider."));
+        return clusterMapper.toDto(cluster);
+    }
+
+    /**
+     * Retrieves a paginated list of clusters registered by the currently authenticated provider,
+     * with support for filtering by name and status from the searchParams map.
+     *
+     * @param searchParams A map of query parameters (e.g., "name" -> "mycluster", "status" -> "ACTIVE").
+     * @param pageable Pagination information.
+     * @return A page of ClusterResponse DTOs.
+     */
+    @Transactional(readOnly = true)
+    public Page<ClusterDto> getClusters(Map<String, String> searchParams, Pageable pageable) {
+        Long providerUserId = SecurityContextHelper.getAuthenticatedUserId();
+
+        String nameFilter = searchParams.getOrDefault("name", "").trim();
+        String statusFilterString = searchParams.getOrDefault("status", "").trim();
+
+        ClusterStatus statusFilter = null;
+        if (StringUtils.hasText(statusFilterString)) {
+            try {
+                statusFilter = ClusterStatus.valueOf(statusFilterString.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                logger.warn("Invalid status value provided in filter: '{}'. Ignoring status filter.", statusFilterString);
+                // statusFilter remains null, so it won't be used
+            }
+        }
+
+        Page<KubernetesCluster> clusterPage;
+
+        boolean hasNameFilter = StringUtils.hasText(nameFilter);
+
+        if (hasNameFilter && statusFilter != null) {
+            clusterPage = clusterRepository.findByProviderUser_IdAndNameContainingIgnoreCaseAndStatus(
+                    providerUserId, nameFilter, statusFilter, pageable);
+        } else if (hasNameFilter) {
+            clusterPage = clusterRepository.findByProviderUser_IdAndNameContainingIgnoreCase(
+                    providerUserId, nameFilter, pageable);
+        } else if (statusFilter != null) {
+            clusterPage = clusterRepository.findByProviderUser_IdAndStatus(
+                    providerUserId, statusFilter, pageable);
+        } else {
+            clusterPage = clusterRepository.findByProviderUser_Id(providerUserId, pageable);
+        }
+
+        return clusterPage.map(clusterMapper::toDto);
     }
 }
