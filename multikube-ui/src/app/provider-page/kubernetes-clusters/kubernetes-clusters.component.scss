@@ -1,0 +1,13 @@
+.loading-container{
+    display: flex;
+    margin-left: 1.2rem;
+    align-items: center;
+}
+
+.cluster-cards-container{
+    display: flex;
+    flex-flow: row;
+    .cluster-card{
+        width: 20rem;
+    }
+}

@@ -1,1 +1,34 @@
-<p>kubernetes-clusters works!</p>
+@if (errorMessage) {
+    <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertClosed">
+        <clr-alert-item>
+            <span class="alert-text">{{ errorMessage }}</span>
+        </clr-alert-item>
+    </clr-alert>
+}
+@if (loading) {
+    <div class="loading-container">
+        <clr-spinner clrInline>Loading...</clr-spinner>
+        <h5>Loading...</h5>
+    </div>
+
+} @else {
+
+    <div class="cluster-cards-container">
+        @for (cluster of allClusters; track cluster.id) {
+            <div class="card cluster-card">
+                <div class="card-header">{{ cluster.name }}</div>
+                <div class="card-block">
+
+                    <div class="card-text">
+                        {{ cluster.description }}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-sm btn-link">Action</button>
+                </div>
+            </div>
+        }
+    </div>
+
+
+}
