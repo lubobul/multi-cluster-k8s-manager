@@ -15,6 +15,7 @@ import {JWT_OPTIONS, JwtHelperService} from '@auth0/angular-jwt';
 import '@cds/core/icon/register.js';
 import * as allIcons from '@cds/core/icon';
 import {ClarityIcons, chatBubbleIcon, talkBubblesIcon, usersIcon,} from '@cds/core/icon';
+import {MonacoEditorModule, NGX_MONACO_EDITOR_CONFIG} from 'ngx-monaco-editor-v2';
 
 ClarityIcons.addIcons(
     ...allIcons.coreCollectionIcons,
@@ -39,10 +40,17 @@ export const appConfig: { providers: any[] } = {
                 BrowserAnimationsModule,
                 ClarityModule, // Import ClarityModule
                 ClrInputModule, // Import ClrInputModule
-                ClrPasswordModule // Import ClrPasswordModule
+                ClrPasswordModule, // Import ClrPasswordModule
+                MonacoEditorModule.forRoot()
             ),
             {provide: JWT_OPTIONS, useValue: JWT_OPTIONS},
             JwtHelperService,
             Renderer2,
+            {
+                provide: NGX_MONACO_EDITOR_CONFIG,
+                useFactory: () => ({
+                    baseUrl: `/monaco/min/vs`,
+                }),
+            },
         ],
 };
