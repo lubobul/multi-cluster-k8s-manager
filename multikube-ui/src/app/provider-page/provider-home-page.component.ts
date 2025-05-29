@@ -35,11 +35,11 @@ import {AuthService} from '../services/auth.service';
         ReactiveFormsModule,
         DatePipe,
     ],
-    templateUrl: './application-home.component.html',
+    templateUrl: './provider-home-page.component.html',
     standalone: true,
-    styleUrl: './application-home.component.scss'
+    styleUrl: './provider-home-page.component.scss'
 })
-export class ApplicationHomeComponent implements OnInit, OnDestroy {
+export class ProviderHomePageComponent implements OnInit, OnDestroy {
     friendSearchControl = new FormControl('');
     chatSearchControl = new FormControl('');
     channelSearchControl = new FormControl('');

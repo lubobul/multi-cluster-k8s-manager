@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import { ApplicationHomeComponent } from './application-home/application-home.component';
+import { ProviderHomePageComponent } from './provider-page/provider-home-page.component';
 import { ChatLoginComponent } from './auth-components/chat-login/chat-login.component';
 import { ChatRegisterUserComponent } from './auth-components/chat-register-user/chat-register-user.component';
-import { MultiKubeWelcomeScreenComponent } from './mltikube-welcome-screen/multi-kube-welcome-screen.component';
+import { ProviderDashboardComponent } from './provider-page/provider-dashboard-component/provider-dashboard.component';
 import { ProfileSettingsComponent } from './profile-settings/profile-settings.component';
 
 // Placeholder/Actual Components (Import or lazy load as needed)
@@ -51,13 +51,13 @@ export const routes: Routes = [
     },
     {
         path: MULTIKUBE_ROUTE_PATHS.PROVIDER_BASE,
-        component: ApplicationHomeComponent, // Or a specific ProviderLayoutComponent
+        component: ProviderHomePageComponent, // Or a specific ProviderLayoutComponent
         canActivate: [authGuard, providerGuard], // Must be logged in AND be a provider
         children: [
             { path: '', redirectTo: MULTIKUBE_ROUTE_PATHS.PROVIDER_DASHBOARD, pathMatch: 'full' },
             {
                 path: MULTIKUBE_ROUTE_PATHS.PROVIDER_DASHBOARD, // e.g., 'provider/dashboard'
-                component: MultiKubeWelcomeScreenComponent // Or a dedicated ProviderDashboardComponent
+                component: ProviderDashboardComponent // Or a dedicated ProviderDashboardComponent
             },
             {
                 path: MULTIKUBE_ROUTE_PATHS.KUBE_CLUSTERS, // e.g., 'provider/kubernetes-clusters'
@@ -80,13 +80,13 @@ export const routes: Routes = [
     },
     {
         path: MULTIKUBE_ROUTE_PATHS.TENANT_BASE,
-        component: ApplicationHomeComponent, // Or a specific TenantLayoutComponent
+        component: ProviderHomePageComponent, // Or a specific TenantLayoutComponent
         canActivate: [authGuard, tenantGuard], // Must be logged in AND be a tenant
         children: [
             { path: '', redirectTo: MULTIKUBE_ROUTE_PATHS.TENANT_DASHBOARD, pathMatch: 'full' },
             {
                 path: MULTIKUBE_ROUTE_PATHS.TENANT_DASHBOARD, // e.g., 'tenant/dashboard'
-                component: MultiKubeWelcomeScreenComponent // Replace with TenantDashboardComponent
+                component: ProviderDashboardComponent // Replace with TenantDashboardComponent
                 // loadComponent: () => import('./tenant-page/tenant-dashboard/tenant-dashboard.component').then(m => m.TenantDashboardComponent)
             },
             {

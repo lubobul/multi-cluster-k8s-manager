@@ -1,15 +1,15 @@
 import { Component } from '@angular/core';
-import {UserResponse} from '../common/rest/types/responses/user-response';
-import {AuthService} from '../services/auth.service';
+import {UserResponse} from '../../common/rest/types/responses/user-response';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
     selector: 'app-welcome-screen',
     imports: [],
-    templateUrl: './multi-kube-welcome-screen.component.html',
+    templateUrl: './provider-dashboard.component.html',
     standalone: true,
-    styleUrl: './multi-kube-welcome-screen.component.scss'
+    styleUrl: './provider-dashboard.component.scss'
 })
-export class MultiKubeWelcomeScreenComponent {
+export class ProviderDashboardComponent {
 
     constructor(private authService: AuthService) {
     }
