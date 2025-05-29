@@ -47,6 +47,7 @@ export const routes: Routes = [
                     {
                         component: KubernetesClustersComponent,
                         path: MULTIKUBE_ROUTE_PATHS.KUBE_CLUSTERS
+                        canActivate
                     },
                     {
                         path: `${MULTIKUBE_ROUTE_PATHS.KUBE_CLUSTERS}/:${MULTIKUBE_ROUTE_PATHS.KUBE_ID}`,
