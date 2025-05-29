@@ -47,8 +47,6 @@ export class ChatLoginComponent {
 
         this.authService.login({ email, password }).subscribe({
             next: (jwtResp: JwtResponse) => {
-                this.storeUserIdentity(jwtResp);
-                this.router.navigate(['/home']); // Navigate to the home page after login
             },
             error: (error) => {
                 this.alertClosed = false;
@@ -58,10 +56,5 @@ export class ChatLoginComponent {
         });
     }
 
-    private storeUserIdentity(jwtResponse: JwtResponse): void {
-        localStorage.setItem(this.TOKEN_KEY, jwtResponse.token);
-        const decodedToken = this.jwtHelper.decodeToken(jwtResponse.token);
-        localStorage.setItem(this.USER_ID_KEY, decodedToken?.userId);
-    }
 
 }

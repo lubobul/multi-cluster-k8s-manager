@@ -83,7 +83,7 @@ export class ProfileSettingsComponent implements OnInit{
             } as UpdateProfileRequest
         ).subscribe({
             next: (user: UserResponse) => {
-                this.router.navigate([MULTIKUBE_ROUTE_PATHS.HOME]);
+                this.authService.navigateToDashboard();
             },
             error: (error) => {
                 this.errorMessage = resolveErrorMessage(error);
