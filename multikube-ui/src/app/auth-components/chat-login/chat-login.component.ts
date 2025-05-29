@@ -6,13 +6,14 @@ import {ClarityModule} from '@clr/angular';
 import {resolveErrorMessage} from '../../common/utils/util-functions';
 import {JwtResponse} from '../../common/rest/types/auth-types';
 import {JwtHelperService} from '@auth0/angular-jwt';
+import {CdsIconModule} from '@cds/angular';
 
 @Component({
     selector: 'app-chat-login',
     imports: [
         ClarityModule,
         ReactiveFormsModule,
-        RouterLink
+        CdsIconModule
     ],
     templateUrl: './chat-login.component.html',
     standalone: true,

@@ -1,35 +1,52 @@
-.login-container {
-    .welcome-message{
-        margin-bottom: 4rem;
-        animation: fadeIn 0.5s ease-in; /* Add fade-in animation */
+.welcome-message {
 
+    animation: fadeIn 0.5s ease-in; /* Add fade-in animation */
+
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0; /* Start fully transparent */
+        transform: translateY(-20px); /* Optional: slight upward movement */
     }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0; /* Start fully transparent */
-            transform: translateY(-20px); /* Optional: slight upward movement */
-        }
-        to {
-            opacity: 1; /* End fully visible */
-            transform: translateY(0); /* Set to original position */
-        }
+    to {
+        opacity: 1; /* End fully visible */
+        transform: translateY(0); /* Set to original position */
     }
+}
 
+.login-form{
     display: flex;
+    width: 100%;
     flex-flow: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    .login-card{
-        max-width: 30rem;
+    ::ng-deep clr-input-container{
+        .clr-control-container{
+            width: 100%;
+        }
+    }
+
+    ::ng-deep clr-password-container{
+        .clr-control-container{
+            width: 100%;
+            .clr-input-wrapper{
+                .clr-input-group{
+                    width: 100%;
+                    button.clr-input-group-icon-action{
+                        margin-left: -1.2rem;
+                    }
+
+                }
+            }
+        }
+    }
+
+    input{
+        width: 100%;
     }
 }
 
-.danger-alert{
-    margin-top: 1rem;
+.login-btn{
+    margin-top: 1.2rem;
+    width: 50%;
 }
 
-.btn-form-action{
-    margin-top: 1rem;
-}

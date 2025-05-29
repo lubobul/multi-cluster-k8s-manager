@@ -13,11 +13,9 @@
         <div class="settings">
             <a [routerLink]="CHAT_ROUTE_PATHS.PROFILE_SETTINGS" [routerLinkActive]="['active']"
                class="nav-link nav-icon">
-                @if (!!currentUser?.avatar) {
-                    <img class="avatar-display" src="{{currentUser.avatar}}">
-                } @else {
-                    <cds-icon shape="user"></cds-icon>
-                }
+
+                <cds-icon shape="user"></cds-icon>
+
                 <span>{{ currentUser?.username }}</span>
             </a>
         </div>
@@ -25,7 +23,8 @@
     <nav class="subnav">
         <ul class="nav">
             <li class="nav-item">
-                <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="CHAT_ROUTE_PATHS.KUBE_CLUSTERS">Kubernetes Clusters</a>
+                <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="CHAT_ROUTE_PATHS.KUBE_CLUSTERS">Kubernetes
+                    Clusters</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="CHAT_ROUTE_PATHS.TENANT_PROFILES">Tenants</a>
@@ -35,63 +34,63 @@
     <div class="content-container">
         <div class="content-area">
             <div class="chat-application-dynamic-content">
-<!--                <nav class="message-nav">-->
-<!--                    <clr-vertical-nav [clrVerticalNavCollapsible]="false">-->
-<!--                        <button class="btn btn-primary button-new-chat">-->
-<!--                            <cds-icon shape="chat-bubble"></cds-icon>-->
-<!--                            New chat-->
-<!--                        </button>-->
-<!--                        <clr-vertical-nav-group routerLinkActive="active" [clrVerticalNavGroupExpanded]="true">-->
-<!--                            <cds-icon shape="chat-bubble" clrVerticalNavIcon></cds-icon>-->
-<!--                            Direct messages-->
-<!--                            <clr-vertical-nav-group-children>-->
-<!--                                <form class="clr-form">-->
-<!--                                    <input type="text"-->
-<!--                                           id="directChatSearch"-->
-<!--                                           placeholder="Search for messages..."-->
-<!--                                           class="clr-input"-->
-<!--                                           [formControl]="chatSearchControl"-->
-<!--                                    />-->
-<!--                                </form>-->
-<!--                            </clr-vertical-nav-group-children>-->
+                <!--                <nav class="message-nav">-->
+                <!--                    <clr-vertical-nav [clrVerticalNavCollapsible]="false">-->
+                <!--                        <button class="btn btn-primary button-new-chat">-->
+                <!--                            <cds-icon shape="chat-bubble"></cds-icon>-->
+                <!--                            New chat-->
+                <!--                        </button>-->
+                <!--                        <clr-vertical-nav-group routerLinkActive="active" [clrVerticalNavGroupExpanded]="true">-->
+                <!--                            <cds-icon shape="chat-bubble" clrVerticalNavIcon></cds-icon>-->
+                <!--                            Direct messages-->
+                <!--                            <clr-vertical-nav-group-children>-->
+                <!--                                <form class="clr-form">-->
+                <!--                                    <input type="text"-->
+                <!--                                           id="directChatSearch"-->
+                <!--                                           placeholder="Search for messages..."-->
+                <!--                                           class="clr-input"-->
+                <!--                                           [formControl]="chatSearchControl"-->
+                <!--                                    />-->
+                <!--                                </form>-->
+                <!--                            </clr-vertical-nav-group-children>-->
 
-<!--                        </clr-vertical-nav-group>-->
-<!--                        <clr-vertical-nav-group routerLinkActive="active" [clrVerticalNavGroupExpanded]="true">-->
-<!--                            <cds-icon shape="talk-bubbles" clrVerticalNavIcon></cds-icon>-->
-<!--                            Channels-->
-<!--                            <clr-vertical-nav-group-children>-->
-<!--                                <form class="clr-form">-->
-<!--                                    <input type="text"-->
-<!--                                           id="channelChatSearch"-->
-<!--                                           placeholder="Search for channels..."-->
-<!--                                           class="clr-input"-->
-<!--                                           [formControl]="channelSearchControl"-->
-<!--                                    />-->
-<!--                                </form>-->
-<!--                            </clr-vertical-nav-group-children>-->
-<!--&lt;!&ndash;                            <clr-vertical-nav-group-children>&ndash;&gt;-->
-<!--&lt;!&ndash;                                @if (loadingChannels) {&ndash;&gt;-->
-<!--&lt;!&ndash;                                    <div class="loading-container">&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <clr-spinner clrInline>Loading...</clr-spinner>&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <span class="chat-title">Loading...</span>&ndash;&gt;-->
-<!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
+                <!--                        </clr-vertical-nav-group>-->
+                <!--                        <clr-vertical-nav-group routerLinkActive="active" [clrVerticalNavGroupExpanded]="true">-->
+                <!--                            <cds-icon shape="talk-bubbles" clrVerticalNavIcon></cds-icon>-->
+                <!--                            Channels-->
+                <!--                            <clr-vertical-nav-group-children>-->
+                <!--                                <form class="clr-form">-->
+                <!--                                    <input type="text"-->
+                <!--                                           id="channelChatSearch"-->
+                <!--                                           placeholder="Search for channels..."-->
+                <!--                                           class="clr-input"-->
+                <!--                                           [formControl]="channelSearchControl"-->
+                <!--                                    />-->
+                <!--                                </form>-->
+                <!--                            </clr-vertical-nav-group-children>-->
+                <!--&lt;!&ndash;                            <clr-vertical-nav-group-children>&ndash;&gt;-->
+                <!--&lt;!&ndash;                                @if (loadingChannels) {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    <div class="loading-container">&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        <clr-spinner clrInline>Loading...</clr-spinner>&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        <span class="chat-title">Loading...</span>&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
 
-<!--&lt;!&ndash;                                } @else {&ndash;&gt;-->
-<!--&lt;!&ndash;                                    @if (!!channels?.length) {&ndash;&gt;-->
-<!--&lt;!&ndash;                                        @for (channel of channels; track channel.id) {&ndash;&gt;-->
-<!--&lt;!&ndash;                                            <a [routerLinkActive]="['active']"&ndash;&gt;-->
-<!--&lt;!&ndash;                                               [routerLink]="'/' +CHAT_ROUTE_PATHS.HOME+ '/' + CHAT_ROUTE_PATHS.CHAT + '/' + channel.id"&ndash;&gt;-->
-<!--&lt;!&ndash;                                               class="user-nav-button"&ndash;&gt;-->
-<!--&lt;!&ndash;                                               clrVerticalNavLink>{{ channel.title }}</a>&ndash;&gt;-->
-<!--&lt;!&ndash;                                        }&ndash;&gt;-->
-<!--&lt;!&ndash;                                    } @else {&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <span clrVerticalNavLink>No channels</span>&ndash;&gt;-->
-<!--&lt;!&ndash;                                    }&ndash;&gt;-->
-<!--&lt;!&ndash;                                }&ndash;&gt;-->
-<!--&lt;!&ndash;                            </clr-vertical-nav-group-children>&ndash;&gt;-->
-<!--                        </clr-vertical-nav-group>-->
-<!--                    </clr-vertical-nav>-->
-<!--                </nav>-->
+                <!--&lt;!&ndash;                                } @else {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    @if (!!channels?.length) {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        @for (channel of channels; track channel.id) {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                            <a [routerLinkActive]="['active']"&ndash;&gt;-->
+                <!--&lt;!&ndash;                                               [routerLink]="'/' +CHAT_ROUTE_PATHS.HOME+ '/' + CHAT_ROUTE_PATHS.CHAT + '/' + channel.id"&ndash;&gt;-->
+                <!--&lt;!&ndash;                                               class="user-nav-button"&ndash;&gt;-->
+                <!--&lt;!&ndash;                                               clrVerticalNavLink>{{ channel.title }}</a>&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        }&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    } @else {&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        <span clrVerticalNavLink>No channels</span>&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    }&ndash;&gt;-->
+                <!--&lt;!&ndash;                                }&ndash;&gt;-->
+                <!--&lt;!&ndash;                            </clr-vertical-nav-group-children>&ndash;&gt;-->
+                <!--                        </clr-vertical-nav-group>-->
+                <!--                    </clr-vertical-nav>-->
+                <!--                </nav>-->
 
                 <div class="application-home-outlet">
                     @if (errorMessage) {
@@ -114,11 +113,9 @@
                         <span class="clr-row">
                             <label class="clr-col-3">Avatar:</label>
                             <div class="clr-col-9 view-user-avatar-container">
-                                @if (!!selectedFriend.avatar) {
-                                    <img class="avatar-display" src="{{selectedFriend.avatar}}">
-                                } @else {
+
                                     <cds-icon shape="user"></cds-icon>
-                                }
+
                             </div>
                             <label class="clr-col-3">Username:</label>
                             <p class="clr-col-9 no-margin">{{ selectedFriend.username }}</p>

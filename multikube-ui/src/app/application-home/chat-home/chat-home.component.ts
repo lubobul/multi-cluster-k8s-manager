@@ -3,7 +3,7 @@ import {ActivatedRoute, Params, Router, RouterLink, RouterLinkActive, RouterOutl
 import {catchError, map, mergeMap, Observable, tap, throwError} from 'rxjs';
 import {resolveErrorMessage} from '../../common/utils/util-functions';
 import {AuthService} from '../../services/auth.service';
-import {ChatUserType, UserChatRightsResponse, UserResponse} from '../../common/rest/types/responses/user-response';
+import {UserChatRightsResponse, UserResponse} from '../../common/rest/types/responses/user-response';
 import {MULTIKUBE_ROUTE_PATHS} from '../../app.routes';
 import {ClrAlertModule, ClrSpinnerModule} from '@clr/angular';
 
@@ -12,8 +12,6 @@ import {ClrAlertModule, ClrSpinnerModule} from '@clr/angular';
     imports: [
         RouterOutlet,
         ClrAlertModule,
-        RouterLinkActive,
-        RouterLink,
         ClrSpinnerModule
     ],
     templateUrl: './chat-home.component.html',
@@ -59,5 +57,4 @@ export class ChatHomeComponent implements OnInit {
 
 
     protected readonly CHAT_ROUTE_PATHS = MULTIKUBE_ROUTE_PATHS;
-    protected readonly ChatUserType = ChatUserType;
 }

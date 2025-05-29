@@ -1,23 +1,27 @@
-<div class="login-container">
-    <h1 class="welcome-message">
-        <span class="highlight">Welcome Back to Multikube!</span> Please login to your account.
-    </h1>
-    <div class="card login-card">
-        <div class="card-header">
-            <h3 class="title">Login into Multikube</h3>
+<div class="login-wrapper">
+    <form class="login">
+        <div class="login-header">
+            <cds-icon class="branding-icon" shape="block" solid="true" size="'xxl'"></cds-icon>
+            <div class="title">Multikube</div>
         </div>
-        <div class="card-block">
-            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-                @if(errorMessage){
-                    <clr-alert class="danger-alert" [clrAlertType]="'danger'" [clrAlertSizeSmall]="true" [(clrAlertClosed)]="alertClosed">
+        <div class="login-body">
+            <section class="title welcome-message">
+                <div class="welcome">Welcome Back</div>
+                <div class="hint">Manage your Kubernetes clusters with ease</div>
+            </section>
+
+            <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                @if (errorMessage) {
+                    <clr-alert class="danger-alert" [clrAlertType]="'danger'" [clrAlertSizeSmall]="true"
+                               [(clrAlertClosed)]="alertClosed">
                         <clr-alert-item>
-                            <span class="alert-text">{{errorMessage}}</span>
+                            <span class="alert-text">{{ errorMessage }}</span>
                         </clr-alert-item>
                     </clr-alert>
                 }
                 <clr-input-container>
                     <label>Email</label>
-                    <input clrInput type="email" formControlName="email" placeholder="Enter your email" />
+                    <input clrInput type="email" formControlName="email" placeholder="Enter your email"/>
                     <clr-control-error *clrIfError="'email'">
                         Please enter a valid email.
                     </clr-control-error>
@@ -28,7 +32,8 @@
 
                 <clr-password-container>
                     <label>Password</label>
-                    <input clrPassword type="password" formControlName="password" placeholder="Enter your password" />
+                    <input clrPassword type="password" formControlName="password"
+                           placeholder="Enter your password"/>
                     <clr-control-error *clrIfError="'required'">
                         Password field is required.
                     </clr-control-error>
@@ -37,13 +42,18 @@
                     </clr-control-helper>
                 </clr-password-container>
 
-                <button type="submit" [disabled]="loginForm.invalid" class="btn btn-primary btn-form-action">Login</button>
+                <button type="submit" [disabled]="loginForm.invalid" class="btn btn-primary login-btn">Login
+                </button>
             </form>
+
+
         </div>
-        <div class="card-footer">
-            <a routerLink="/register">Don't have an account? Register here.</a>
-        <div>
-    </div>
-</div>
-    </div>
+        <div class="login-footer">
+            <span class="copyright">
+                Copyright © 2025 Multikube. All Rights Reserved
+            </span>
+            <a href="javascript://">Terms</a>
+            <a href="javascript://">Privacy</a>
+        </div>
+    </form>
 </div>

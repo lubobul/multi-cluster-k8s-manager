@@ -16,4 +16,6 @@ public class UserDto {
     private String email;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Timestamp createdAt;
+
+    private TenantDto tenant;
 }
