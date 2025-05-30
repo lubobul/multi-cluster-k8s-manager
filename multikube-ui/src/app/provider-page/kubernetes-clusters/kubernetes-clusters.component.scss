@@ -45,3 +45,21 @@
         width: 20rem;
     }
 }
+
+:host ::ng-deep clr-side-panel{
+    height: 100%;
+    .modal-body{
+        height: 100%;
+        .side-panel-body{
+            height: 100%;
+        }
+    }
+}
+
+.kube-config-editor-title{
+    margin: 0 0 1.2rem 0;
+}
+
+.kube-config-editor{
+    height: 25rem;
+}

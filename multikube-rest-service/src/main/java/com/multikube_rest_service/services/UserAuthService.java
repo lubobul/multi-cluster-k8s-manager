@@ -14,8 +14,9 @@ import com.multikube_rest_service.repositories.UserSecretRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils; // For StringUtils.hasText
+
 import java.util.HashSet;
-import java.util.Optional;
 
 @Service
 public class UserAuthService {
@@ -40,7 +41,6 @@ public class UserAuthService {
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.userMapper = userMapper;
-
     }
 
     @Transactional
@@ -50,86 +50,78 @@ public class UserAuthService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("The email you entered already exists.");
         }
-
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("The username you entered already exists.");
         }
 
         var userRole = roleRepository.findByName(request.getRole());
-
-        if(userRole.isEmpty()) {
+        if (userRole.isEmpty()) {
             throw new IllegalArgumentException("The role you entered does not exist.");
         }
 
-        // Create and save the User entity with the avatar
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
+        // user.setTenant(systemTenant); // EXAMPLE: Assign tenant - THIS NEEDS PROPER LOGIC
 
         var roles = new HashSet<Role>();
         roles.add(userRole.get());
         user.setRoles(roles);
 
-        // Create and save the UserSecret entity with the password
         UserSecret userSecret = new UserSecret();
-        userSecret.setUser(user);
-        userSecret.setPassword(passwordEncoder.encode(request.getPassword())); // Hash the password
+        userSecret.setUser(user); // Set the user reference in UserSecret
+        userSecret.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        user.setUserSecret(userSecret);
+        user.setUserSecret(userSecret); // Set the UserSecret reference in User
 
-        userRepository.save(user);
+        // userRepository.save(user); // This will fail if user.tenant is null
+        throw new UnsupportedOperationException("Tenant assignment logic during registration needs to be implemented.");
     }
 
     public JwtResponse login(LoginRequest request) {
         validateLoginRequest(request);
 
-        Optional<User> user = userRepository.findByEmail(request.getEmail());
+        User userEntity = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("The email, password, or organization you entered is incorrect."));
 
-        if (user.isEmpty()) {
-            throw new IllegalArgumentException("The email or password you entered is incorrect.");
+        // Validate Tenant
+        if (userEntity.getTenant() == null ||
+                !userEntity.getTenant().getName().equalsIgnoreCase(request.getTenant().trim())) {
+            throw new IllegalArgumentException("The email, password, or organization you entered is incorrect.");
         }
 
-        Optional<UserSecret> userSecret = userSecretRepository.findByUserId(user.get().getId());
+        UserSecret userSecret = userSecretRepository.findByUserId(userEntity.getId())
+                .orElseThrow(() -> new IllegalArgumentException("The email, password, or organization you entered is incorrect.")); // Should not happen if user exists
 
-        if (userSecret.isEmpty()) {
-            throw new IllegalArgumentException("The email or password you entered is incorrect.");
+        if (passwordEncoder.matches(request.getPassword(), userSecret.getPassword())) {
+            return new JwtResponse(userMapper.toDto(userEntity), jwtUtil.generateToken(userEntity));
         }
 
-        if (passwordEncoder.matches(request.getPassword(), userSecret.get().getPassword())) {
-            return new JwtResponse(userMapper.toDto(user.get()), jwtUtil.generateToken(user.get()));
-        }
-
-        throw new IllegalArgumentException("The email or password you entered is incorrect.");
-    }
-
-    public Optional<UserSecret> findUserSecretByUserId(Long userId) {
-        return userSecretRepository.findByUserId(userId);
+        throw new IllegalArgumentException("The email, password, or organization you entered is incorrect.");
     }
 
     private void validateRegisterRequest(RegisterRequest request) {
-        if (isNullOrEmpty(request.getUsername()) ||
-                isNullOrEmpty(request.getEmail()) ||
-                isNullOrEmpty(request.getPassword())) {
-            throw new IllegalArgumentException("Username, email, and password must not be empty");
+        if (!StringUtils.hasText(request.getUsername()) ||
+                !StringUtils.hasText(request.getEmail()) ||
+                !StringUtils.hasText(request.getPassword()) ||
+                !StringUtils.hasText(request.getRole())) { // Added role check
+            throw new IllegalArgumentException("Username, email, password, and role must not be empty");
         }
-
+        // ... (rest of password validation)
         String password = request.getPassword();
         if (password.length() < 6) {
             throw new IllegalArgumentException("Password must be at least 6 characters long");
         }
-
         if (!password.matches("^(?=.*[A-Za-z])(?=.*\\d).+$")) {
             throw new IllegalArgumentException("Password must contain at least one letter and one number");
         }
     }
 
     private void validateLoginRequest(LoginRequest request) {
-        if (isNullOrEmpty(request.getEmail()) || isNullOrEmpty(request.getPassword())) {
-            throw new IllegalArgumentException("Email and password must not be empty");
+        if (!StringUtils.hasText(request.getEmail()) ||
+                !StringUtils.hasText(request.getPassword()) ||
+                !StringUtils.hasText(request.getTenant())) { // Added tenant check
+            throw new IllegalArgumentException("Email, password, and tenant must not be empty");
         }
-    }
-
-    private boolean isNullOrEmpty(String value) {
-        return value == null || value.trim().isEmpty();
     }
 }

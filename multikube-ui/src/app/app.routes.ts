@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { ProviderHomePageComponent } from './provider-page/provider-home-page.component';
-import { ChatLoginComponent } from './auth-components/chat-login/chat-login.component';
-import { ChatRegisterUserComponent } from './auth-components/chat-register-user/chat-register-user.component';
+import { MultikubeLoginComponent } from './auth-components/multikube-login/multikube-login.component';
 import { ProviderDashboardComponent } from './provider-page/provider-dashboard-component/provider-dashboard.component';
 import { ProfileSettingsComponent } from './profile-settings/profile-settings.component';
 
@@ -18,7 +17,6 @@ import {providerGuard, tenantGuard} from './common/guards/scope.guard';
 
 export const MULTIKUBE_ROUTE_PATHS = {
     LOGIN: 'login',
-    REGISTER: 'register',
     PROVIDER_BASE: 'provider', // New base for provider
     TENANT_BASE: 'tenant',     // New base for tenant
 
@@ -41,12 +39,7 @@ export const MULTIKUBE_ROUTE_PATHS = {
 export const routes: Routes = [
     {
         path: MULTIKUBE_ROUTE_PATHS.LOGIN,
-        component: ChatLoginComponent,
-        canActivate: [nonAuthGuard]
-    },
-    {
-        path: MULTIKUBE_ROUTE_PATHS.REGISTER,
-        component: ChatRegisterUserComponent,
+        component: MultikubeLoginComponent,
         canActivate: [nonAuthGuard]
     },
     {

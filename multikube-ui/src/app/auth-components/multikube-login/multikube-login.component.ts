@@ -15,11 +15,11 @@ import {CdsIconModule} from '@cds/angular';
         ReactiveFormsModule,
         CdsIconModule
     ],
-    templateUrl: './chat-login.component.html',
+    templateUrl: './multikube-login.component.html',
     standalone: true,
-    styleUrl: './chat-login.component.scss'
+    styleUrl: './multikube-login.component.scss'
 })
-export class ChatLoginComponent {
+export class MultikubeLoginComponent {
     private readonly TOKEN_KEY = "jwt";
     private readonly USER_ID_KEY = "userId";
     loginForm: FormGroup;
@@ -29,10 +29,9 @@ export class ChatLoginComponent {
     constructor(
         private fb: FormBuilder,
         private authService: AuthService,
-        private router: Router,
-        private jwtHelper: JwtHelperService
     ) {
         this.loginForm = this.fb.group({
+            tenant: ['System', [Validators.required]],
             email: ['', [Validators.required, Validators.email]],
             password: ['', [Validators.required, Validators.minLength(6)]],
         });
@@ -43,9 +42,9 @@ export class ChatLoginComponent {
             return;
         }
 
-        const { email, password } = this.loginForm.value;
+        const { tenant, email, password } = this.loginForm.value;
 
-        this.authService.login({ email, password }).subscribe({
+        this.authService.login({ tenant, email, password }).subscribe({
             next: (jwtResp: JwtResponse) => {
             },
             error: (error) => {

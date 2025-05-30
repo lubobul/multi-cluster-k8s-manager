@@ -20,6 +20,13 @@
                     </clr-alert>
                 }
                 <clr-input-container>
+                    <label>Organization</label>
+                    <input clrInput type="email" formControlName="tenant" placeholder="Enter organization name"/>
+                    <clr-control-error *clrIfError="'required'">
+                        Organization name field is required.
+                    </clr-control-error>
+                </clr-input-container>
+                <clr-input-container>
                     <label>Email</label>
                     <input clrInput type="email" formControlName="email" placeholder="Enter your email"/>
                     <clr-control-error *clrIfError="'email'">

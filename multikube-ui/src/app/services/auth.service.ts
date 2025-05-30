@@ -3,7 +3,7 @@ import {AuthApiService} from '../common/rest/api-services/auth-api.service';
 import {
     JwtResponse,
     LoginRequest,
-    RegisterRequest, // Ensure this is used if you have a specific RegisterRequest for the backend
+    RegisterUserRequest, // Ensure this is used if you have a specific RegisterRequest for the backend
     RestMessageResponse,
     UpdateProfileRequest
 } from '../common/rest/types/auth-types';
@@ -37,7 +37,7 @@ export class AuthService {
         return identity ? JSON.parse(identity) : null;
     }
 
-    public register(request: RegisterRequest): Observable<RestMessageResponse> { // Ensure RegisterRequest matches backend
+    public register(request: RegisterUserRequest): Observable<RestMessageResponse> { // Ensure RegisterRequest matches backend
         return this.authApiService.register(request);
     }
 
@@ -82,7 +82,7 @@ export class AuthService {
         this.userProfileUpdate.next(userIdentity); // Continue to emit on this if used elsewhere
     }
 
-    private clearUserIdentity(): void {
+    public clearUserIdentity(): void {
         localStorage.removeItem(this.USER_IDENTITY_KEY); // Use removeItem for specific key
         this.currentUserSubject.next(null);
     }

@@ -49,7 +49,7 @@ export const appConfig: { providers: any[] } = {
             {
                 provide: NGX_MONACO_EDITOR_CONFIG,
                 useFactory: () => ({
-                    baseUrl: `/monaco/min/vs`,
+                    baseUrl: `assets/monaco/min/vs`,
                 }),
             },
         ],

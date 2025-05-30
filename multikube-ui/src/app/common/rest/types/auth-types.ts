@@ -1,12 +1,13 @@
 import {UserResponse} from './responses/user-response';
 
-export interface RegisterRequest {
+export interface RegisterUserRequest {
     username: string;
     email: string;
     password: string;
 }
 
 export interface LoginRequest {
+    tenant: string;
     email: string;
     password: string;
 }

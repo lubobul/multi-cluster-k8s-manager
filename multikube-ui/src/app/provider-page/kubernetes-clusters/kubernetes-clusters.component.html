@@ -1,12 +1,12 @@
 @if (errorMessage) {
-    <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertClosed">
+    <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorClosed">
         <clr-alert-item>
             <span class="alert-text">{{ errorMessage }}</span>
         </clr-alert-item>
     </clr-alert>
 }
 
-<button class="btn btn-primary register-cluster-btn" (click)="openRegisterClusterModal = true">
+<button class="btn btn-primary register-cluster-btn" (click)="openRegisterClusterModal()">
     <cds-icon shape="plus"></cds-icon>Register cluster
 </button>
 
@@ -52,14 +52,75 @@
         }
     </div>
 
-    <clr-side-panel [(clrSidePanelOpen)]="openRegisterClusterModal" [clrSidePanelSize]="'xl'">
-        <div class="side-panel-title">Register Kubernetes Cluster</div>
+    <clr-side-panel [(clrSidePanelOpen)]="registerClusterModalOpened" [clrSidePanelSize]="'xl'">
+        <div class="side-panel-title">Register Kubernetes Cluster
+        </div>
         <div class="side-panel-body">
-            <ngx-monaco-editor [options]="editorOptions">
-            </ngx-monaco-editor>
+            @if (errorRegisterClusterMessage) {
+                <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorRegisterClusterClosed">
+                    <clr-alert-item>
+                        <span class="alert-text">{{ errorMessage }}</span>
+                    </clr-alert-item>
+                </clr-alert>
+            }
+            @if(registerClusterModalOpened){
+                <form clrStepper [formGroup]="clusterForm">
+
+                    <clr-stepper-panel formGroupName="details">
+                        <clr-step-title>Cluster details</clr-step-title>
+                        <clr-step-description>Give your cluster registration name and description</clr-step-description>
+                        <clr-step-content *clrIfExpanded>
+                            <clr-input-container>
+                                <label>Name</label>
+                                <input clrInput formControlName="name" />
+                                <clr-control-error *clrIfError="'required'">
+                                    Cluster name field is required.
+                                </clr-control-error>
+                                <clr-control-helper>
+                                    Enter some meaningful name to remember this cluster
+                                </clr-control-helper>
+                            </clr-input-container>
+
+                            <clr-textarea-container>
+                                <label>Description</label>
+                                <textarea clrTextarea formControlName="description"></textarea>
+                                <clr-control-error *clrIfError="'required'">
+                                    Cluster description field is required.
+                                </clr-control-error>
+                                <clr-control-helper>
+                                    Enter some meaningful description
+                                </clr-control-helper>
+                            </clr-textarea-container>
+
+                            <button clrStepButton="next">next</button>
+                        </clr-step-content>
+                    </clr-stepper-panel>
+
+                    <clr-stepper-panel formGroupName="config">
+                        <clr-step-title>Cluster config</clr-step-title>
+                        <clr-step-description>Simply copy the raw kubecofig</clr-step-description>
+                        <clr-step-content *clrIfExpanded>
+                            <h6 class="kube-config-editor-title">Paste kubeconfig here</h6>
+                            <ngx-monaco-editor
+                                class="kube-config-editor"
+                                [options]="editorOptions"
+                                [formControl]="clusterForm.controls.config.controls.kubeConfig"
+                            >
+                            </ngx-monaco-editor>
+                        </clr-step-content>
+                    </clr-stepper-panel>
+                </form>
+            }
+            @if (loadingRegisterCluster) {
+                <div class="loading-container">
+                    <clr-spinner clrInline>Registering...</clr-spinner>
+                    <h5>Registering...</h5>
+                </div>
+
+            }
         </div>
         <div class="side-panel-footer">
-            <button type="button" class="btn btn-outline" (click)="openRegisterClusterModal = false">Cancel</button>
+            <button type="button" class="btn btn-outline" (click)="registerClusterModalOpened = false">Cancel</button>
             <button type="button" class="btn btn-primary" (click)="registerCluster()">Register</button>
         </div>
     </clr-side-panel>

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
-    RegisterRequest,
+    RegisterUserRequest,
     LoginRequest,
     JwtResponse,
     RestMessageResponse,
@@ -18,7 +18,7 @@ export class AuthApiService {
 
     constructor(private http: HttpClient) {}
 
-    register(request: RegisterRequest): Observable<RestMessageResponse> {
+    register(request: RegisterUserRequest): Observable<RestMessageResponse> {
         return this.http.post<RestMessageResponse>(`${this.apiUrl}/register`, request);
     }
 
