@@ -1,3 +1,5 @@
+import {TenantResponse} from '../provider/responses/TenantResponse';
+
 export interface UserResponse {
     id: number,
     username: string,
@@ -10,17 +12,6 @@ export interface UserResponse {
 export enum UserRoles{
     PROVIDER_ADMIN = "PROVIDER_ADMIN",
 }
-
-export interface TenantResponse {
-    id: number,
-    name: string,
-    description: string,
-    isActive: boolean,
-    createdAt: string,
-    updatedAt: string
-}
-
-
 export interface UserChatRightsResponse {
     user: UserResponse;
     chatId: number;

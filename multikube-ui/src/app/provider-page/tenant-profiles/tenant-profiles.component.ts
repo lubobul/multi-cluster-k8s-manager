@@ -1,19 +1,20 @@
 import { Component } from '@angular/core';
-import {ClrAlertModule, ClrDatagridModule, ClrDatagridStateInterface} from "@clr/angular";
+import {ClrAlertModule, ClrDatagridModule, ClrDatagridStateInterface, ClrIconModule} from "@clr/angular";
 import {DatePipe} from "@angular/common";
 import {debounceTime, mergeMap, Subject} from 'rxjs';
 import {PaginatedResponse} from '../../common/rest/types/responses/paginated-response';
-import {UserResponse} from '../../common/rest/types/responses/user-response';
 import {QueryRequest, QueryRequestSortType} from '../../common/rest/types/requests/query-request';
-import {UsersService} from '../../services/users.service';
 import {buildRestGridFilter, resolveErrorMessage} from '../../common/utils/util-functions';
+import {TenantService} from '../services/tenant.service';
+import {TenantResponse} from '../../common/rest/types/provider/responses/TenantResponse';
 
 @Component({
   selector: 'app-tenant-profiles',
     imports: [
         ClrAlertModule,
         ClrDatagridModule,
-        DatePipe
+        DatePipe,
+        ClrIconModule
     ],
   templateUrl: './tenant-profiles.component.html',
   styleUrl: './tenant-profiles.component.scss'
@@ -25,24 +26,24 @@ export class TenantProfilesComponent {
     alertClosed = true;
     loading = true;
 
-    usersPage: PaginatedResponse<UserResponse> = {
+    tenantsPage: PaginatedResponse<TenantResponse> = {
         pageSize: 0,
         content: [],
         totalPages: 0,
-    } as unknown as PaginatedResponse<UserResponse>;
+    } as unknown as PaginatedResponse<TenantResponse>;
 
     private restQuery: QueryRequest = {
         page: 1,
         pageSize: 5,
     };
-    constructor(private usersService: UsersService) {
+    constructor(private tenantService: TenantService) {
     }
 
     ngOnInit(): void {
-        this.subscribeToUsersGrid();
+        this.subscribeToTenantsGrid();
     }
 
-    public subscribeToUsersGrid(): void{
+    public subscribeToTenantsGrid(): void{
         this.onDataGridRefresh.pipe(
             debounceTime(500),
             mergeMap((state) => {
@@ -56,10 +57,10 @@ export class TenantProfilesComponent {
                     } : undefined,
                     filter: buildRestGridFilter(state.filters)
                 }
-                return this.usersService.getUsers(this.restQuery);
+                return this.tenantService.getTenants(this.restQuery);
             })).subscribe( {
             next: (response) => {
-                this.usersPage = response;
+                this.tenantsPage = response;
                 this.loading = false;
 
             }, error: (error) => {
@@ -74,8 +75,8 @@ export class TenantProfilesComponent {
     }
 
     public refresh(): void{
-        this.usersService.getUsers(this.restQuery).subscribe((response) => {
-            this.usersPage = response;
+        this.tenantService.getTenants(this.restQuery).subscribe((response) => {
+            this.tenantsPage = response;
         });
     }
 }

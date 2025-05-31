@@ -1,5 +1,3 @@
-<h3>Users</h3>
-
 @if(errorMessage){
     <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertClosed">
         <clr-alert-item>
@@ -8,35 +6,37 @@
     </clr-alert>
 }
 
+<button class="btn btn-primary create-tenant-btn">
+    <cds-icon shape="plus"></cds-icon>Create tenant
+</button>
+
 <clr-datagrid (clrDgRefresh)="refreshByGrid($event)" [clrDgLoading]="loading">
-    <clr-dg-column [clrDgField]="'username'">Username</clr-dg-column>
-    <clr-dg-column [clrDgField]="'email'">Email</clr-dg-column>
-    <clr-dg-column>Friend Status</clr-dg-column>
-    <clr-dg-column>Active Since</clr-dg-column>
-    <clr-dg-placeholder>No users found.</clr-dg-placeholder>
-    @for(user of usersPage.content; track user.id){
+    <clr-dg-column [clrDgField]="'name'">Organization Name</clr-dg-column>
+    <clr-dg-column >State</clr-dg-column>
+    <clr-dg-column>Created</clr-dg-column>
+    <clr-dg-column>Last Updated</clr-dg-column>
+    <clr-dg-placeholder>No tenants found.</clr-dg-placeholder>
+    @for(tenant of tenantsPage.content; track tenant.id){
         <clr-dg-row>
             <clr-dg-action-overflow>
-                @if(user.isFriendOfYours){
-                    <button class="action-item" (click)="unfriend(user)">Unfriend</button>
-                }@else{
-                    <button class="action-item" (click)="addFriend(user)">Add Friend</button>
+                @if(tenant.isActive){
+                    <button class="action-item">Deactivate</button>
+                } @else {
+                    <button class="action-item">Activate</button>
                 }
-
-
             </clr-dg-action-overflow>
-            <clr-dg-cell>{{ user.username }}</clr-dg-cell>
-            <clr-dg-cell>{{ user.email }}</clr-dg-cell>
-            <clr-dg-cell>{{ user.isFriendOfYours ? "Friend" : "Not Friend" }}</clr-dg-cell>
-            <clr-dg-cell>{{ user.createdAt | date }}</clr-dg-cell>
+            <clr-dg-cell>{{ tenant.name }}</clr-dg-cell>
+            <clr-dg-cell>{{ tenant.isActive ? "Active" : "Not Active" }}</clr-dg-cell>
+            <clr-dg-cell>{{ tenant.createdAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
+            <clr-dg-cell>{{ tenant.updatedAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
         </clr-dg-row>
     }
 
     <clr-dg-footer>
-        <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="usersPage.totalElements">
-            <clr-dg-page-size [clrPageSizeOptions]="[5, 10, 15]">Users per page</clr-dg-page-size>
+        <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="tenantsPage.totalElements">
+            <clr-dg-page-size [clrPageSizeOptions]="[5, 10, 15]">Tenants per page</clr-dg-page-size>
             {{ pagination.firstItem + 1 }} - {{ pagination.lastItem + 1 }} of
-            {{ pagination.totalItems }} users
+            {{ pagination.totalItems }} tenants
         </clr-dg-pagination>
     </clr-dg-footer>
 </clr-datagrid>

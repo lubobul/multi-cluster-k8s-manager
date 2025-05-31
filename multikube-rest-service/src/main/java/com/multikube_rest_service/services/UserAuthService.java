@@ -5,6 +5,7 @@ import com.multikube_rest_service.dtos.auth.JwtResponse;
 import com.multikube_rest_service.dtos.auth.LoginRequest;
 import com.multikube_rest_service.dtos.auth.RegisterRequest;
 import com.multikube_rest_service.entities.Role;
+import com.multikube_rest_service.entities.Tenant;
 import com.multikube_rest_service.entities.User;
 import com.multikube_rest_service.entities.UserSecret;
 import com.multikube_rest_service.mappers.UserMapper;
@@ -17,9 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils; // For StringUtils.hasText
 
 import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class UserAuthService {
+    private static final String TENANT_ADMIN_ROLE = "TENANT_ADMIN";
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserSecretRepository userSecretRepository;
@@ -76,6 +79,64 @@ public class UserAuthService {
 
         // userRepository.save(user); // This will fail if user.tenant is null
         throw new UnsupportedOperationException("Tenant assignment logic during registration needs to be implemented.");
+    }
+
+    /**
+     * Registers a new user and associates them with a specific, existing tenant.
+     * Used by TenantService when creating a new tenant with a default admin.
+     *
+     * @param request The registration request containing user details.
+     * @param tenant The Tenant entity to associate the new user with.
+     * @return The created User entity.
+     */
+    @Transactional
+    public User registerUserForTenant(RegisterRequest request, Tenant tenant) {
+        // Basic validation (can reuse parts of validateRegisterRequest)
+        if (!StringUtils.hasText(request.getUsername()) ||
+                !StringUtils.hasText(request.getEmail()) ||
+                !StringUtils.hasText(request.getPassword()) ||
+                !StringUtils.hasText(request.getRole())) {
+            throw new IllegalArgumentException("Username, email, password, and role must not be empty for tenant user registration.");
+        }
+        // Add password validation from validateRegisterRequest if desired
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("The email '" + request.getEmail() + "' already exists.");
+        }
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new IllegalArgumentException("The username '" + request.getUsername() + "' already exists.");
+        }
+
+        Role userRole = roleRepository.findByName(request.getRole())
+                .orElseThrow(() -> new IllegalArgumentException("Role '" + request.getRole() + "' not found."));
+
+        // Ensure the role is appropriate for a tenant user (e.g., TENANT_ADMIN)
+        if (!TENANT_ADMIN_ROLE.equals(userRole.getName())) {
+            // Or allow TENANT_USER as well depending on context, but not PROVIDER_ADMIN
+            // For creating a tenant's default admin, TENANT_ADMIN is expected.
+            throw new IllegalArgumentException("Invalid role '" + request.getRole() + "' for default tenant admin. Expected 'TENANT_ADMIN'.");
+        }
+        if (tenant == null || tenant.getId() == null) {
+            throw new IllegalArgumentException("A valid tenant must be provided for user registration.");
+        }
+
+
+        User user = new User();
+        user.setUsername(request.getUsername().trim());
+        user.setEmail(request.getEmail().trim());
+        user.setTenant(tenant); // Assign the provided tenant
+        user.setIsActive(true);
+
+        Set<Role> roles = new HashSet<>();
+        roles.add(userRole);
+        user.setRoles(roles);
+
+        UserSecret userSecret = new UserSecret();
+        userSecret.setUser(user);
+        userSecret.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setUserSecret(userSecret);
+
+        return userRepository.save(user);
     }
 
     public JwtResponse login(LoginRequest request) {
