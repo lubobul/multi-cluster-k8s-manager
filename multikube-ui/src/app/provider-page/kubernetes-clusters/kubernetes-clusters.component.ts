@@ -173,7 +173,7 @@ export class KubernetesClustersComponent implements OnInit, OnDestroy {
                     this.registerClusterModalOpened = false;
                 },
                 error: (error) => {
-                    this.errorMessage = resolveErrorMessage(error);
+                    this.errorRegisterClusterMessage = resolveErrorMessage(error);
                     this.alertErrorRegisterClusterClosed = false;
                     this.loadingRegisterCluster = false;
                 }

@@ -1,6 +1,7 @@
 package com.multikube_rest_service.services;
 
 import com.multikube_rest_service.auth.JwtUtil;
+import com.multikube_rest_service.common.enums.RoleType;
 import com.multikube_rest_service.dtos.auth.JwtResponse;
 import com.multikube_rest_service.dtos.auth.LoginRequest;
 import com.multikube_rest_service.dtos.auth.RegisterRequest;
@@ -22,7 +23,6 @@ import java.util.Set;
 
 @Service
 public class UserAuthService {
-    private static final String TENANT_ADMIN_ROLE = "TENANT_ADMIN";
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserSecretRepository userSecretRepository;
@@ -111,7 +111,7 @@ public class UserAuthService {
                 .orElseThrow(() -> new IllegalArgumentException("Role '" + request.getRole() + "' not found."));
 
         // Ensure the role is appropriate for a tenant user (e.g., TENANT_ADMIN)
-        if (!TENANT_ADMIN_ROLE.equals(userRole.getName())) {
+        if (!RoleType.TENANT_ADMIN.getRoleName().equals(userRole.getName())) {
             // Or allow TENANT_USER as well depending on context, but not PROVIDER_ADMIN
             // For creating a tenant's default admin, TENANT_ADMIN is expected.
             throw new IllegalArgumentException("Invalid role '" + request.getRole() + "' for default tenant admin. Expected 'TENANT_ADMIN'.");

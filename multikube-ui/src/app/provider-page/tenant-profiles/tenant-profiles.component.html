@@ -6,7 +6,7 @@
     </clr-alert>
 }
 
-<button class="btn btn-primary create-tenant-btn">
+<button class="btn btn-primary create-tenant-btn" (click)="openCreateTenantModal()">
     <cds-icon shape="plus"></cds-icon>Create tenant
 </button>
 
@@ -40,3 +40,101 @@
         </clr-dg-pagination>
     </clr-dg-footer>
 </clr-datagrid>
+
+<clr-side-panel [(clrSidePanelOpen)]="createTenantModalOpened" [clrSidePanelSize]="'xl'">
+    <div class="side-panel-title">Create Tenant
+    </div>
+    <div class="side-panel-body">
+        @if (createTenantError) {
+            <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorCreateTenantClosed">
+                <clr-alert-item>
+                    <span class="alert-text">{{ errorMessage }}</span>
+                </clr-alert-item>
+            </clr-alert>
+        }
+        @if(createTenantModalOpened){
+            <form clrStepper [formGroup]="createTenantForm">
+
+                <clr-stepper-panel formGroupName="details">
+                    <clr-step-title>Tenant details</clr-step-title>
+                    <clr-step-description>Give this tenant organization name and description</clr-step-description>
+                    <clr-step-content *clrIfExpanded>
+                        <clr-input-container>
+                            <label>Organization Name</label>
+                            <input clrInput formControlName="name" />
+                            <clr-control-error *clrIfError="'required'">
+                                Organization name field is required.
+                            </clr-control-error>
+                            <clr-control-helper>
+                                Enter some meaningful name for this organization.
+                            </clr-control-helper>
+                        </clr-input-container>
+
+                        <clr-textarea-container>
+                            <label>Description</label>
+                            <textarea clrTextarea formControlName="description"></textarea>
+                            <clr-control-error *clrIfError="'required'">
+                                Tenant description field is required.
+                            </clr-control-error>
+                            <clr-control-helper>
+                                Enter some meaningful description
+                            </clr-control-helper>
+                        </clr-textarea-container>
+
+                        <button clrStepButton="next">next</button>
+                    </clr-step-content>
+                </clr-stepper-panel>
+                <clr-stepper-panel formGroupName="userConfig">
+                    <clr-step-title>First user config</clr-step-title>
+                    <clr-step-description>Configure the very first user for this organization</clr-step-description>
+                    <clr-step-content *clrIfExpanded>
+                        <clr-input-container>
+                            <label>Administrator username</label>
+                            <input clrInput formControlName="defaultAdminName" />
+                            <clr-control-error *clrIfError="'required'">
+                                Administrator username field is required.
+                            </clr-control-error>
+                            <clr-control-helper>
+                                Enter some meaningful username name for this organization's administrator.
+                            </clr-control-helper>
+                        </clr-input-container>
+
+                        <clr-password-container>
+                            <label>Default password</label>
+                            <input clrPassword type="password" formControlName="defaultAdminPassword" placeholder="Enter default password"/>
+                            <clr-control-error *clrIfError="'required'">
+                                Default password field is required.
+                            </clr-control-error>
+                            <clr-control-helper>
+                                Password rules - Min 6 characters, at least 1 numeric and at least one alphabetic character.
+                            </clr-control-helper>
+                        </clr-password-container>
+
+                        <clr-password-container>
+                            <label>Repeat default password</label>
+                            <input clrPassword type="password" formControlName="repeatDefaultAdminPassword" placeholder="Enter default password"/>
+                            <clr-control-error *clrIfError="'required'">
+                                Repeating default password field is required.
+                            </clr-control-error>
+                            <clr-control-error *clrIfError="'passwordDoesntMatch'">
+                                Password doesn't match.
+                            </clr-control-error>
+                        </clr-password-container>
+                    </clr-step-content>
+                </clr-stepper-panel>
+
+            </form>
+        }
+        @if (creatingTenantLoading) {
+            <div class="loading-container">
+                <clr-spinner clrInline>Creating tenant...</clr-spinner>
+                <h5>Creating tenant...</h5>
+            </div>
+
+        }
+    </div>
+    <div class="side-panel-footer">
+        <button type="button" class="btn btn-outline" (click)="createTenantModalOpened = false">Cancel</button>
+        <button [disabled]="creatingTenantLoading || createTenantForm.invalid" class="btn btn-primary" (click)="createTenant()">Create tenant</button>
+    </div>
+</clr-side-panel>

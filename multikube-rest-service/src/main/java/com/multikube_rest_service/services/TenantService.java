@@ -1,5 +1,6 @@
 package com.multikube_rest_service.services;
 
+import com.multikube_rest_service.common.enums.RoleType;
 import com.multikube_rest_service.dtos.auth.RegisterRequest;
 import com.multikube_rest_service.dtos.requests.provider.TenantCreateRequest;
 import com.multikube_rest_service.dtos.responses.TenantDto;
@@ -29,8 +30,6 @@ public class TenantService {
     private final TenantMapper tenantMapper;
     private final UserAuthService userAuthService; // Inject UserAuthService to create the default admin
     private static final String SYSTEM_TENANT_NAME = "System";
-    private static final String TENANT_ADMIN_ROLE = "TENANT_ADMIN";
-
 
     /**
      * Constructs a new TenantService.
@@ -104,7 +103,7 @@ public class TenantService {
                             defaultAdminUsername,
                             defaultAdminEmail, // Auto-generated email
                             createRequest.getDefaultAdminPassword(),
-                            TENANT_ADMIN_ROLE
+                            RoleType.TENANT_ADMIN.getRoleName()
                             // Tenant ID will be set by a potentially refactored UserAuthService or a new specialized method
                     );
 

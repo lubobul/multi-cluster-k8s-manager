@@ -7,7 +7,8 @@
 }
 
 <button class="btn btn-primary register-cluster-btn" (click)="openRegisterClusterModal()">
-    <cds-icon shape="plus"></cds-icon>Register cluster
+    <cds-icon shape="plus"></cds-icon>
+    Register cluster
 </button>
 
 @if (loading) {
@@ -26,19 +27,19 @@
                     <div class="cluster-card-details">
                         <div class="card-details-pair">
                             <span class="card-detail-label">Status</span>
-                            <span class="card-detail-value">{{cluster.status}}</span>
+                            <span class="card-detail-value">{{ cluster.status }}</span>
                         </div>
                         <div class="card-details-pair">
                             <span class="card-detail-label">Owner</span>
-                            <span class="card-detail-value">{{cluster.providerUsername}}</span>
+                            <span class="card-detail-value">{{ cluster.providerUsername }}</span>
                         </div>
                         <div class="card-details-pair">
                             <span class="card-detail-label">Created</span>
-                            <span class="card-detail-value">{{cluster.createdAt | date : "dd.MM, hh:mm" }}</span>
+                            <span class="card-detail-value">{{ cluster.createdAt | date : "dd.MM, hh:mm" }}</span>
                         </div>
                         <div class="card-details-pair">
                             <span class="card-detail-label">Updated</span>
-                            <span class="card-detail-value">{{cluster.updatedAt | date : "dd.MM, hh:mm" }}</span>
+                            <span class="card-detail-value">{{ cluster.updatedAt | date : "dd.MM, hh:mm" }}</span>
                         </div>
                     </div>
                     <div class="card-text">
@@ -57,13 +58,14 @@
         </div>
         <div class="side-panel-body">
             @if (errorRegisterClusterMessage) {
-                <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorRegisterClusterClosed">
+                <clr-alert class="danger-alert" [clrAlertType]="'danger'"
+                           [(clrAlertClosed)]="alertErrorRegisterClusterClosed">
                     <clr-alert-item>
                         <span class="alert-text">{{ errorMessage }}</span>
                     </clr-alert-item>
                 </clr-alert>
             }
-            @if(registerClusterModalOpened){
+            @if (registerClusterModalOpened) {
                 <form clrStepper [formGroup]="clusterForm">
 
                     <clr-stepper-panel formGroupName="details">
@@ -72,7 +74,7 @@
                         <clr-step-content *clrIfExpanded>
                             <clr-input-container>
                                 <label>Name</label>
-                                <input clrInput formControlName="name" />
+                                <input clrInput formControlName="name"/>
                                 <clr-control-error *clrIfError="'required'">
                                     Cluster name field is required.
                                 </clr-control-error>
@@ -107,6 +109,11 @@
                                 [formControl]="clusterForm.controls.config.controls.kubeConfig"
                             >
                             </ngx-monaco-editor>
+                            @if (clusterForm.invalid && clusterForm.controls.config.controls.kubeConfig.errors?.["required"]) {
+                                <span class="clr-subtext subtext-error">
+                                    Kubeconfig is required and must not be empty.
+                                </span>
+                            }
                         </clr-step-content>
                     </clr-stepper-panel>
                 </form>
@@ -121,7 +128,10 @@
         </div>
         <div class="side-panel-footer">
             <button type="button" class="btn btn-outline" (click)="registerClusterModalOpened = false">Cancel</button>
-            <button type="button" class="btn btn-primary" (click)="registerCluster()">Register</button>
+            <button [disabled]="loadingRegisterCluster || clusterForm.invalid" class="btn btn-primary"
+                    (click)="registerCluster()">
+                Register
+            </button>
         </div>
     </clr-side-panel>
 }
