@@ -77,7 +77,6 @@ public class UserAuthService {
 
         user.setUserSecret(userSecret); // Set the UserSecret reference in User
 
-        // userRepository.save(user); // This will fail if user.tenant is null
         throw new UnsupportedOperationException("Tenant assignment logic during registration needs to be implemented.");
     }
 
@@ -91,6 +90,10 @@ public class UserAuthService {
      */
     @Transactional
     public User registerUserForTenant(RegisterRequest request, Tenant tenant) {
+        if (tenant == null || tenant.getId() == null) {
+            throw new IllegalArgumentException("A valid tenant must be provided for user registration.");
+        }
+
         // Basic validation (can reuse parts of validateRegisterRequest)
         if (!StringUtils.hasText(request.getUsername()) ||
                 !StringUtils.hasText(request.getEmail()) ||
@@ -116,10 +119,6 @@ public class UserAuthService {
             // For creating a tenant's default admin, TENANT_ADMIN is expected.
             throw new IllegalArgumentException("Invalid role '" + request.getRole() + "' for default tenant admin. Expected 'TENANT_ADMIN'.");
         }
-        if (tenant == null || tenant.getId() == null) {
-            throw new IllegalArgumentException("A valid tenant must be provided for user registration.");
-        }
-
 
         User user = new User();
         user.setUsername(request.getUsername().trim());
