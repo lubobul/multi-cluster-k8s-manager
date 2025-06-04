@@ -21,14 +21,14 @@
                 }
                 <clr-input-container>
                     <label>Organization</label>
-                    <input clrInput type="email" formControlName="tenant" placeholder="Enter organization name"/>
+                    <input clrInput type="text" name="org" formControlName="tenant" placeholder="Enter organization name"/>
                     <clr-control-error *clrIfError="'required'">
                         Organization name field is required.
                     </clr-control-error>
                 </clr-input-container>
                 <clr-input-container>
                     <label>Email</label>
-                    <input clrInput type="email" formControlName="email" placeholder="Enter your email"/>
+                    <input clrInput type="email" name="email" formControlName="email" placeholder="Enter your email"/>
                     <clr-control-error *clrIfError="'email'">
                         Please enter a valid email.
                     </clr-control-error>
@@ -39,7 +39,7 @@
 
                 <clr-password-container>
                     <label>Password</label>
-                    <input clrPassword type="password" formControlName="password"
+                    <input clrPassword type="password" name="password" formControlName="password"
                            placeholder="Enter your password"/>
                     <clr-control-error *clrIfError="'required'">
                         Password field is required.

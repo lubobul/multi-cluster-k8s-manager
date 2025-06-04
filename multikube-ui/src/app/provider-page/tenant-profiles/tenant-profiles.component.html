@@ -135,6 +135,6 @@
     </div>
     <div class="side-panel-footer">
         <button type="button" class="btn btn-outline" (click)="createTenantModalOpened = false">Cancel</button>
-        <button [disabled]="creatingTenantLoading || createTenantForm.invalid" class="btn btn-primary" (click)="createTenant()">Create tenant</button>
+        <button [attr.ui-e2e]="'create-tenant'" [disabled]="creatingTenantLoading || createTenantForm.invalid" class="btn btn-primary" (click)="createTenant()">Create tenant</button>
     </div>
 </clr-side-panel>

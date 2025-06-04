@@ -106,9 +106,6 @@ public class UserAuthService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("The email '" + request.getEmail() + "' already exists.");
         }
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("The username '" + request.getUsername() + "' already exists.");
-        }
 
         Role userRole = roleRepository.findByName(request.getRole())
                 .orElseThrow(() -> new IllegalArgumentException("Role '" + request.getRole() + "' not found."));

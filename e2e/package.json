@@ -2,7 +2,11 @@
   "name": "e2e",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test:login-as-system-admin": "export TEST_ENVIRONMENT=http://localhost:4200 && npx playwright test --ui --project=setup-system-admin",
+    "test:register-k8s-cluster": "export TEST_ENVIRONMENT=http://localhost:4200 && npx playwright test --ui --project=provider-cluster-registration",
+    "test:create-tenant": "export TEST_ENVIRONMENT=http://localhost:4200 && npx playwright test --ui --project=provider-tenant-creation"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
