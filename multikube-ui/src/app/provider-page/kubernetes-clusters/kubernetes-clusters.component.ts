@@ -10,6 +10,8 @@ import {EditorComponent} from 'ngx-monaco-editor-v2';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {BehaviorSubject, delayWhen, mergeMap, retry, Subscription, tap, timer} from 'rxjs';
 import {RegisterClusterRequest} from '../../common/rest/types/provider/requests/RegisterClusterRequest';
+import {MULTIKUBE_ROUTE_PATHS} from '../../app.routes';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
     selector: 'app-kubernetes-clusters',
@@ -77,6 +79,8 @@ export class KubernetesClustersComponent implements OnInit, OnDestroy {
     constructor(
         private clusterService: ClusterService,
         private fb: FormBuilder,
+        private router: Router,
+        private activatedRoute: ActivatedRoute,
     ) {
     }
 
@@ -87,11 +91,11 @@ export class KubernetesClustersComponent implements OnInit, OnDestroy {
         this.buildForm();
     }
 
-    ngOnDestroy(): void{
+    ngOnDestroy(): void {
         this.stopClustersPolling();
     }
 
-    buildForm(): void{
+    buildForm(): void {
         this.clusterForm = this.fb.group({
             details: this.fb.group({
                 name: ["", Validators.required],
@@ -146,7 +150,7 @@ export class KubernetesClustersComponent implements OnInit, OnDestroy {
         }
     }
 
-    openRegisterClusterModal(): void{
+    openRegisterClusterModal(): void {
         this.registerClusterModalOpened = true;
         this.clusterForm.controls.details.reset({
             name: "",
@@ -177,6 +181,15 @@ export class KubernetesClustersComponent implements OnInit, OnDestroy {
                     this.alertErrorRegisterClusterClosed = false;
                     this.loadingRegisterCluster = false;
                 }
+            }
+        );
+    }
+
+    openDetails(cluster: ClusterResponse): void {
+        this.router.navigate(
+            [`${cluster.id}/${MULTIKUBE_ROUTE_PATHS.CLUSTER_DETAILS}`],
+            {
+                relativeTo: this.activatedRoute,
             }
         );
     }

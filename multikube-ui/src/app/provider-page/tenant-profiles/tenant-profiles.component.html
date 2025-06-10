@@ -1,140 +1,149 @@
-@if(errorMessage){
-    <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertClosed">
-        <clr-alert-item>
-            <span class="alert-text">{{errorMessage}}</span>
-        </clr-alert-item>
-    </clr-alert>
-}
-
-<button class="btn btn-primary create-tenant-btn" (click)="openCreateTenantModal()">
-    <cds-icon shape="plus"></cds-icon>Create tenant
-</button>
-
-<clr-datagrid (clrDgRefresh)="refreshByGrid($event)" [clrDgLoading]="loading">
-    <clr-dg-column [clrDgField]="'name'">Organization Name</clr-dg-column>
-    <clr-dg-column >State</clr-dg-column>
-    <clr-dg-column>Created</clr-dg-column>
-    <clr-dg-column>Last Updated</clr-dg-column>
-    <clr-dg-placeholder>No tenants found.</clr-dg-placeholder>
-    @for(tenant of tenantsPage.content; track tenant.id){
-        <clr-dg-row>
-            <clr-dg-action-overflow>
-                @if(tenant.isActive){
-                    <button class="action-item">Deactivate</button>
-                } @else {
-                    <button class="action-item">Activate</button>
-                }
-            </clr-dg-action-overflow>
-            <clr-dg-cell>{{ tenant.name }}</clr-dg-cell>
-            <clr-dg-cell>{{ tenant.isActive ? "Active" : "Not Active" }}</clr-dg-cell>
-            <clr-dg-cell>{{ tenant.createdAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
-            <clr-dg-cell>{{ tenant.updatedAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
-        </clr-dg-row>
+<div class="host-container">
+    @if (errorMessage) {
+        <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertClosed">
+            <clr-alert-item>
+                <span class="alert-text">{{ errorMessage }}</span>
+            </clr-alert-item>
+        </clr-alert>
     }
 
-    <clr-dg-footer>
-        <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="tenantsPage.totalElements">
-            <clr-dg-page-size [clrPageSizeOptions]="[5, 10, 15]">Tenants per page</clr-dg-page-size>
-            {{ pagination.firstItem + 1 }} - {{ pagination.lastItem + 1 }} of
-            {{ pagination.totalItems }} tenants
-        </clr-dg-pagination>
-    </clr-dg-footer>
-</clr-datagrid>
+    <button class="btn btn-primary create-tenant-btn" (click)="openCreateTenantModal()">
+        <cds-icon shape="plus"></cds-icon>
+        Create tenant
+    </button>
 
-<clr-side-panel [(clrSidePanelOpen)]="createTenantModalOpened" [clrSidePanelSize]="'xl'">
-    <div class="side-panel-title">Create Tenant
-    </div>
-    <div class="side-panel-body">
-        @if (createTenantError) {
-            <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorCreateTenantClosed">
-                <clr-alert-item>
-                    <span class="alert-text">{{ errorMessage }}</span>
-                </clr-alert-item>
-            </clr-alert>
+    <clr-datagrid (clrDgRefresh)="refreshByGrid($event)" [clrDgLoading]="loading">
+        <clr-dg-column [clrDgField]="'name'">Organization Name</clr-dg-column>
+        <clr-dg-column>State</clr-dg-column>
+        <clr-dg-column>Created</clr-dg-column>
+        <clr-dg-column>Last Updated</clr-dg-column>
+        <clr-dg-placeholder>No tenants found.</clr-dg-placeholder>
+        @for (tenant of tenantsPage.content; track tenant.id) {
+            <clr-dg-row>
+                <clr-dg-action-overflow>
+                    @if (tenant.isActive) {
+                        <button class="action-item">Deactivate</button>
+                    } @else {
+                        <button class="action-item">Activate</button>
+                    }
+                </clr-dg-action-overflow>
+                <clr-dg-cell>{{ tenant.name }}</clr-dg-cell>
+                <clr-dg-cell>{{ tenant.isActive ? "Active" : "Not Active" }}</clr-dg-cell>
+                <clr-dg-cell>{{ tenant.createdAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
+                <clr-dg-cell>{{ tenant.updatedAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
+            </clr-dg-row>
         }
-        @if(createTenantModalOpened){
-            <form clrStepper [formGroup]="createTenantForm">
 
-                <clr-stepper-panel formGroupName="details">
-                    <clr-step-title>Tenant details</clr-step-title>
-                    <clr-step-description>Give this tenant organization name and description</clr-step-description>
-                    <clr-step-content *clrIfExpanded>
-                        <clr-input-container>
-                            <label>Organization Name</label>
-                            <input clrInput formControlName="name" />
-                            <clr-control-error *clrIfError="'required'">
-                                Organization name field is required.
-                            </clr-control-error>
-                            <clr-control-helper>
-                                Enter some meaningful name for this organization.
-                            </clr-control-helper>
-                        </clr-input-container>
+        <clr-dg-footer>
+            <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="tenantsPage.totalElements">
+                <clr-dg-page-size [clrPageSizeOptions]="[5, 10, 15]">Tenants per page</clr-dg-page-size>
+                {{ pagination.firstItem + 1 }} - {{ pagination.lastItem + 1 }} of
+                {{ pagination.totalItems }} tenants
+            </clr-dg-pagination>
+        </clr-dg-footer>
+    </clr-datagrid>
 
-                        <clr-textarea-container>
-                            <label>Description</label>
-                            <textarea clrTextarea formControlName="description"></textarea>
-                            <clr-control-error *clrIfError="'required'">
-                                Tenant description field is required.
-                            </clr-control-error>
-                            <clr-control-helper>
-                                Enter some meaningful description
-                            </clr-control-helper>
-                        </clr-textarea-container>
+    <clr-side-panel [(clrSidePanelOpen)]="createTenantModalOpened" [clrSidePanelSize]="'xl'">
+        <div class="side-panel-title">Create Tenant
+        </div>
+        <div class="side-panel-body">
+            @if (createTenantError) {
+                <clr-alert class="danger-alert" [clrAlertType]="'danger'"
+                           [(clrAlertClosed)]="alertErrorCreateTenantClosed">
+                    <clr-alert-item>
+                        <span class="alert-text">{{ errorMessage }}</span>
+                    </clr-alert-item>
+                </clr-alert>
+            }
+            @if (createTenantModalOpened) {
+                <form clrStepper [formGroup]="createTenantForm">
 
-                        <button clrStepButton="next">next</button>
-                    </clr-step-content>
-                </clr-stepper-panel>
-                <clr-stepper-panel formGroupName="userConfig">
-                    <clr-step-title>First user config</clr-step-title>
-                    <clr-step-description>Configure the very first user for this organization</clr-step-description>
-                    <clr-step-content *clrIfExpanded>
-                        <clr-input-container>
-                            <label>Administrator username</label>
-                            <input clrInput formControlName="defaultAdminName" />
-                            <clr-control-error *clrIfError="'required'">
-                                Administrator username field is required.
-                            </clr-control-error>
-                            <clr-control-helper>
-                                Enter some meaningful username name for this organization's administrator.
-                            </clr-control-helper>
-                        </clr-input-container>
+                    <clr-stepper-panel formGroupName="details">
+                        <clr-step-title>Tenant details</clr-step-title>
+                        <clr-step-description>Give this tenant organization name and description</clr-step-description>
+                        <clr-step-content *clrIfExpanded>
+                            <clr-input-container>
+                                <label>Organization Name</label>
+                                <input clrInput formControlName="name"/>
+                                <clr-control-error *clrIfError="'required'">
+                                    Organization name field is required.
+                                </clr-control-error>
+                                <clr-control-helper>
+                                    Enter some meaningful name for this organization.
+                                </clr-control-helper>
+                            </clr-input-container>
 
-                        <clr-password-container>
-                            <label>Default password</label>
-                            <input clrPassword type="password" formControlName="defaultAdminPassword" placeholder="Enter default password"/>
-                            <clr-control-error *clrIfError="'required'">
-                                Default password field is required.
-                            </clr-control-error>
-                            <clr-control-helper>
-                                Password rules - Min 6 characters, at least 1 numeric and at least one alphabetic character.
-                            </clr-control-helper>
-                        </clr-password-container>
+                            <clr-textarea-container>
+                                <label>Description</label>
+                                <textarea clrTextarea formControlName="description"></textarea>
+                                <clr-control-error *clrIfError="'required'">
+                                    Tenant description field is required.
+                                </clr-control-error>
+                                <clr-control-helper>
+                                    Enter some meaningful description
+                                </clr-control-helper>
+                            </clr-textarea-container>
 
-                        <clr-password-container>
-                            <label>Repeat default password</label>
-                            <input clrPassword type="password" formControlName="repeatDefaultAdminPassword" placeholder="Enter default password"/>
-                            <clr-control-error *clrIfError="'required'">
-                                Repeating default password field is required.
-                            </clr-control-error>
-                            <clr-control-error *clrIfError="'passwordDoesntMatch'">
-                                Password doesn't match.
-                            </clr-control-error>
-                        </clr-password-container>
-                    </clr-step-content>
-                </clr-stepper-panel>
+                            <button clrStepButton="next">next</button>
+                        </clr-step-content>
+                    </clr-stepper-panel>
+                    <clr-stepper-panel formGroupName="userConfig">
+                        <clr-step-title>First user config</clr-step-title>
+                        <clr-step-description>Configure the very first user for this organization</clr-step-description>
+                        <clr-step-content *clrIfExpanded>
+                            <clr-input-container>
+                                <label>Administrator username</label>
+                                <input clrInput formControlName="defaultAdminName"/>
+                                <clr-control-error *clrIfError="'required'">
+                                    Administrator username field is required.
+                                </clr-control-error>
+                                <clr-control-helper>
+                                    Enter some meaningful username name for this organization's administrator.
+                                </clr-control-helper>
+                            </clr-input-container>
 
-            </form>
-        }
-        @if (creatingTenantLoading) {
-            <div class="loading-container">
-                <clr-spinner clrInline>Creating tenant...</clr-spinner>
-                <h5>Creating tenant...</h5>
-            </div>
+                            <clr-password-container>
+                                <label>Default password</label>
+                                <input clrPassword type="password" formControlName="defaultAdminPassword"
+                                       placeholder="Enter default password"/>
+                                <clr-control-error *clrIfError="'required'">
+                                    Default password field is required.
+                                </clr-control-error>
+                                <clr-control-helper>
+                                    Password rules - Min 6 characters, at least 1 numeric and at least one alphabetic
+                                    character.
+                                </clr-control-helper>
+                            </clr-password-container>
 
-        }
-    </div>
-    <div class="side-panel-footer">
-        <button type="button" class="btn btn-outline" (click)="createTenantModalOpened = false">Cancel</button>
-        <button [attr.ui-e2e]="'create-tenant'" [disabled]="creatingTenantLoading || createTenantForm.invalid" class="btn btn-primary" (click)="createTenant()">Create tenant</button>
-    </div>
-</clr-side-panel>
+                            <clr-password-container>
+                                <label>Repeat default password</label>
+                                <input clrPassword type="password" formControlName="repeatDefaultAdminPassword"
+                                       placeholder="Enter default password"/>
+                                <clr-control-error *clrIfError="'required'">
+                                    Repeating default password field is required.
+                                </clr-control-error>
+                                <clr-control-error *clrIfError="'passwordDoesntMatch'">
+                                    Password doesn't match.
+                                </clr-control-error>
+                            </clr-password-container>
+                        </clr-step-content>
+                    </clr-stepper-panel>
+
+                </form>
+            }
+            @if (creatingTenantLoading) {
+                <div class="loading-container">
+                    <clr-spinner clrInline>Creating tenant...</clr-spinner>
+                    <h5>Creating tenant...</h5>
+                </div>
+
+            }
+        </div>
+        <div class="side-panel-footer">
+            <button type="button" class="btn btn-outline" (click)="createTenantModalOpened = false">Cancel</button>
+            <button [attr.ui-e2e]="'create-tenant'" [disabled]="creatingTenantLoading || createTenantForm.invalid"
+                    class="btn btn-primary" (click)="createTenant()">Create tenant
+            </button>
+        </div>
+    </clr-side-panel>
+</div>

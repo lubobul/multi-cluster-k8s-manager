@@ -1,0 +1,16 @@
+<div class="main-container">
+    <div class="cluster-details-header">
+        <h3 class="cluster-details-title">Cluster1</h3>
+    </div>
+
+    <div class="content-container">
+        <clr-vertical-nav>
+            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="MULTIKUBE_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.DASHBOARD">Dashboard</a>
+            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="MULTIKUBE_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.SCOPE">Scope</a>
+            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="MULTIKUBE_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.RESOURCES">Resources</a>
+        </clr-vertical-nav>
+        <div class="content-area">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

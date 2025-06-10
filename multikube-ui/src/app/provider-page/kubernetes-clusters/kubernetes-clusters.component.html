@@ -1,137 +1,146 @@
-@if (errorMessage) {
-    <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorClosed">
-        <clr-alert-item>
-            <span class="alert-text">{{ errorMessage }}</span>
-        </clr-alert-item>
-    </clr-alert>
-}
+<div class="host-container">
+    @if (errorMessage) {
+        <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorClosed">
+            <clr-alert-item>
+                <span class="alert-text">{{ errorMessage }}</span>
+            </clr-alert-item>
+        </clr-alert>
+    }
 
-<button class="btn btn-primary register-cluster-btn" (click)="openRegisterClusterModal()">
-    <cds-icon shape="plus"></cds-icon>
-    Register cluster
-</button>
+    <button class="btn btn-primary register-cluster-btn" (click)="openRegisterClusterModal()">
+        <cds-icon shape="plus"></cds-icon>
+        Register cluster
+    </button>
 
-@if (loading) {
-    <div class="loading-container">
-        <clr-spinner clrInline>Loading...</clr-spinner>
-        <h5>Loading...</h5>
-    </div>
-
-} @else {
-
-    <div class="cluster-cards-container">
-        @for (cluster of allClusters; track cluster.id) {
-            <div class="card cluster-card">
-                <div class="card-header">{{ cluster.name }}</div>
-                <div class="card-block">
-                    <div class="cluster-card-details">
-                        <div class="card-details-pair">
-                            <span class="card-detail-label">Status</span>
-                            <span class="card-detail-value">{{ cluster.status }}</span>
-                        </div>
-                        <div class="card-details-pair">
-                            <span class="card-detail-label">Owner</span>
-                            <span class="card-detail-value">{{ cluster.providerUsername }}</span>
-                        </div>
-                        <div class="card-details-pair">
-                            <span class="card-detail-label">Created</span>
-                            <span class="card-detail-value">{{ cluster.createdAt | date : "dd.MM, hh:mm" }}</span>
-                        </div>
-                        <div class="card-details-pair">
-                            <span class="card-detail-label">Updated</span>
-                            <span class="card-detail-value">{{ cluster.updatedAt | date : "dd.MM, hh:mm" }}</span>
-                        </div>
-                    </div>
-                    <div class="card-text">
-                        {{ cluster.description }}
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <button class="btn btn-sm btn-link">Details</button>
-                </div>
-            </div>
-        }
-    </div>
-
-    <clr-side-panel [(clrSidePanelOpen)]="registerClusterModalOpened" [clrSidePanelSize]="'xl'">
-        <div class="side-panel-title">Register Kubernetes Cluster
+    @if (loading) {
+        <div class="loading-container">
+            <clr-spinner clrInline>Loading...</clr-spinner>
+            <h5>Loading...</h5>
         </div>
-        <div class="side-panel-body">
-            @if (errorRegisterClusterMessage) {
-                <clr-alert class="danger-alert" [clrAlertType]="'danger'"
-                           [(clrAlertClosed)]="alertErrorRegisterClusterClosed">
-                    <clr-alert-item>
-                        <span class="alert-text">{{ errorMessage }}</span>
-                    </clr-alert-item>
-                </clr-alert>
+
+    } @else {
+
+        @if (!allClusters?.length) {
+            <h4>No Kubernetes clusters registered.</h4>
+            <h5>Empower your customers by registering your first Kubernetes clusters!</h5>
+        }
+
+        <div class="cluster-cards-container">
+            @for (cluster of allClusters; track cluster.id) {
+                <div class="card cluster-card">
+                    <div class="card-header">{{ cluster.name }}</div>
+                    <div class="card-block">
+                        <div class="cluster-card-details">
+                            <div class="card-details-pair">
+                                <span class="card-detail-label">Status</span>
+                                <span class="card-detail-value">{{ cluster.status }}</span>
+                            </div>
+                            <div class="card-details-pair">
+                                <span class="card-detail-label">Owner</span>
+                                <span class="card-detail-value">{{ cluster.providerUsername }}</span>
+                            </div>
+                            <div class="card-details-pair">
+                                <span class="card-detail-label">Created</span>
+                                <span class="card-detail-value">{{ cluster.createdAt | date : "dd.MM, hh:mm" }}</span>
+                            </div>
+                            <div class="card-details-pair">
+                                <span class="card-detail-label">Updated</span>
+                                <span class="card-detail-value">{{ cluster.updatedAt | date : "dd.MM, hh:mm" }}</span>
+                            </div>
+                        </div>
+                        <div class="card-text">
+                            {{ cluster.description }}
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-sm btn-link" (click)="openDetails(cluster)">Details</button>
+                    </div>
+                </div>
             }
-            @if (registerClusterModalOpened) {
-                <form clrStepper [formGroup]="clusterForm">
+        </div>
 
-                    <clr-stepper-panel formGroupName="details">
-                        <clr-step-title>Cluster details</clr-step-title>
-                        <clr-step-description>Give your cluster registration name and description</clr-step-description>
-                        <clr-step-content *clrIfExpanded>
-                            <clr-input-container>
-                                <label>Name</label>
-                                <input clrInput formControlName="name"/>
-                                <clr-control-error *clrIfError="'required'">
-                                    Cluster name field is required.
-                                </clr-control-error>
-                                <clr-control-helper>
-                                    Enter some meaningful name to remember this cluster
-                                </clr-control-helper>
-                            </clr-input-container>
+        <clr-side-panel [(clrSidePanelOpen)]="registerClusterModalOpened" [clrSidePanelSize]="'xl'">
+            <div class="side-panel-title">Register Kubernetes Cluster
+            </div>
+            <div class="side-panel-body">
+                @if (errorRegisterClusterMessage) {
+                    <clr-alert class="danger-alert" [clrAlertType]="'danger'"
+                               [(clrAlertClosed)]="alertErrorRegisterClusterClosed">
+                        <clr-alert-item>
+                            <span class="alert-text">{{ errorMessage }}</span>
+                        </clr-alert-item>
+                    </clr-alert>
+                }
+                @if (registerClusterModalOpened) {
+                    <form clrStepper [formGroup]="clusterForm">
 
-                            <clr-textarea-container>
-                                <label>Description</label>
-                                <textarea clrTextarea formControlName="description"></textarea>
-                                <clr-control-error *clrIfError="'required'">
-                                    Cluster description field is required.
-                                </clr-control-error>
-                                <clr-control-helper>
-                                    Enter some meaningful description
-                                </clr-control-helper>
-                            </clr-textarea-container>
+                        <clr-stepper-panel formGroupName="details">
+                            <clr-step-title>Cluster details</clr-step-title>
+                            <clr-step-description>Give your cluster registration name and description
+                            </clr-step-description>
+                            <clr-step-content *clrIfExpanded>
+                                <clr-input-container>
+                                    <label>Name</label>
+                                    <input clrInput formControlName="name"/>
+                                    <clr-control-error *clrIfError="'required'">
+                                        Cluster name field is required.
+                                    </clr-control-error>
+                                    <clr-control-helper>
+                                        Enter some meaningful name to remember this cluster
+                                    </clr-control-helper>
+                                </clr-input-container>
 
-                            <button clrStepButton="next">next</button>
-                        </clr-step-content>
-                    </clr-stepper-panel>
+                                <clr-textarea-container>
+                                    <label>Description</label>
+                                    <textarea clrTextarea formControlName="description"></textarea>
+                                    <clr-control-error *clrIfError="'required'">
+                                        Cluster description field is required.
+                                    </clr-control-error>
+                                    <clr-control-helper>
+                                        Enter some meaningful description
+                                    </clr-control-helper>
+                                </clr-textarea-container>
 
-                    <clr-stepper-panel formGroupName="config">
-                        <clr-step-title>Cluster config</clr-step-title>
-                        <clr-step-description>Simply copy the raw kubecofig</clr-step-description>
-                        <clr-step-content *clrIfExpanded>
-                            <h6 class="kube-config-editor-title">Paste kubeconfig here</h6>
-                            <ngx-monaco-editor
-                                class="kube-config-editor"
-                                [options]="editorOptions"
-                                [formControl]="clusterForm.controls.config.controls.kubeConfig"
-                            >
-                            </ngx-monaco-editor>
-                            @if (clusterForm.invalid && clusterForm.controls.config.controls.kubeConfig.errors?.["required"]) {
-                                <span class="clr-subtext subtext-error">
+                                <button clrStepButton="next">next</button>
+                            </clr-step-content>
+                        </clr-stepper-panel>
+
+                        <clr-stepper-panel formGroupName="config">
+                            <clr-step-title>Cluster config</clr-step-title>
+                            <clr-step-description>Simply copy the raw kubecofig</clr-step-description>
+                            <clr-step-content *clrIfExpanded>
+                                <h6 class="kube-config-editor-title">Paste kubeconfig here</h6>
+                                <ngx-monaco-editor
+                                    class="kube-config-editor"
+                                    [options]="editorOptions"
+                                    [formControl]="clusterForm.controls.config.controls.kubeConfig"
+                                >
+                                </ngx-monaco-editor>
+                                @if (clusterForm.invalid && clusterForm.controls.config.controls.kubeConfig.errors?.["required"]) {
+                                    <span class="clr-subtext subtext-error">
                                     Kubeconfig is required and must not be empty.
                                 </span>
-                            }
-                        </clr-step-content>
-                    </clr-stepper-panel>
-                </form>
-            }
-            @if (loadingRegisterCluster) {
-                <div class="loading-container">
-                    <clr-spinner clrInline>Registering...</clr-spinner>
-                    <h5>Registering...</h5>
-                </div>
+                                }
+                            </clr-step-content>
+                        </clr-stepper-panel>
+                    </form>
+                }
+                @if (loadingRegisterCluster) {
+                    <div class="loading-container">
+                        <clr-spinner clrInline>Registering...</clr-spinner>
+                        <h5>Registering...</h5>
+                    </div>
 
-            }
-        </div>
-        <div class="side-panel-footer">
-            <button type="button" class="btn btn-outline" (click)="registerClusterModalOpened = false">Cancel</button>
-            <button [disabled]="loadingRegisterCluster || clusterForm.invalid" class="btn btn-primary"
-                    (click)="registerCluster()">
-                Register
-            </button>
-        </div>
-    </clr-side-panel>
-}
+                }
+            </div>
+            <div class="side-panel-footer">
+                <button type="button" class="btn btn-outline" (click)="registerClusterModalOpened = false">Cancel
+                </button>
+                <button [disabled]="loadingRegisterCluster || clusterForm.invalid" class="btn btn-primary"
+                        (click)="registerCluster()">
+                    Register
+                </button>
+            </div>
+        </clr-side-panel>
+    }
+</div>
