@@ -18,7 +18,6 @@ export class UsersService {
 
     getUsers(queryRequest: QueryRequest): Observable<PaginatedResponse<UserResponse>> {
         const params = buildQueryParams(queryRequest) as any;
-        params.withFriendsInfo = true;
         return this.usersApiService.getUsers(params);
     }
 

@@ -19,6 +19,10 @@ export class ClustersApiService {
         return this.http.get<PaginatedResponse<ClusterResponse>>(this.apiUrl, { params });
     }
 
+    getCluster(clusterId: number): Observable<ClusterResponse> {
+        return this.http.get<ClusterResponse>(`${this.apiUrl}/${clusterId}`);
+    }
+
     createCluster(cluster: RegisterClusterRequest): Observable<ClusterResponse> {
         return this.http.post<ClusterResponse>(this.apiUrl, cluster);
     }

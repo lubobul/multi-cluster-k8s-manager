@@ -20,8 +20,11 @@ export class ClusterService {
 
     public getClusters(queryRequest: QueryRequest): Observable<PaginatedResponse<ClusterResponse>> {
         const params = buildQueryParams(queryRequest) as any;
-        params.withFriendsInfo = true;
         return this.usersApiService.getClusters(params);
+    }
+
+    public getCluster(clusterId: number): Observable<ClusterResponse> {
+        return this.usersApiService.getCluster(clusterId);
     }
 
     public registerCluster(cluster: RegisterClusterRequest): Observable<ClusterResponse>{

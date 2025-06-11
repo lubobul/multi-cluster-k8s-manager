@@ -12,6 +12,7 @@ import {BehaviorSubject, delayWhen, mergeMap, retry, Subscription, tap, timer} f
 import {RegisterClusterRequest} from '../../common/rest/types/provider/requests/RegisterClusterRequest';
 import {MULTIKUBE_ROUTE_PATHS} from '../../app.routes';
 import {ActivatedRoute, Router} from '@angular/router';
+import {ClusterStatusComponent} from '../../common/cluster-status/cluster-status.component';
 
 @Component({
     selector: 'app-kubernetes-clusters',
@@ -21,7 +22,8 @@ import {ActivatedRoute, Router} from '@angular/router';
         DatePipe,
         EditorComponent,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        ClusterStatusComponent
     ],
     templateUrl: './kubernetes-clusters.component.html',
     styleUrl: './kubernetes-clusters.component.scss'

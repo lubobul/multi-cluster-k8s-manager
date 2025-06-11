@@ -33,7 +33,9 @@
                         <div class="cluster-card-details">
                             <div class="card-details-pair">
                                 <span class="card-detail-label">Status</span>
-                                <span class="card-detail-value">{{ cluster.status }}</span>
+                                <span class="card-detail-value">
+                                    <cluster-status [cluster]="cluster"></cluster-status>
+                                </span>
                             </div>
                             <div class="card-details-pair">
                                 <span class="card-detail-label">Owner</span>
