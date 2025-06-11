@@ -1,50 +1,50 @@
 @switch (status){
     @case (ClusterStatus.ACTIVE){
         <div class="status-row">
-            <cds-icon shape="connect" status="success" size="md"></cds-icon>
-            <span>Active</span>
+            <cds-icon shape="check-circle" status="success" size="md"></cds-icon>
+            <span class="status-text">Active</span>
         </div>
     }
 
     @case (ClusterStatus.UNREACHABLE){
         <div class="status-row">
             <cds-icon shape="disconnect" status="danger" size="md"></cds-icon>
-            <span>Unreachable</span>
+            <span class="status-text">Unreachable</span>
         </div>
     }
 
     @case (ClusterStatus.ERROR){
         <div class="status-row">
             <cds-icon shape="warning-standard" status="danger" size="md"></cds-icon>
-            <span>Error</span>
+            <span class="status-text">Error</span>
         </div>
     }
 
     @case (ClusterStatus.PENDING_VERIFICATION){
         <div class="status-row">
             <clr-spinner clrInline></clr-spinner>
-            <span>Pending</span>
+            <span class="status-text">Pending</span>
         </div>
     }
 
     @case (ClusterStatus.DELETING){
         <div class="status-row">
             <clr-spinner clrInline></clr-spinner>
-            <span>Deleting</span>
+            <span class="status-text">Deleting</span>
         </div>
     }
 
     @case (ClusterStatus.INACTIVE){
         <div class="status-row">
             <cds-icon shape="warning-standard" status="warning" size="md"></cds-icon>
-            <span>Inactive</span>
+            <span class="status-text">Inactive</span>
         </div>
     }
 
     @case (ClusterStatus.DEGRADED){
         <div class="status-row">
             <cds-icon shape="warning-standard" status="warning" size="md"></cds-icon>
-            <span>Degraded</span>
+            <span class="status-text">Degraded</span>
         </div>
     }
 }

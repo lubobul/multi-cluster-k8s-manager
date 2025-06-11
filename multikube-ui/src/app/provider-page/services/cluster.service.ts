@@ -6,6 +6,8 @@ import {PaginatedResponse} from '../../common/rest/types/responses/paginated-res
 import {buildQueryParams, getAllElementsFromAllPages} from '../../common/utils/util-functions';
 import {ClusterResponse} from '../../common/rest/types/provider/responses/ClusterResponse';
 import {RegisterClusterRequest} from '../../common/rest/types/provider/requests/RegisterClusterRequest';
+import {AllocateClusterRequest} from '../../common/rest/types/provider/requests/AllocateClusterRequest';
+import {RestMessageResponse} from '../../common/rest/types/auth-types';
 
 
 @Injectable({
@@ -14,21 +16,29 @@ import {RegisterClusterRequest} from '../../common/rest/types/provider/requests/
 export class ClusterService {
 
     constructor(
-        private usersApiService: ClustersApiService,
+        private clustersApiService: ClustersApiService,
     ) {
     }
 
     public getClusters(queryRequest: QueryRequest): Observable<PaginatedResponse<ClusterResponse>> {
         const params = buildQueryParams(queryRequest) as any;
-        return this.usersApiService.getClusters(params);
+        return this.clustersApiService.getClusters(params);
     }
 
     public getCluster(clusterId: number): Observable<ClusterResponse> {
-        return this.usersApiService.getCluster(clusterId);
+        return this.clustersApiService.getCluster(clusterId);
     }
 
     public registerCluster(cluster: RegisterClusterRequest): Observable<ClusterResponse>{
-        return this.usersApiService.createCluster(cluster);
+        return this.clustersApiService.createCluster(cluster);
+    }
+
+    public allocateCluster(cluster: ClusterResponse, clusterAllocation: AllocateClusterRequest): Observable<RestMessageResponse> {
+        return this.clustersApiService.allocateCluster(cluster.id, clusterAllocation);
+    }
+
+    public deallocateCluster(clusterId: number): Observable<RestMessageResponse> {
+        return this.clustersApiService.deallocateCluster(clusterId);
     }
 
     public getAllClusters(queryRequest: QueryRequest): Observable<ClusterResponse[]>{

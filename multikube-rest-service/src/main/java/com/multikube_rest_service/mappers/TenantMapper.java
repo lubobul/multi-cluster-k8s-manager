@@ -11,6 +11,7 @@ public interface TenantMapper extends GenericMapper<Tenant, TenantDto> {
     @Override
     @Mapping(target = "createdAt", source = "createdAt") // Explicit mapping if needed
     @Mapping(target = "updatedAt", source = "updatedAt") // Explicit mapping if needed
+    @Mapping(target = "allocatedClusterIds", ignore = true)
     TenantDto toDto(Tenant tenant);
 
     @Override

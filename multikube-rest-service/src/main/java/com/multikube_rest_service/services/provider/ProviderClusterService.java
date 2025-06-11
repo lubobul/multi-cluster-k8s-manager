@@ -3,14 +3,21 @@ package com.multikube_rest_service.services.provider;
 import com.multikube_rest_service.common.SecurityContextHelper; //
 import com.multikube_rest_service.common.encryption.KubeconfigEncryptor;
 import com.multikube_rest_service.common.enums.ClusterStatus;
+import com.multikube_rest_service.dtos.requests.provider.ClusterAllocationRequest;
 import com.multikube_rest_service.dtos.requests.provider.ClusterRegistrationRequest;
 import com.multikube_rest_service.dtos.responses.provider.ClusterDto;
+import com.multikube_rest_service.entities.Tenant;
 import com.multikube_rest_service.entities.User;
+import com.multikube_rest_service.entities.provider.ClusterAllocation;
 import com.multikube_rest_service.entities.provider.KubernetesCluster;
 import com.multikube_rest_service.exceptions.ResourceNotFoundException;
 import com.multikube_rest_service.mappers.provider.KubernetesClusterMapper;
+import com.multikube_rest_service.repositories.TenantRepository;
 import com.multikube_rest_service.repositories.UserRepository; //
+import com.multikube_rest_service.repositories.provider.ClusterAllocationRepository;
 import com.multikube_rest_service.repositories.provider.KubernetesClusterRepository;
+import com.multikube_rest_service.repositories.provider.TenantNamespaceRepository;
+import com.multikube_rest_service.rest.RestMessageResponse;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1NamespaceList;
@@ -40,23 +47,32 @@ public class ProviderClusterService {
     private final UserRepository userRepository;
     private final KubeconfigEncryptor kubeconfigEncryptor;
     private final KubernetesClusterMapper clusterMapper;
+    private final ClusterAllocationRepository clusterAllocationRepository;
+    private final TenantRepository tenantRepository;
+    private final TenantNamespaceRepository tenantNamespaceRepository;
 
     /**
      * Constructs a new ProviderClusterService.
      *
-     * @param clusterRepository     The repository for Kubernetes cluster data.
-     * @param userRepository        The repository for user data.
-     * @param kubeconfigEncryptor   The utility for encrypting/decrypting kubeconfigs.
-     * @param clusterMapper         The mapper for converting between cluster entities and DTOs.
+     * @param clusterRepository   The repository for Kubernetes cluster data.
+     * @param userRepository      The repository for user data.
+     * @param kubeconfigEncryptor The utility for encrypting/decrypting kubeconfigs.
+     * @param clusterMapper       The mapper for converting between cluster entities and DTOs.
      */
     public ProviderClusterService(KubernetesClusterRepository clusterRepository,
                                   UserRepository userRepository,
                                   KubeconfigEncryptor kubeconfigEncryptor,
-                                  KubernetesClusterMapper clusterMapper) {
+                                  KubernetesClusterMapper clusterMapper,
+                                  ClusterAllocationRepository clusterAllocationRepository,
+                                  TenantRepository tenantRepository, TenantNamespaceRepository tenantNamespaceRepository
+    ) {
         this.clusterRepository = clusterRepository;
         this.userRepository = userRepository;
         this.kubeconfigEncryptor = kubeconfigEncryptor;
         this.clusterMapper = clusterMapper;
+        this.clusterAllocationRepository = clusterAllocationRepository;
+        this.tenantRepository = tenantRepository;
+        this.tenantNamespaceRepository = tenantNamespaceRepository;
     }
 
     /**
@@ -67,7 +83,7 @@ public class ProviderClusterService {
      * @param request The cluster registration request DTO containing name, description, and kubeconfig.
      * @return A DTO representing the newly registered cluster, including its initial status.
      * @throws ResourceNotFoundException if the authenticated provider user is not found.
-     * @throws IllegalArgumentException if the cluster name or kubeconfig is invalid or if a cluster with the same name already exists.
+     * @throws IllegalArgumentException  if the cluster name or kubeconfig is invalid or if a cluster with the same name already exists.
      */
     @Transactional
     public ClusterDto registerCluster(ClusterRegistrationRequest request) {
@@ -111,7 +127,8 @@ public class ProviderClusterService {
      *
      * @param cluster The KubernetesCluster entity to verify.
      */
-    @Transactional // Ensures status update is part of the same transaction if called within one, or its own if called separately.
+    @Transactional
+    // Ensures status update is part of the same transaction if called within one, or its own if called separately.
     public void tryToVerifyConnectivity(KubernetesCluster cluster) {
         if (cluster == null) {
             logger.warn("Attempted to verify connectivity for a null cluster object.");
@@ -146,10 +163,10 @@ public class ProviderClusterService {
                 // Perform a lightweight operation, like listing namespaces, limited to a few items.
                 // The 'limit' parameter helps ensure the call doesn't fetch too much data.
                 // If you want to apply a limit or timeout specifically to this call:
-                 V1NamespaceList response = api.listNamespace()
-                 .limit(1) // Limit to 1 result
-                 .timeoutSeconds(5) // Specific timeout for this API call
-                 .execute();
+                V1NamespaceList response = api.listNamespace()
+                        .limit(1) // Limit to 1 result
+                        .timeoutSeconds(5) // Specific timeout for this API call
+                        .execute();
                 cluster.setStatus(ClusterStatus.ACTIVE);
                 logger.info("Successfully verified connectivity for cluster ID: {}", cluster.getId());
             }
@@ -186,7 +203,7 @@ public class ProviderClusterService {
      * with support for filtering by name and status from the searchParams map.
      *
      * @param searchParams A map of query parameters (e.g., "name" -> "mycluster", "status" -> "ACTIVE").
-     * @param pageable Pagination information.
+     * @param pageable     Pagination information.
      * @return A page of ClusterResponse DTOs.
      */
     @Transactional(readOnly = true)
@@ -224,5 +241,93 @@ public class ProviderClusterService {
         }
 
         return clusterPage.map(clusterMapper::toDto);
+    }
+
+    /**
+     * Allocates a registered cluster to a specific tenant.
+     *
+     * @param clusterId The ID of the cluster to allocate.
+     * @param allocationRequest The request containing the ID of the tenant.
+     * @return A message response indicating success.
+     */
+    @Transactional
+    public RestMessageResponse allocateCluster(Long clusterId, ClusterAllocationRequest allocationRequest) {
+        Long providerUserId = SecurityContextHelper.getAuthenticatedUserId();
+
+        // 1. Validate that the cluster exists and is owned by the current provider
+        KubernetesCluster cluster = clusterRepository.findByIdAndProviderUser_Id(clusterId, providerUserId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Cluster not found with ID: " + clusterId + " for the current provider."));
+
+        // 2. Validate that the cluster is in an ACTIVE state and can be allocated
+        if (cluster.getStatus() != ClusterStatus.ACTIVE) {
+            throw new IllegalArgumentException(
+                    "Cluster must be in ACTIVE state to be allocated. Current status: " + cluster.getStatus());
+        }
+
+        // 3. Validate that the cluster is not already allocated
+        if (clusterAllocationRepository.existsByKubernetesClusterId(clusterId)) {
+            throw new IllegalArgumentException("Cluster with ID " + clusterId + " is already allocated to a tenant.");
+        }
+
+        // 4. Validate that the tenant exists
+        Long tenantId = allocationRequest.getTenantId();
+        Tenant tenant = tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tenant not found with ID: " + tenantId));
+
+        // Prevent allocating to the "System" tenant
+        if ("System".equalsIgnoreCase(tenant.getName())) {
+            throw new IllegalArgumentException("Cannot allocate clusters to the 'System' tenant.");
+        }
+
+        // 5. Create and save the allocation
+        ClusterAllocation allocation = new ClusterAllocation();
+        allocation.setKubernetesCluster(cluster);
+        allocation.setTenant(tenant);
+        clusterAllocationRepository.save(allocation);
+
+        logger.info("Cluster ID {} successfully allocated to Tenant ID {}", clusterId, tenantId);
+
+        return new RestMessageResponse("Cluster " + cluster.getName() + " successfully allocated to tenant " + tenant.getName() + ".");
+    }
+
+    /**
+     * De-allocates a cluster from a tenant, making it available again.
+     * This operation will fail if the tenant has created any namespaces on the cluster.
+     *
+     * @param clusterId The ID of the cluster to de-allocate.
+     * @return A message response indicating success.
+     */
+    @Transactional
+    public RestMessageResponse deallocateCluster(Long clusterId) {
+        Long providerUserId = SecurityContextHelper.getAuthenticatedUserId();
+
+        // 1. Verify the cluster exists and is owned by the provider.
+        // We also need to find the allocation record to know which tenant to check.
+        ClusterAllocation allocation = clusterAllocationRepository.findByKubernetesClusterId(clusterId)
+                .orElseThrow(() -> new ResourceNotFoundException("No allocation found for cluster ID: " + clusterId));
+
+        // Security check: Ensure the cluster related to the allocation is owned by the current provider.
+        if (!allocation.getKubernetesCluster().getProviderUser().getId().equals(providerUserId)) {
+            throw new ResourceNotFoundException(
+                    "Cluster allocation not found for cluster ID: " + clusterId + " for the current provider.");
+        }
+
+        // 2. CRITICAL VALIDATION: Check if the tenant has any active resources on this cluster.
+        // For now, we check for namespaces. This should be expanded to check tenant_workloads later.
+        if (tenantNamespaceRepository.existsByKubernetesClusterId(clusterId)) {
+            throw new IllegalStateException(
+                    "Cannot de-allocate cluster. Tenant still has active namespaces on it. Please ensure all tenant resources are removed first.");
+        }
+        // TODO: Add a similar check for tenant_workloads once that repository exists.
+        // if (tenantWorkloadRepository.existsByTenantNamespace_KubernetesClusterId(clusterId)) { ... }
+
+        // 3. If validation passes, delete the allocation.
+        clusterAllocationRepository.delete(allocation);
+
+        logger.info("Cluster ID {} successfully de-allocated from Tenant ID {}.",
+                clusterId, allocation.getTenant().getId());
+
+        return new RestMessageResponse("Cluster " + allocation.getKubernetesCluster().getName() + " has been successfully de-allocated.");
     }
 }

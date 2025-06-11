@@ -1,8 +1,10 @@
 package com.multikube_rest_service.controllers.provider;
 
 import com.multikube_rest_service.common.utils.FilterStringParser;
+import com.multikube_rest_service.dtos.requests.provider.ClusterAllocationRequest;
 import com.multikube_rest_service.dtos.requests.provider.ClusterRegistrationRequest;
 import com.multikube_rest_service.dtos.responses.provider.ClusterDto;
+import com.multikube_rest_service.rest.RestMessageResponse;
 import com.multikube_rest_service.services.provider.ProviderClusterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -104,10 +106,48 @@ public class ProviderClusterController {
         return ResponseEntity.ok(clusters);
     }
 
-    // Future endpoints for cluster management by providers can be added here:
-    // - GET /api/provider/clusters/{clusterId} (Get cluster details)
-    // - GET /api/provider/clusters (List all clusters registered by the provider)
-    // - PUT /api/provider/clusters/{clusterId} (Update cluster details - e.g., description)
-    // - DELETE /api/provider/clusters/{clusterId} (Deregister a cluster)
-    // - POST /api/provider/clusters/{clusterId}/verify (Explicitly re-verify cluster connectivity)
+    /**
+     * Allocates a cluster to a specific tenant.
+     * This creates the relationship that grants a tenant exclusive use of a registered cluster.
+     *
+     * @param clusterId The ID of the cluster to be allocated.
+     * @param allocationRequest The request body containing the tenantId.
+     * @return A ResponseEntity with a success message.
+     */
+    @Operation(summary = "Allocate a cluster to a tenant")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cluster successfully allocated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request (e.g., cluster already allocated, not active)"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Cluster or Tenant not found")
+    })
+    @PostMapping("/{clusterId}/allocation")
+    public ResponseEntity<RestMessageResponse> allocateCluster(
+            @Parameter(description = "ID of the cluster to allocate") @PathVariable Long clusterId,
+            @RequestBody ClusterAllocationRequest allocationRequest) {
+        RestMessageResponse response = providerClusterService.allocateCluster(clusterId, allocationRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * De-allocates a cluster from a tenant.
+     * This removes the relationship, making the cluster available for allocation to another tenant.
+     * The operation will fail if the tenant has any resources (e.g., namespaces) on the cluster.
+     *
+     * @param clusterId The ID of the cluster to be de-allocated.
+     * @return A ResponseEntity with a success message.
+     */
+    @Operation(summary = "De-allocate a cluster from a tenant")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cluster successfully de-allocated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request (e.g., cluster has active tenant resources)"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Cluster or allocation not found for this provider")
+    })
+    @DeleteMapping("/{clusterId}/allocation")
+    public ResponseEntity<RestMessageResponse> deallocateCluster(
+            @Parameter(description = "ID of the cluster whose allocation is to be removed") @PathVariable Long clusterId) {
+        RestMessageResponse response = providerClusterService.deallocateCluster(clusterId);
+        return ResponseEntity.ok(response);
+    }
 }

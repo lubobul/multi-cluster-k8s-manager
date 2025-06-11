@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -20,4 +21,6 @@ public class TenantDto {
     private Timestamp createdAt;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Timestamp updatedAt;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY) // Don't include if the list is empty
+    private List<Long> allocatedClusterIds;
 }

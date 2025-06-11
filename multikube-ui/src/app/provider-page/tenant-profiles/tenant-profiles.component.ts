@@ -14,7 +14,6 @@ import {QueryRequest, QueryRequestSortType} from '../../common/rest/types/reques
 import {buildRestGridFilter, resolveErrorMessage} from '../../common/utils/util-functions';
 import {TenantService} from '../services/tenant.service';
 import {TenantResponse} from '../../common/rest/types/provider/responses/TenantResponse';
-import {EditorComponent} from 'ngx-monaco-editor-v2';
 import {
     AbstractControlOptions,
     FormBuilder,
@@ -27,7 +26,7 @@ import {FormValidators} from '../../common/utils/form-validators';
 import {CreateTenantRequest} from '../../common/rest/types/provider/requests/CreateTenantRequest';
 
 @Component({
-  selector: 'app-tenant-profiles',
+    selector: 'app-tenant-profiles',
     imports: [
         ClrAlertModule,
         ClrDatagridModule,
@@ -43,10 +42,10 @@ import {CreateTenantRequest} from '../../common/rest/types/provider/requests/Cre
         ReactiveFormsModule,
         ClarityModule,
     ],
-  templateUrl: './tenant-profiles.component.html',
-  styleUrl: './tenant-profiles.component.scss'
+    templateUrl: './tenant-profiles.component.html',
+    styleUrl: './tenant-profiles.component.scss'
 })
-export class TenantProfilesComponent implements OnInit{
+export class TenantProfilesComponent implements OnInit {
 
     private onDataGridRefresh = new Subject<ClrDatagridStateInterface>();
     errorMessage = "";
@@ -81,6 +80,7 @@ export class TenantProfilesComponent implements OnInit{
         page: 1,
         pageSize: 5,
     };
+
     constructor(
         private tenantService: TenantService,
         private fb: FormBuilder,
@@ -92,7 +92,7 @@ export class TenantProfilesComponent implements OnInit{
         this.buildForm();
     }
 
-    buildForm(): void{
+    buildForm(): void {
         this.createTenantForm = this.fb.group({
             details: this.fb.group({
                 name: ["", Validators.required],
@@ -102,7 +102,7 @@ export class TenantProfilesComponent implements OnInit{
                 defaultAdminName: ["", Validators.required],
                 defaultAdminPassword: ["", [Validators.required, Validators.minLength(6)]],
                 repeatDefaultAdminPassword: ["", Validators.required],
-            },{
+            }, {
                 validators: [FormValidators.matchPasswords(
                     "defaultAdminPassword",
                     "repeatDefaultAdminPassword"
@@ -111,7 +111,7 @@ export class TenantProfilesComponent implements OnInit{
         });
     }
 
-    public subscribeToTenantsGrid(): void{
+    public subscribeToTenantsGrid(): void {
         this.onDataGridRefresh.pipe(
             debounceTime(500),
             mergeMap((state) => {
@@ -126,7 +126,7 @@ export class TenantProfilesComponent implements OnInit{
                     filter: buildRestGridFilter(state.filters)
                 }
                 return this.tenantService.getTenants(this.restQuery);
-            })).subscribe( {
+            })).subscribe({
             next: (response) => {
                 this.tenantsPage = response;
                 this.loading = false;
@@ -138,7 +138,7 @@ export class TenantProfilesComponent implements OnInit{
         });
     }
 
-    openCreateTenantModal(): void{
+    openCreateTenantModal(): void {
         this.createTenantModalOpened = true;
         this.createTenantForm.controls.details.reset({
             name: "",
@@ -151,8 +151,8 @@ export class TenantProfilesComponent implements OnInit{
         });
     }
 
-    createTenant(): void{
-        if(this.createTenantForm.invalid){
+    createTenant(): void {
+        if (this.createTenantForm.invalid) {
             return;
         }
         this.creatingTenantLoading = true;
@@ -180,7 +180,7 @@ export class TenantProfilesComponent implements OnInit{
         this.onDataGridRefresh.next(state);
     }
 
-    public refresh(): void{
+    public refresh(): void {
         this.tenantService.getTenants(this.restQuery).subscribe((response) => {
             this.tenantsPage = response;
         });

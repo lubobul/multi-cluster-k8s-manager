@@ -5,6 +5,8 @@ import {QueryParams} from '../../types/requests/query-request';
 import {PaginatedResponse} from '../../types/responses/paginated-response';
 import {ClusterResponse} from '../../types/provider/responses/ClusterResponse';
 import {RegisterClusterRequest} from '../../types/provider/requests/RegisterClusterRequest';
+import {AllocateClusterRequest} from '../../types/provider/requests/AllocateClusterRequest';
+import {RestMessageResponse} from '../../types/auth-types';
 
 
 @Injectable({
@@ -25,5 +27,13 @@ export class ClustersApiService {
 
     createCluster(cluster: RegisterClusterRequest): Observable<ClusterResponse> {
         return this.http.post<ClusterResponse>(this.apiUrl, cluster);
+    }
+
+    allocateCluster(clusterId: number, clusterAllocation: AllocateClusterRequest): Observable<RestMessageResponse> {
+        return this.http.post<RestMessageResponse>(`${this.apiUrl}/${clusterId}/allocation`, clusterAllocation);
+    }
+
+    deallocateCluster(clusterId: number): Observable<RestMessageResponse> {
+        return this.http.delete<RestMessageResponse>(`${this.apiUrl}/${clusterId}/allocation`);
     }
 }

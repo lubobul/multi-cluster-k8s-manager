@@ -5,11 +5,13 @@ import com.multikube_rest_service.dtos.auth.RegisterRequest;
 import com.multikube_rest_service.dtos.requests.provider.TenantCreateRequest;
 import com.multikube_rest_service.dtos.responses.TenantDto;
 import com.multikube_rest_service.entities.Tenant;
+import com.multikube_rest_service.entities.provider.ClusterAllocation;
 import com.multikube_rest_service.exceptions.ResourceNotFoundException;
 import com.multikube_rest_service.mappers.TenantMapper;
 import com.multikube_rest_service.repositories.TenantRepository;
 import com.multikube_rest_service.common.utils.FilterStringParser; // Assuming this exists
 
+import com.multikube_rest_service.repositories.provider.ClusterAllocationRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import org.springframework.util.StringUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Service layer for managing Tenant entities.
@@ -28,7 +31,8 @@ public class TenantService {
 
     private final TenantRepository tenantRepository;
     private final TenantMapper tenantMapper;
-    private final UserAuthService userAuthService; // Inject UserAuthService to create the default admin
+    private final UserAuthService userAuthService;
+    private final ClusterAllocationRepository clusterAllocationRepository;
     private static final String SYSTEM_TENANT_NAME = "System";
 
     /**
@@ -39,10 +43,11 @@ public class TenantService {
      */
     public TenantService(TenantRepository tenantRepository,
                          TenantMapper tenantMapper,
-                         UserAuthService userAuthService) {
+                         UserAuthService userAuthService, ClusterAllocationRepository clusterAllocationRepository) {
         this.tenantRepository = tenantRepository;
         this.tenantMapper = tenantMapper;
         this.userAuthService = userAuthService;
+        this.clusterAllocationRepository = clusterAllocationRepository;
     }
 
     /**
@@ -124,53 +129,67 @@ public class TenantService {
     }
 
 
-    /**
-     * Finds a non-System tenant by its ID.
-     * Intended for provider management APIs.
-     *
-     * @param id The ID of the tenant.
-     * @return The TenantDto if found and is not the "System" tenant.
-     * @throws ResourceNotFoundException if no tenant is found or if the found tenant is the "System" tenant.
-     */
     @Transactional(readOnly = true)
     public TenantDto getTenant(Long id) {
-        Tenant tenant = tenantRepository.findById(id)
+        Tenant tenantEntity = tenantRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tenant not found with ID: " + id));
 
-        if (SYSTEM_TENANT_NAME.equals(tenant.getName())) {
+        if (SYSTEM_TENANT_NAME.equals(tenantEntity.getName())) {
             throw new ResourceNotFoundException("Access to '" + SYSTEM_TENANT_NAME + "' tenant via this API is restricted.");
         }
-        return tenantMapper.toDto(tenant);
+
+        // Map to DTO first
+        TenantDto tenantDto = tenantMapper.toDto(tenantEntity);
+
+        // Fetch and set allocated cluster IDs
+        List<Long> allocatedClusterIds = clusterAllocationRepository.findByTenantIdIn(Collections.singletonList(id))
+                .stream()
+                .map(allocation -> allocation.getKubernetesCluster().getId())
+                .collect(Collectors.toList());
+        tenantDto.setAllocatedClusterIds(allocatedClusterIds);
+
+        return tenantDto;
     }
 
-    /**
-     * Retrieves a paginated list of all tenants, EXCLUDING the "System" tenant.
-     * Intended for provider management APIs.
-     * Filter format: "key1==value1,key2==value2" (e.g., "name==test,status==ACTIVE")
-     * Currently supported keys: "name"
-     *
-     * @param filterString Optional filter string.
-     * @param pageable Pagination information.
-     * @return A page of TenantDto objects.
-     */
     @Transactional(readOnly = true)
     public Page<TenantDto> getTenants(String filterString, Pageable pageable) {
-        Map<String, String> filters = FilterStringParser.parse(filterString); // Assuming FilterStringParser exists
+        Map<String, String> filters = FilterStringParser.parse(filterString);
         String nameFilter = filters.getOrDefault("name", "").trim();
 
         Page<Tenant> tenantPage;
         List<String> excludedNames = Collections.singletonList(SYSTEM_TENANT_NAME);
 
         if (StringUtils.hasText(nameFilter)) {
-            // Explicitly exclude "System" even if searched for via this general listing
             if (SYSTEM_TENANT_NAME.equalsIgnoreCase(nameFilter)) {
-                return Page.empty(pageable); // Return empty if "System" is explicitly searched
+                return Page.empty(pageable);
             }
             tenantPage = tenantRepository.findByNameContainingIgnoreCaseAndNameNotIn(nameFilter, excludedNames, pageable);
         } else {
             tenantPage = tenantRepository.findByNameNotIn(excludedNames, pageable);
         }
-        return tenantPage.map(tenantMapper::toDto);
+
+        // Efficiently fetch all allocations for the tenants on the current page
+        List<Long> tenantIdsOnPage = tenantPage.getContent().stream()
+                .map(Tenant::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, List<Long>> tenantToClusterIdsMap = new java.util.HashMap<>();
+        if (!tenantIdsOnPage.isEmpty()) {
+            List<ClusterAllocation> allocations = clusterAllocationRepository.findByTenantIdIn(tenantIdsOnPage);
+            tenantToClusterIdsMap = allocations.stream()
+                    .collect(Collectors.groupingBy(
+                            allocation -> allocation.getTenant().getId(),
+                            Collectors.mapping(allocation -> allocation.getKubernetesCluster().getId(), Collectors.toList())
+                    ));
+        }
+
+        // Map the Page<Tenant> to Page<TenantDto> and set the allocatedClusterIds for each DTO
+        final Map<Long, List<Long>> finalTenantToClusterIdsMap = tenantToClusterIdsMap;
+        return tenantPage.map(tenant -> {
+            TenantDto dto = tenantMapper.toDto(tenant);
+            dto.setAllocatedClusterIds(finalTenantToClusterIdsMap.getOrDefault(tenant.getId(), Collections.emptyList()));
+            return dto;
+        });
     }
 
     /**

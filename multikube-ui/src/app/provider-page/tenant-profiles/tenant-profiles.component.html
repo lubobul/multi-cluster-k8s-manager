@@ -15,6 +15,7 @@
     <clr-datagrid (clrDgRefresh)="refreshByGrid($event)" [clrDgLoading]="loading">
         <clr-dg-column [clrDgField]="'name'">Organization Name</clr-dg-column>
         <clr-dg-column>State</clr-dg-column>
+        <clr-dg-column>Allocated K8s clusters</clr-dg-column>
         <clr-dg-column>Created</clr-dg-column>
         <clr-dg-column>Last Updated</clr-dg-column>
         <clr-dg-placeholder>No tenants found.</clr-dg-placeholder>
@@ -29,6 +30,7 @@
                 </clr-dg-action-overflow>
                 <clr-dg-cell>{{ tenant.name }}</clr-dg-cell>
                 <clr-dg-cell>{{ tenant.isActive ? "Active" : "Not Active" }}</clr-dg-cell>
+                <clr-dg-cell>{{ tenant?.allocatedClusterIds?.length || 0 }}</clr-dg-cell>
                 <clr-dg-cell>{{ tenant.createdAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
                 <clr-dg-cell>{{ tenant.updatedAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
             </clr-dg-row>
