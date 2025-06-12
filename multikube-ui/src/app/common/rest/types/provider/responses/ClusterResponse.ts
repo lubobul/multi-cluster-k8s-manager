@@ -7,6 +7,12 @@ export interface ClusterResponse {
     status: ClusterStatus,
     createdAt: string,
     updatedAt: string
+    allocation?: ClusterAllocation;
+}
+
+export interface ClusterAllocation {
+    tenantName: string;
+    tenantId: number
 }
 
 export enum ClusterStatus {

@@ -11,66 +11,27 @@
     }
     <clr-toggle-container>
         <clr-toggle-wrapper>
-            <input type="checkbox" clrToggle value="option1" name="options" [(ngModel)]="darkMode" (change)="toggleDarkMode($event)" />
+            <input type="checkbox" clrToggle value="option1" name="options" [(ngModel)]="darkMode"
+                   (change)="toggleDarkMode($event)"/>
             <label>Dark mode</label>
         </clr-toggle-wrapper>
     </clr-toggle-container>
 
-    <div class="avatar-selection">
-        <label class="clr-control-label">Avatar</label>
-        <div class="clr-row select-avatar-container">
-            <button (click)="selectAvatar()" class="btn btn-primary-outline button-select-avatar">
-                <cds-icon size="'md'"  shape="pencil"></cds-icon>
-            </button>
-            @if(!!avatar64){
-                <img class="avatar-display" src="{{avatar64}}">
-            }@else{
-                <cds-icon size="'xl'"  shape="user"></cds-icon>
-            }
 
-        </div>
+    <div class="clr-row user-profile-row">
+        <label class="clr-col-2">Username</label>
+        <span>{{user.username}}</span>
     </div>
 
+    <div class="clr-row user-profile-row">
+        <label class="clr-col-2">Email</label>
+        <span>{{user.email}}</span>
+    </div>
 
-<form [formGroup]="updateProfileForm">
-    <clr-input-container>
-        <label>Username</label>
-        <input clrInput type="name" formControlName="username" placeholder="Enter your username"/>
-        <clr-control-error *clrIfError="'minlength'">
-            Username should be more than 3 characters long.
-        </clr-control-error>
-        <clr-control-error *clrIfError="'required'">
-            Username field is required.
-        </clr-control-error>
-        <clr-control-helper>
-            With this name you will be seen by others.
-        </clr-control-helper>
-    </clr-input-container>
-
-    <clr-input-container>
-        <label>Email</label>
-        <input clrInput type="email" formControlName="email" placeholder="Enter your email"/>
-    </clr-input-container>
 
     <div class="profile-actions">
-        <button type="submit" (click)="updateProfile()" [disabled]="updateProfileForm.invalid" class="btn btn-primary btn-form-action">Update Profile</button>
-        <button type="submit" (click)="logout()" class="btn btn-primary btn-primary-outline logout-profile-btn">Logout</button>
-        <button type="submit" (click)="openDeleteProfileModal()" class="btn btn-danger-outline delete-profile-btn">Delete Profile</button>
-    </div>
-
-</form>
-</div>
-
-<clr-modal [(clrModalOpen)]="showConfirm">
-    <h3 class="modal-title">Are you sure?</h3>
-    <div class="modal-body">
-        <p>Deleting your profiled cannot be reverted, all conversations and profile data will be lost.</p>
-        <p>Are you sure you want to delete your profile?.</p>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-outline" (click)="showConfirm = false">Cancel</button>
-        <button type="button" class="btn btn-outline-danger" (click)="deleteProfile()">
-            Delete
+        <button type="submit" (click)="logout()" class="btn btn-primary btn-primary-outline logout-profile-btn">Logout
         </button>
     </div>
-</clr-modal>
+
+</div>

@@ -1,6 +1,6 @@
 package com.multikube_rest_service.services.provider;
 
-import com.multikube_rest_service.common.SecurityContextHelper; //
+import com.multikube_rest_service.common.SecurityContextHelper;
 import com.multikube_rest_service.common.encryption.KubeconfigEncryptor;
 import com.multikube_rest_service.common.enums.ClusterStatus;
 import com.multikube_rest_service.dtos.requests.provider.ClusterAllocationRequest;
@@ -13,7 +13,7 @@ import com.multikube_rest_service.entities.provider.KubernetesCluster;
 import com.multikube_rest_service.exceptions.ResourceNotFoundException;
 import com.multikube_rest_service.mappers.provider.KubernetesClusterMapper;
 import com.multikube_rest_service.repositories.TenantRepository;
-import com.multikube_rest_service.repositories.UserRepository; //
+import com.multikube_rest_service.repositories.UserRepository;
 import com.multikube_rest_service.repositories.provider.ClusterAllocationRepository;
 import com.multikube_rest_service.repositories.provider.KubernetesClusterRepository;
 import com.multikube_rest_service.repositories.provider.TenantNamespaceRepository;
@@ -32,7 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Service layer for managing Kubernetes cluster registration and related operations
@@ -195,7 +198,19 @@ public class ProviderClusterService {
         KubernetesCluster cluster = clusterRepository.findByIdAndProviderUser_Id(clusterId, providerUserId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Cluster not found with ID: " + clusterId + " for the current provider."));
-        return clusterMapper.toDto(cluster);
+
+        ClusterDto clusterDto = clusterMapper.toDto(cluster);
+
+        // Find allocation and set it if present
+        clusterAllocationRepository.findByKubernetesClusterId(clusterId).ifPresent(allocation -> {
+            ClusterDto.AllocationDto allocationDto = new ClusterDto.AllocationDto(
+                    allocation.getTenant().getId(),
+                    allocation.getTenant().getName()
+            );
+            clusterDto.setAllocation(allocationDto);
+        });
+
+        return clusterDto;
     }
 
     /**
@@ -240,7 +255,32 @@ public class ProviderClusterService {
             clusterPage = clusterRepository.findByProviderUser_Id(providerUserId, pageable);
         }
 
-        return clusterPage.map(clusterMapper::toDto);
+        // Fetch all allocations for the clusters on the current page in one go
+        List<Long> clusterIdsOnPage = clusterPage.getContent().stream()
+                .map(KubernetesCluster::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, ClusterAllocation> allocationsMap = new HashMap<>();
+        if (!clusterIdsOnPage.isEmpty()) {
+            List<ClusterAllocation> allocations = clusterAllocationRepository.findByKubernetesClusterIdIn(clusterIdsOnPage);
+            allocationsMap = allocations.stream()
+                    .collect(Collectors.toMap(allocation -> allocation.getKubernetesCluster().getId(), allocation -> allocation));
+        }
+
+        final Map<Long, ClusterAllocation> finalAllocationsMap = allocationsMap;
+
+        // Map the Page<KubernetesCluster> to Page<ClusterDto> and set the allocation info
+        return clusterPage.map(cluster -> {
+            ClusterDto dto = clusterMapper.toDto(cluster);
+            ClusterAllocation allocation = finalAllocationsMap.get(cluster.getId());
+            if (allocation != null) {
+                dto.setAllocation(new ClusterDto.AllocationDto(
+                        allocation.getTenant().getId(),
+                        allocation.getTenant().getName()
+                ));
+            }
+            return dto;
+        });
     }
 
     /**

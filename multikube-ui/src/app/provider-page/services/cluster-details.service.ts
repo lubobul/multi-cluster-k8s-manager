@@ -16,10 +16,10 @@ export class ClusterDetailsService {
         private router: Router,
         private clusterService: ClusterService,
     ) {
-        this.initClusterDetails();
+        this.updateClusterDetails();
     }
 
-    public initClusterDetails(): void {
+    public updateClusterDetails(): void {
         (this.activatedRoute.params as Observable<Params>).pipe(
             map((routeParameters) => {
                 return routeParameters[MULTIKUBE_ROUTE_PATHS.CLUSTER_ID];

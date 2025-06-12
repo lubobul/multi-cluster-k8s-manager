@@ -13,4 +13,5 @@ public interface ClusterAllocationRepository extends JpaRepository<ClusterAlloca
     List<ClusterAllocation> findByTenantIdIn(List<Long> tenantIds);
     Optional<ClusterAllocation> findByKubernetesClusterId(Long kubernetesClusterId);
     long deleteByKubernetesClusterId(Long kubernetesClusterId);
+    List<ClusterAllocation> findByKubernetesClusterIdIn(List<Long> kubernetesClusterIds);
 }

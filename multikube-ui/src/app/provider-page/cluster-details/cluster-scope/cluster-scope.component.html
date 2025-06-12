@@ -14,40 +14,50 @@
     </clr-alert>
 }
 
-@if(cluster | isClusterPublished: selectedTenant){
-    <button [disabled]="!selectedTenant" class="btn btn-primary" (click)="unpublish()">Unpublish</button>
+@if (cluster?.allocation) {
+    <clr-alert class="danger-alert" [clrAlertClosable]="false" [clrAlertType]="'success'">
+        <clr-alert-item>
+            <span class="alert-text">
+                <div class="allocated-alert-text">
+                    <h5 class="success">This cluster is allocated to tenant <b>{{ cluster.allocation.tenantName }}</b></h5>
+                    <button class="btn btn-secondary-outline" (click)="unpublish()">Unpublish</button>
+                </div>
+            </span>
+        </clr-alert-item>
+    </clr-alert>
+
+
 } @else {
     <button [disabled]="!selectedTenant" class="btn btn-primary" (click)="publish()">Publish</button>
-}
 
-<clr-datagrid
-    (clrDgRefresh)="refreshByGrid($event)"
-    [clrDgLoading]="loading"
-    [(clrDgSingleSelected)]="selectedTenant"
-    [clrDgItemsTrackBy]="trackTenantItemById"
->
-    <clr-dg-column [clrDgField]="'name'">Organization Name</clr-dg-column>
-    <clr-dg-column>Scoped to current K8s</clr-dg-column>
-    <clr-dg-column>State</clr-dg-column>
-    <clr-dg-column>Allocated K8s clusters</clr-dg-column>
-    <clr-dg-column>Created</clr-dg-column>
-    <clr-dg-column>Last Updated</clr-dg-column>
-    <clr-dg-placeholder>No tenants found.</clr-dg-placeholder>
-    <clr-dg-row *clrDgItems="let tenant of tenantsPage.content" [clrDgItem]="tenant">
+    <clr-datagrid
+        (clrDgRefresh)="refreshByGrid($event)"
+        [clrDgLoading]="loading"
+        [(clrDgSingleSelected)]="selectedTenant"
+        [clrDgItemsTrackBy]="trackTenantItemById"
+    >
+        <clr-dg-column [clrDgField]="'name'">Organization Name</clr-dg-column>
+        <clr-dg-column>State</clr-dg-column>
+        <clr-dg-column>Allocated K8s clusters</clr-dg-column>
+        <clr-dg-column>Created</clr-dg-column>
+        <clr-dg-column>Last Updated</clr-dg-column>
+        <clr-dg-placeholder>No tenants found.</clr-dg-placeholder>
+        <clr-dg-row *clrDgItems="let tenant of tenantsPage.content" [clrDgItem]="tenant">
             <clr-dg-cell>{{ tenant.name }}</clr-dg-cell>
-            <clr-dg-cell>{{ (cluster | isClusterPublished: tenant) ? "True" : "False" }}</clr-dg-cell>
             <clr-dg-cell>{{ tenant.isActive ? "Active" : "Not Active" }}</clr-dg-cell>
-            <clr-dg-cell>{{ tenant?.allocatedClusterIds?.length || 0}}</clr-dg-cell>
+            <clr-dg-cell>{{ tenant?.allocatedClusterIds?.length || 0 }}</clr-dg-cell>
             <clr-dg-cell>{{ tenant.createdAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
             <clr-dg-cell>{{ tenant.updatedAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
         </clr-dg-row>
 
 
-    <clr-dg-footer>
-        <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="tenantsPage.totalElements">
-            <clr-dg-page-size [clrPageSizeOptions]="[5, 10, 15]">Tenants per page</clr-dg-page-size>
-            {{ pagination.firstItem + 1 }} - {{ pagination.lastItem + 1 }} of
-            {{ pagination.totalItems }} tenants
-        </clr-dg-pagination>
-    </clr-dg-footer>
-</clr-datagrid>
+        <clr-dg-footer>
+            <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="tenantsPage.totalElements">
+                <clr-dg-page-size [clrPageSizeOptions]="[5, 10, 15]">Tenants per page</clr-dg-page-size>
+                {{ pagination.firstItem + 1 }} - {{ pagination.lastItem + 1 }} of
+                {{ pagination.totalItems }} tenants
+            </clr-dg-pagination>
+        </clr-dg-footer>
+    </clr-datagrid>
+}
+

@@ -42,6 +42,10 @@
                                 <span class="card-detail-value">{{ cluster.providerUsername }}</span>
                             </div>
                             <div class="card-details-pair">
+                                <span class="card-detail-label">Allocation</span>
+                                <span class="card-detail-value">{{ cluster?.allocation ? cluster?.allocation?.tenantName : "No" }}</span>
+                            </div>
+                            <div class="card-details-pair">
                                 <span class="card-detail-label">Created</span>
                                 <span class="card-detail-value">{{ cluster.createdAt | date : "dd.MM, hh:mm" }}</span>
                             </div>

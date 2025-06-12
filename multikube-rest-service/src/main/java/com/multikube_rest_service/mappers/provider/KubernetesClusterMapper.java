@@ -12,7 +12,8 @@ public interface KubernetesClusterMapper extends GenericMapper<KubernetesCluster
 
     @Mappings({
             @Mapping(source = "providerUser.id", target = "providerUserId"),
-            @Mapping(source = "providerUser.username", target = "providerUsername")
+            @Mapping(source = "providerUser.username", target = "providerUsername"),
+            @Mapping(target = "allocation", ignore = true)
     })
     @Override
     ClusterDto toDto(KubernetesCluster kubernetesCluster);

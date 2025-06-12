@@ -11,8 +11,6 @@ import {buildRestGridFilter, resolveErrorMessage} from '../../../common/utils/ut
 import {ClusterService} from '../../services/cluster.service';
 import {ClusterResponse} from '../../../common/rest/types/provider/responses/ClusterResponse';
 import {ClusterDetailsService} from '../../services/cluster-details.service';
-import {IsClusterPublishedPipe} from './is-cluster-published.pipe';
-import {unpinIcon} from '@cds/core/icon';
 
 @Component({
   selector: 'app-cluster-scope',
@@ -20,7 +18,6 @@ import {unpinIcon} from '@cds/core/icon';
         ClrDatagridModule,
         DatePipe,
         ClrAlertModule,
-        IsClusterPublishedPipe
     ],
   templateUrl: './cluster-scope.component.html',
   styleUrl: './cluster-scope.component.scss'
@@ -115,7 +112,7 @@ export class ClusterScopeComponent implements OnInit {
                 this.loading = false;
                 this.publishMessage = response.message;
                 this.publishAlertClosed = false;
-                this.refresh();
+                this.clusterDetailsService.updateClusterDetails();
             }, error: (error) => {
                 this.errorMessage = resolveErrorMessage(error);
                 this.alertClosed = false;
@@ -132,9 +129,7 @@ export class ClusterScopeComponent implements OnInit {
         }).subscribe({
             next: (response) => {
                 this.loading = false;
-                this.publishMessage = response.message;
-                this.publishAlertClosed = false;
-                this.refresh();
+                this.clusterDetailsService.updateClusterDetails();
             }, error: (error) => {
                 this.errorMessage = resolveErrorMessage(error);
                 this.alertClosed = false;
@@ -149,6 +144,4 @@ export class ClusterScopeComponent implements OnInit {
             this.tenantsPage = response;
         });
     }
-
-    protected readonly unpinIcon = unpinIcon;
 }
