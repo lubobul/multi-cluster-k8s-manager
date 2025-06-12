@@ -11,18 +11,21 @@ public class JwtUserDetails implements UserDetails {
     private final String email;
     @Getter
     private final Long userId;
+    @Getter
+    private final Long tenantId;
     private final Collection<? extends GrantedAuthority> authorities; // Added authorities
 
-    public JwtUserDetails(String email, Long userId, Collection<? extends GrantedAuthority> authorities) {
+    public JwtUserDetails(String email, Long userId, Long tenantId, Collection<? extends GrantedAuthority> authorities) {
         this.email = email;
         this.userId = userId;
+        this.tenantId = tenantId;
         this.authorities = authorities != null ? authorities : Collections.emptyList(); // Store authorities
     }
 
     // Constructor without authorities for cases where they might not be immediately available or needed
     // However, for role-based security, you'll primarily use the one with authorities.
-    public JwtUserDetails(String email, Long userId) {
-        this(email, userId, Collections.emptyList());
+    public JwtUserDetails(String email, Long userId, Long tenantId) {
+        this(email, userId, tenantId, Collections.emptyList());
     }
 
 

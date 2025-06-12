@@ -26,7 +26,7 @@ import java.util.Map;
  * All operations in this controller require the user to have the 'PROVIDER_ADMIN' authority.
  */
 @RestController
-@RequestMapping("/api/provider/clusters")
+@RequestMapping("/api/v1/provider/clusters")
 @PreAuthorize("hasAuthority('PROVIDER_ADMIN')") // Secures all endpoints in this controller
 @Tag(name = "Provider - Cluster Management", description = "APIs for providers to manage Kubernetes clusters")
 // Assuming 'bearerAuth' is defined in your OpenAPI/Swagger configuration for JWT

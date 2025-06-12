@@ -14,7 +14,7 @@ import {UserResponse} from '../types/responses/user-response';
     providedIn: 'root',
 })
 export class ProfileApiService {
-    private readonly apiUrl = '/api/profile';
+    private readonly apiUrl = '/api/v1/profile';
 
     constructor(private http: HttpClient) {}
 

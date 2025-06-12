@@ -3,9 +3,6 @@ import { ProviderHomePageComponent } from './provider-page/provider-home-page.co
 import { MultikubeLoginComponent } from './auth-components/multikube-login/multikube-login.component';
 import { ProviderDashboardComponent } from './provider-page/provider-dashboard-component/provider-dashboard.component';
 import { ProfileSettingsComponent } from './profile-settings/profile-settings.component';
-
-// Placeholder/Actual Components (Import or lazy load as needed)
-// Provider components
 import { KubernetesClustersComponent } from './provider-page/kubernetes-clusters/kubernetes-clusters.component';
 import { TenantProfilesComponent } from './provider-page/tenant-profiles/tenant-profiles.component';
 import { TenantUsersComponent } from './provider-page/tenant-users/tenant-users.component';
@@ -15,9 +12,16 @@ import {ClusterDetailsComponent} from './provider-page/cluster-details/cluster-d
 import {ClusterResourcesComponent} from './provider-page/cluster-details/cluster-resources/cluster-resources.component';
 import {ClusterScopeComponent} from './provider-page/cluster-details/cluster-scope/cluster-scope.component';
 import {ClusterDashboardComponent} from './provider-page/cluster-details/cluster-dashboard/cluster-dashboard.component';
+import {TenantHomePageComponent} from './tenant-page/tenant-home-page.component';
+import {TenantDashboardComponent} from './tenant-page/tenant-dashboard-component/tenant-dashboard.component';
+import {
+    TenantKubernetesClustersComponent
+} from './tenant-page/kubernetes-clusters/tenant-kubernetes-clusters.component';
+import {TenantClusterDetailsComponent} from './tenant-page/cluster-details/tenant-cluster-details.component';
+import {
+    TenantClusterDashboardComponent
+} from './tenant-page/cluster-details/cluster-dashboard/tenant-cluster-dashboard.component';
 
-// Tenant components (you'll need to create these or use placeholders)
-// Example: import { TenantDashboardComponent } from './tenant-page/dashboard/tenant-dashboard.component';
 
 export const MULTIKUBE_ROUTE_PATHS = {
     LOGIN: 'login',
@@ -37,14 +41,16 @@ export const MULTIKUBE_ROUTE_PATHS = {
     TENANT_PROFILES: 'tenant-profiles',
     TENANT_USERS: 'tenant-users',
     PROFILE_SETTINGS: 'profile-settings', // Common, but can be part of layouts
+};
 
-    // Tenant specific children (can be nested under TENANT_BASE)
-    TENANT_DASHBOARD: 'dashboard',
-    TENANT_APPLICATIONS: 'applications',
-    // ... other tenant routes
-
-    // Common inside authenticated areas if needed, or specific to provider/tenant
-    HOME_WELCOME: 'welcome', // Might be part of provider/tenant dashboard
+export const TENANT_ROUTE_PATHS = {
+    TENANT_DASHBOARD: "dashboard",
+    KUBE_CLUSTERS: 'kubernetes-clusters',
+    CLUSTER_ID: 'clusters-id',
+    CLUSTER_DETAILS: 'details',
+    CLUSTER_DETAILS_CHILDREN: {
+        DASHBOARD: "dashboard",
+    },
 };
 
 export const routes: Routes = [
@@ -117,14 +123,42 @@ export const routes: Routes = [
     },
     {
         path: MULTIKUBE_ROUTE_PATHS.TENANT_BASE,
-        component: ProviderHomePageComponent, // Or a specific TenantLayoutComponent
+        component: TenantHomePageComponent, // Or a specific TenantLayoutComponent
         canActivate: [authGuard, tenantGuard], // Must be logged in AND be a tenant
         children: [
-            { path: '', redirectTo: MULTIKUBE_ROUTE_PATHS.TENANT_DASHBOARD, pathMatch: 'full' },
+            { path: '', redirectTo: TENANT_ROUTE_PATHS.TENANT_DASHBOARD, pathMatch: 'full' },
             {
-                path: MULTIKUBE_ROUTE_PATHS.TENANT_DASHBOARD, // e.g., 'tenant/dashboard'
-                component: ProviderDashboardComponent // Replace with TenantDashboardComponent
-                // loadComponent: () => import('./tenant-page/tenant-dashboard/tenant-dashboard.component').then(m => m.TenantDashboardComponent)
+                path: TENANT_ROUTE_PATHS.TENANT_DASHBOARD, // e.g., 'tenant/dashboard'
+                component: TenantDashboardComponent // Replace with TenantDashboardComponent
+            },
+            {
+                path: TENANT_ROUTE_PATHS.KUBE_CLUSTERS, // e.g., 'provider/kubernetes-clusters'
+                component: TenantKubernetesClustersComponent
+            },
+            {
+                path: `${TENANT_ROUTE_PATHS.KUBE_CLUSTERS}/:${TENANT_ROUTE_PATHS.CLUSTER_ID}`,
+                children: [
+                    {
+                        path: "",
+                        redirectTo: TENANT_ROUTE_PATHS.CLUSTER_DETAILS,
+                        pathMatch: "full",
+                    },
+                    {
+                        path: TENANT_ROUTE_PATHS.CLUSTER_DETAILS,
+                        component: TenantClusterDetailsComponent,
+                        children: [
+                            {
+                                path: "",
+                                redirectTo: TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.DASHBOARD,
+                                pathMatch: "full",
+                            },
+                            {
+                                path: TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.DASHBOARD,
+                                component: TenantClusterDashboardComponent,
+                            },
+                        ]
+                    },
+                ]
             },
             {
                 path: MULTIKUBE_ROUTE_PATHS.PROFILE_SETTINGS, // e.g., 'tenant/profile-settings'

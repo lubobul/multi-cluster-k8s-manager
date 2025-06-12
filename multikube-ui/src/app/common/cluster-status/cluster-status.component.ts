@@ -2,6 +2,7 @@ import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {ClusterResponse, ClusterStatus} from '../rest/types/provider/responses/ClusterResponse';
 import {CdsModule} from '@cds/angular';
 import {ClrSpinnerModule} from '@clr/angular';
+import {TenantClusterResponse} from '../rest/types/tenant/responses/TenantClusterResponse';
 
 @Component({
     selector: 'cluster-status',
@@ -16,7 +17,7 @@ import {ClrSpinnerModule} from '@clr/angular';
 export class ClusterStatusComponent {
 
     @Input()
-    cluster?: ClusterResponse;
+    cluster?: ClusterResponse | TenantClusterResponse;
 
     get status(): ClusterStatus {
         if (!this.cluster){

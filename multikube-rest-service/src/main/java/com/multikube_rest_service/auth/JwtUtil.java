@@ -32,6 +32,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .subject(user.getEmail())
                 .claim("userId", user.getId())
+                .claim("tenantId", user.getTenant().getId())
                 .claim("roles", roles) // Add roles as a claim
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours

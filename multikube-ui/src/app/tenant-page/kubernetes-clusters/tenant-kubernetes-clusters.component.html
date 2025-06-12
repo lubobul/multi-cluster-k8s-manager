@@ -1,0 +1,59 @@
+<div class="host-container">
+    @if (errorMessage) {
+        <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorClosed">
+            <clr-alert-item>
+                <span class="alert-text">{{ errorMessage }}</span>
+            </clr-alert-item>
+        </clr-alert>
+    }
+
+    @if (loading) {
+        <div class="loading-container">
+            <clr-spinner clrInline>Loading...</clr-spinner>
+            <h5>Loading...</h5>
+        </div>
+
+    } @else {
+
+        @if (!allClusters?.length) {
+            <h4>No Kubernetes clusters allocated to you.</h4>
+            <h5>Please contact your provider and ask for Kubernetes clusters allocation.</h5>
+        }
+
+        <div class="cluster-cards-container">
+            @for (cluster of allClusters; track cluster.id) {
+                <div class="card cluster-card">
+                    <div class="card-header">{{ cluster.name }}</div>
+                    <div class="card-block">
+                        <div class="cluster-card-details">
+                            <div class="card-details-pair">
+                                <span class="card-detail-label">Status</span>
+                                <span class="card-detail-value">
+                                    <cluster-status [cluster]="cluster"></cluster-status>
+                                </span>
+                            </div>
+                            <div class="card-details-pair">
+                                <span class="card-detail-label">Owner</span>
+                                <span class="card-detail-value">{{ cluster.providerUsername }}</span>
+                            </div>
+                            <div class="card-details-pair">
+                                <span class="card-detail-label">Created</span>
+                                <span class="card-detail-value">{{ cluster.createdAt | date : "dd.MM, hh:mm" }}</span>
+                            </div>
+                            <div class="card-details-pair">
+                                <span class="card-detail-label">Updated</span>
+                                <span class="card-detail-value">{{ cluster.updatedAt | date : "dd.MM, hh:mm" }}</span>
+                            </div>
+                        </div>
+                        <div class="card-text">
+                            {{ cluster.description }}
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-sm btn-link" (click)="openDetails(cluster)">Details</button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * REST controller for PROVIDER_ADMIN users to manage Tenants.
  */
 @RestController
-@RequestMapping("/api/provider/tenants")
+@RequestMapping("/api/v1/provider/tenants")
 @PreAuthorize("hasAuthority('PROVIDER_ADMIN')")
 @Tag(name = "Provider - Tenant Management", description = "APIs for providers to manage tenant organizations")
 @SecurityRequirement(name = "bearerAuth")

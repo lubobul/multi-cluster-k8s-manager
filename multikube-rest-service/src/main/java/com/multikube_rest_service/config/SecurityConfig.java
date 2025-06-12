@@ -52,10 +52,10 @@ public class SecurityConfig {
                                 "/configuration/ui",
                                 "/configuration/security"
                         ).permitAll()
-                        .requestMatchers("/api/auth/login", "/api/auth/logout").permitAll() // Allow login and logout for all
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/logout").permitAll() // Allow login and logout for all
                         // Secure the register endpoint
                         // Option 1: Using HttpSecurity (if not using @PreAuthorize on controller method)
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register").hasAuthority("PROVIDER_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").hasAuthority("PROVIDER_ADMIN")
                         // Option 2: @PreAuthorize("hasAuthority('PROVIDER_ADMIN')") on the controller method is cleaner
                         .anyRequest().authenticated()
                 )

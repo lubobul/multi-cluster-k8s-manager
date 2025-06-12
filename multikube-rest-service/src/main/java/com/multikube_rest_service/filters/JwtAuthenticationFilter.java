@@ -47,6 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtToken != null && jwtUtil.validateToken(jwtToken)) {
                 String email = jwtUtil.extractEmail(jwtToken);
                 Long userId = jwtUtil.extractClaim(jwtToken, "userId", Long.class);
+                Long tenantId = jwtUtil.extractClaim(jwtToken, "tenantId", Long.class);
                 List<String> rolesClaim = jwtUtil.extractRoles(jwtToken); // Extract roles from token
 
                 List<SimpleGrantedAuthority> authorities;
@@ -58,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authorities = Collections.emptyList(); // Default to an empty list if no roles claim
                 }
 
-                JwtUserDetails userDetails = new JwtUserDetails(email, userId, authorities);
+                JwtUserDetails userDetails = new JwtUserDetails(email, userId, tenantId, authorities);
                 JwtAuthenticationToken authentication = new JwtAuthenticationToken(userDetails);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }

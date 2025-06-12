@@ -1,0 +1,14 @@
+<div class="main-container">
+    <div class="cluster-details-header">
+        <h3 class="cluster-details-title">{{cluster.name}}</h3>
+    </div>
+
+    <div class="content-container">
+        <clr-vertical-nav>
+            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.DASHBOARD">Dashboard</a>
+        </clr-vertical-nav>
+        <div class="content-area">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

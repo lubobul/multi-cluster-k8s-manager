@@ -11,7 +11,7 @@ import {buildQueryParams} from '../../utils/util-functions';
     providedIn: 'root',
 })
 export class UsersApiService {
-    private readonly apiUrl = '/api/users';
+    private readonly apiUrl = '/api/v1/users';
 
     constructor(private http: HttpClient) {}
 

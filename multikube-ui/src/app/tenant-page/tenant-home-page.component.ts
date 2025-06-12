@@ -8,7 +8,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {CdsIconModule} from '@cds/angular';
 import {UserResponse} from '../common/rest/types/responses/user-response';
 
-import {MULTIKUBE_ROUTE_PATHS} from '../app.routes';
+import {MULTIKUBE_ROUTE_PATHS, TENANT_ROUTE_PATHS} from '../app.routes';
 import {AuthService} from '../services/auth.service';
 
 @Component({
@@ -22,13 +22,13 @@ import {AuthService} from '../services/auth.service';
         ClarityModule,
         ReactiveFormsModule,
     ],
-    templateUrl: './provider-home-page.component.html',
+    templateUrl: './tenant-home-page.component.html',
     standalone: true,
-    styleUrl: './provider-home-page.component.scss'
+    styleUrl: './tenant-home-page.component.scss'
 })
-export class ProviderHomePageComponent implements OnInit {
+export class TenantHomePageComponent implements OnInit {
 
-    protected readonly CHAT_ROUTE_PATHS = MULTIKUBE_ROUTE_PATHS;
+    protected readonly MULTIKUBE_ROUTE_PATHS = MULTIKUBE_ROUTE_PATHS;
     currentUser: UserResponse = {} as UserResponse;
 
     constructor(
@@ -43,4 +43,6 @@ export class ProviderHomePageComponent implements OnInit {
             this.currentUser = user;
         })
     }
+
+    protected readonly TENANT_ROUTE_PATHS = TENANT_ROUTE_PATHS;
 }

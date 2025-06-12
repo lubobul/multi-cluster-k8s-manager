@@ -5,14 +5,10 @@ export interface UserResponse {
     username: string,
     email: string,
     createdAt: string,
-    "roles": UserRoles[],
+    roles: UserRoles[],
     tenant: TenantResponse;
 }
 
 export enum UserRoles{
     PROVIDER_ADMIN = "PROVIDER_ADMIN",
-}
-export interface UserChatRightsResponse {
-    user: UserResponse;
-    chatId: number;
 }

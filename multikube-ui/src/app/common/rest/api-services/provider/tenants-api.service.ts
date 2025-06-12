@@ -10,7 +10,7 @@ import {CreateTenantRequest} from '../../types/provider/requests/CreateTenantReq
     providedIn: 'root',
 })
 export class TenantsApiService {
-    private readonly apiUrl = '/api/provider/tenants';
+    private readonly apiUrl = '/api/v1/provider/tenants';
 
     constructor(private http: HttpClient) {}
 

@@ -13,7 +13,7 @@ import {RestMessageResponse} from '../../types/auth-types';
     providedIn: 'root',
 })
 export class ClustersApiService {
-    private readonly apiUrl = '/api/provider/clusters';
+    private readonly apiUrl = '/api/v1/provider/clusters';
 
     constructor(private http: HttpClient) {}
 

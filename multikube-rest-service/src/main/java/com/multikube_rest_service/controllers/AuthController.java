@@ -17,7 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize; // Import PreAu
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
     private final UserAuthService userAuthService;
 

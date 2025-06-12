@@ -19,18 +19,10 @@
             <td>{{ cluster.name }}</td>
         </tr>
         <tr>
-            <th>Allocation</th>
-            <td>{{ cluster?.allocation ? cluster?.allocation?.tenantName : "No" }}</td>
-        </tr>
-        <tr>
             <th>Status</th>
             <td>
                 <cluster-status [cluster]="cluster"></cluster-status>
             </td>
-        </tr>
-        <tr>
-            <th>Owner</th>
-            <td>{{ cluster.providerUsername }}</td>
         </tr>
         <tr>
             <th>Created</th>
