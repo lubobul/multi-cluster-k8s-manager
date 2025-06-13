@@ -1,5 +1,6 @@
 package com.multikube_rest_service.entities;
 
+import com.multikube_rest_service.entities.tenant.TenantNamespace;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -39,15 +41,6 @@ public class Tenant {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    // Optional: If you need to navigate from Tenant to its Users
-    // @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    // private Set<User> users;
-
-    // Optional: If you need to navigate from Tenant to its Namespaces
-    // @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    // private Set<com.multikube_rest_service.entities.tenant.TenantNamespace> tenantNamespaces;
-
-    // Optional: If you need to navigate from Tenant to its accessible published resources
-    // @ManyToMany(mappedBy = "accessibleTenants")
-    // private Set<com.multikube_rest_service.entities.provider.PublishedResource> accessiblePublishedResources;
+    @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<TenantNamespace> tenantNamespaces = new HashSet<>();
 }

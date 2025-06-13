@@ -1,4 +1,4 @@
-package com.multikube_rest_service.repositories.tetnant;
+package com.multikube_rest_service.repositories.tenant;
 
 import com.multikube_rest_service.common.enums.ClusterStatus;
 import com.multikube_rest_service.entities.provider.KubernetesCluster;

@@ -1,7 +1,7 @@
 package com.multikube_rest_service.entities.provider;
-
 import com.multikube_rest_service.common.enums.ClusterStatus;
 import com.multikube_rest_service.entities.User;
+import com.multikube_rest_service.entities.tenant.TenantNamespace;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +10,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "kubernetes_clusters")
@@ -48,4 +50,7 @@ public class KubernetesCluster {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    @OneToMany(mappedBy = "kubernetesCluster", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<TenantNamespace> tenantNamespaces = new HashSet<>();
 }

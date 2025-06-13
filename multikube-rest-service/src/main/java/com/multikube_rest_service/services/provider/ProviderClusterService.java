@@ -16,7 +16,7 @@ import com.multikube_rest_service.repositories.TenantRepository;
 import com.multikube_rest_service.repositories.UserRepository;
 import com.multikube_rest_service.repositories.provider.ClusterAllocationRepository;
 import com.multikube_rest_service.repositories.provider.KubernetesClusterRepository;
-import com.multikube_rest_service.repositories.provider.TenantNamespaceRepository;
+import com.multikube_rest_service.repositories.tenant.TenantNamespaceRepository;
 import com.multikube_rest_service.rest.RestMessageResponse;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
