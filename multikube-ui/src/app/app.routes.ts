@@ -1,11 +1,11 @@
-import { Routes } from '@angular/router';
-import { ProviderHomePageComponent } from './provider-page/provider-home-page.component';
-import { MultikubeLoginComponent } from './auth-components/multikube-login/multikube-login.component';
-import { ProviderDashboardComponent } from './provider-page/provider-dashboard-component/provider-dashboard.component';
-import { ProfileSettingsComponent } from './profile-settings/profile-settings.component';
-import { KubernetesClustersComponent } from './provider-page/kubernetes-clusters/kubernetes-clusters.component';
-import { TenantProfilesComponent } from './provider-page/tenant-profiles/tenant-profiles.component';
-import { TenantUsersComponent } from './provider-page/tenant-users/tenant-users.component';
+import {Routes} from '@angular/router';
+import {ProviderHomePageComponent} from './provider-page/provider-home-page.component';
+import {MultikubeLoginComponent} from './auth-components/multikube-login/multikube-login.component';
+import {ProviderDashboardComponent} from './provider-page/provider-dashboard-component/provider-dashboard.component';
+import {ProfileSettingsComponent} from './profile-settings/profile-settings.component';
+import {KubernetesClustersComponent} from './provider-page/kubernetes-clusters/kubernetes-clusters.component';
+import {TenantProfilesComponent} from './provider-page/tenant-profiles/tenant-profiles.component';
+import {TenantUsersComponent} from './provider-page/tenant-users/tenant-users.component';
 import {authGuard, nonAuthGuard} from './common/guards/auth.guard';
 import {providerGuard, tenantGuard} from './common/guards/scope.guard';
 import {ClusterDetailsComponent} from './provider-page/cluster-details/cluster-details.component';
@@ -21,6 +21,9 @@ import {TenantClusterDetailsComponent} from './tenant-page/cluster-details/tenan
 import {
     TenantClusterDashboardComponent
 } from './tenant-page/cluster-details/cluster-dashboard/tenant-cluster-dashboard.component';
+import {
+    ClusterNamespaceComponent
+} from './tenant-page/cluster-details/cluster-namespace/cluster-namespace.component';
 
 
 export const MULTIKUBE_ROUTE_PATHS = {
@@ -50,6 +53,8 @@ export const TENANT_ROUTE_PATHS = {
     CLUSTER_DETAILS: 'details',
     CLUSTER_DETAILS_CHILDREN: {
         DASHBOARD: "dashboard",
+        NAMESPACES: "namespaces",
+        NAMESPACE_ID: "namespace_id",
     },
 };
 
@@ -64,7 +69,7 @@ export const routes: Routes = [
         component: ProviderHomePageComponent, // Or a specific ProviderLayoutComponent
         canActivate: [authGuard, providerGuard], // Must be logged in AND be a provider
         children: [
-            { path: '', redirectTo: MULTIKUBE_ROUTE_PATHS.PROVIDER_DASHBOARD, pathMatch: 'full' },
+            {path: '', redirectTo: MULTIKUBE_ROUTE_PATHS.PROVIDER_DASHBOARD, pathMatch: 'full'},
             {
                 path: MULTIKUBE_ROUTE_PATHS.PROVIDER_DASHBOARD, // e.g., 'provider/dashboard'
                 component: ProviderDashboardComponent // Or a dedicated ProviderDashboardComponent
@@ -126,7 +131,7 @@ export const routes: Routes = [
         component: TenantHomePageComponent, // Or a specific TenantLayoutComponent
         canActivate: [authGuard, tenantGuard], // Must be logged in AND be a tenant
         children: [
-            { path: '', redirectTo: TENANT_ROUTE_PATHS.TENANT_DASHBOARD, pathMatch: 'full' },
+            {path: '', redirectTo: TENANT_ROUTE_PATHS.TENANT_DASHBOARD, pathMatch: 'full'},
             {
                 path: TENANT_ROUTE_PATHS.TENANT_DASHBOARD, // e.g., 'tenant/dashboard'
                 component: TenantDashboardComponent // Replace with TenantDashboardComponent
@@ -155,6 +160,10 @@ export const routes: Routes = [
                             {
                                 path: TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.DASHBOARD,
                                 component: TenantClusterDashboardComponent,
+                            },
+                            {
+                                path: `${TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACES}/:${TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_ID}`,
+                                component: ClusterNamespaceComponent,
                             },
                         ]
                     },

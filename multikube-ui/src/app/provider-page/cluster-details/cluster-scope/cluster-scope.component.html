@@ -15,12 +15,12 @@
 }
 
 @if (cluster?.allocation) {
-    <clr-alert class="danger-alert" [clrAlertClosable]="false" [clrAlertType]="'success'">
+    <clr-alert class="danger-alert" [clrAlertClosable]="false" [clrAlertType]="'info'">
         <clr-alert-item>
             <span class="alert-text">
                 <div class="allocated-alert-text">
                     <h5 class="success">This cluster is allocated to tenant <b>{{ cluster.allocation.tenantName }}</b></h5>
-                    <button class="btn btn-secondary-outline" (click)="unpublish()">Unpublish</button>
+                    <button class="btn btn-sm btn-danger-outline" (click)="unpublish()">Unpublish</button>
                 </div>
             </span>
         </clr-alert-item>

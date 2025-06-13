@@ -27,39 +27,86 @@ CREATE TABLE cluster_allocations
 -- Tracks namespaces created BY A TENANT ADMIN within their own allocated clusters.
 CREATE TABLE tenant_namespaces
 (
-    id                    BIGINT AUTO_INCREMENT PRIMARY KEY,
-    kubernetes_cluster_id BIGINT       NOT NULL,           -- The cluster this namespace belongs to. Must be a cluster allocated to the tenant.
-    tenant_id             BIGINT       NOT NULL,           -- The tenant who created and owns this namespace.
-    namespace_name        VARCHAR(255) NOT NULL,
-    status                VARCHAR(50) DEFAULT 'REQUESTED', -- Status from the tenant's perspective (e.g., CREATING, ACTIVE, FAILED).
-    created_at            TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    updated_at            TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_tn_kubernetes_cluster FOREIGN KEY (kubernetes_cluster_id) REFERENCES kubernetes_clusters (id) ON DELETE CASCADE,
-    CONSTRAINT fk_tn_tenant FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE CASCADE,
-    UNIQUE (kubernetes_cluster_id, namespace_name)         -- A namespace name is still unique within a given cluster.
+    id             BIGINT PRIMARY KEY AUTO_INCREMENT,
+    -- The DNS-compliant name of the namespace in Kubernetes.
+    name           VARCHAR(255) NOT NULL,
+    -- A user-friendly description for the namespace.
+    description    TEXT,
+    -- The status of the namespace object itself (e.g., ACTIVE, DELETING, FAILED).
+    status         VARCHAR(50)  NOT NULL,
+    -- To store any errors related to the creation or deletion of the namespace object itself.
+    status_details TEXT,
+    -- Foreign keys to the tenant and cluster this namespace belongs to.
+    tenant_id      BIGINT       NOT NULL,
+    cluster_id     BIGINT       NOT NULL,
+    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    -- A namespace name must be unique within a given cluster.
+    CONSTRAINT unique_namespace_per_cluster UNIQUE (name, cluster_id),
+
+    FOREIGN KEY (tenant_id) REFERENCES tenants (id),
+    FOREIGN KEY (cluster_id) REFERENCES kubernetes_clusters (id)
+);
+
+-- Tracks resources such as  'ResourceQuota', 'LimitRange', 'NetworkPolicy' etc.,  created BY A TENANT ADMIN within their own allocated clusters.
+CREATE TABLE tenant_namespace_configurations
+(
+    id                  BIGINT PRIMARY KEY AUTO_INCREMENT,
+    -- A user-friendly name for this configuration in the UI (e.g., "Default Deny Ingress").
+    name                VARCHAR(255) NOT NULL,
+    -- The actual name of the resource in Kubernetes (from its metadata.name).
+    k8s_name            VARCHAR(255) NOT NULL,
+    -- The Kubernetes Kind of the resource (e.g., 'ResourceQuota', 'LimitRange', 'NetworkPolicy', 'Role', 'RoleBinding').
+    k8s_kind            VARCHAR(100) NOT NULL,
+    -- The full YAML content, serving as the "source of intent".
+    yaml_content        TEXT         NOT NULL,
+    -- The status of this configuration record within Multikube (e.g., ACTIVE, ERROR, DELETING).
+    status              VARCHAR(50)  NOT NULL,
+    -- To store any error messages from the last apply/delete operation.
+    status_details      TEXT,
+    -- The status of synchronization with the live cluster state, essential for drift detection.
+    sync_status         VARCHAR(50)  NOT NULL DEFAULT 'UNKNOWN', -- e.g., 'IN_SYNC', 'DRIFT_DETECTED', 'UNKNOWN'
+    -- Foreign key linking back to the parent namespace.
+    tenant_namespace_id BIGINT       NOT NULL,
+    created_at          TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMP             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    -- Foreign key to link this configuration to its parent namespace. On deleting the namespace, these records are also deleted.
+    CONSTRAINT fk_config_namespace FOREIGN KEY (tenant_namespace_id) REFERENCES tenant_namespaces (id) ON DELETE CASCADE,
+
+    -- A resource's k8s_name must be unique for its kind within a namespace.
+    CONSTRAINT unique_config_in_namespace UNIQUE (tenant_namespace_id, k8s_name, k8s_kind)
 );
 
 -- Table to store tenant-created workloads (e.g., Deployments, StatefulSets)
 CREATE TABLE tenant_workloads
 (
-    id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name                VARCHAR(255) NOT NULL,           -- The name of the Kubernetes resource (e.g., 'my-app-deployment').
-    workload_type       VARCHAR(50)  NOT NULL,           -- The type of workload (e.g., 'DEPLOYMENT', 'STATEFULSET', 'SERVICE').
-    tenant_namespace_id BIGINT       NOT NULL,           -- Foreign key to the namespace this workload belongs to.
-    definition          TEXT         NOT NULL,           -- The YAML or JSON manifest provided by the tenant (the "intended state").
-    status              VARCHAR(50) DEFAULT 'REQUESTED', -- The status from Multikube's perspective (e.g., 'CREATING', 'ACTIVE', 'FAILED').
-    sync_status         VARCHAR(50) DEFAULT 'UNKNOWN',   -- The status of synchronization with the live cluster state (e.g., 'IN_SYNC', 'DRIFT_DETECTED').
-    created_at          TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    updated_at          TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    id                  BIGINT PRIMARY KEY AUTO_INCREMENT,
+    -- A user-friendly name for this workload in the UI (e.g., "My Web Application").
+    name                VARCHAR(255) NOT NULL,
+    -- The actual name of the resource in Kubernetes (from its metadata.name).
+    k8s_name            VARCHAR(255) NOT NULL,
+    -- The Kubernetes Kind of the resource (e.g., 'Deployment', 'StatefulSet', 'Service', 'Ingress').
+    k8s_kind            VARCHAR(100) NOT NULL,
+    -- The full YAML content, serving as the "source of intent".
+    yaml_content        TEXT         NOT NULL,
+    -- The status of this workload record within Multikube (e.g., ACTIVE, ERROR, DELETING).
+    status              VARCHAR(50)  NOT NULL,
+    -- To store any error messages from the last apply/delete operation.
+    status_details      TEXT,
+    -- The status of synchronization with the live cluster state, essential for drift detection.
+    sync_status         VARCHAR(50)  NOT NULL DEFAULT 'UNKNOWN', -- e.g., 'IN_SYNC', 'DRIFT_DETECTED', 'UNKNOWN'
+    -- Foreign key linking back to the parent namespace.
+    tenant_namespace_id BIGINT       NOT NULL,
+    created_at          TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMP             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    -- Foreign key to link this workload to its parent namespace.
-    -- If a namespace is deleted from our system, all its associated workload records should also be deleted.
-    CONSTRAINT fk_workload_tenant_namespace FOREIGN KEY (tenant_namespace_id) REFERENCES tenant_namespaces (id) ON DELETE CASCADE,
+    -- Foreign key to link this workload to its parent namespace. On deleting the namespace, these records are also deleted.
+    CONSTRAINT fk_workload_namespace FOREIGN KEY (tenant_namespace_id) REFERENCES tenant_namespaces (id) ON DELETE CASCADE,
 
-    -- A workload's name must be unique within its namespace and for its type.
-    -- e.g., you can't have two Deployments named 'my-app' in the same namespace,
-    -- but you could have a Deployment and a Service named 'my-app'.
-    UNIQUE (tenant_namespace_id, name, workload_type)
+    -- A resource's k8s_name must be unique for its kind within a namespace.
+    CONSTRAINT unique_workload_in_namespace UNIQUE (tenant_namespace_id, k8s_name, k8s_kind)
 );
 
 -- RETAINED TABLE: Holds templates for resources (like Helm charts, standard deployments) that a provider

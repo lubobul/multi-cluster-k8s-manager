@@ -4,10 +4,19 @@
     </div>
 
     <div class="content-container">
-        <clr-vertical-nav>
-            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="MULTIKUBE_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.DASHBOARD">Dashboard</a>
-            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="MULTIKUBE_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.SCOPE">Scope</a>
-            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="MULTIKUBE_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.RESOURCES">Resources</a>
+        <clr-vertical-nav >
+            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="MULTIKUBE_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.DASHBOARD">
+                <cds-icon shape="dashboard"></cds-icon>
+                Dashboard
+            </a>
+            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="MULTIKUBE_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.SCOPE">
+                <cds-icon shape="assign-user"></cds-icon>
+                Scope
+            </a>
+            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="MULTIKUBE_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.RESOURCES">
+                <cds-icon shape="resource-pool"></cds-icon>
+                Resources
+            </a>
         </clr-vertical-nav>
         <div class="content-area">
             <router-outlet></router-outlet>
