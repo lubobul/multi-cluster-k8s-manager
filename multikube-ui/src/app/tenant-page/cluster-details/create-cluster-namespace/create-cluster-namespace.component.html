@@ -1,0 +1,96 @@
+<form clrStepper [formGroup]="namespaceForm">
+
+    <clr-stepper-panel formGroupName="details">
+        <clr-step-title>Namespace details</clr-step-title>
+        <clr-step-description>Give your namespace name and description
+        </clr-step-description>
+        <clr-step-content *clrIfExpanded>
+            <clr-input-container>
+                <label>Name</label>
+                <input clrInput formControlName="name"/>
+                <clr-control-error *clrIfError="'required'">
+                    Namespace name field is required.
+                </clr-control-error>
+                <clr-control-helper>
+                    Enter some meaningful name for this namespace
+                </clr-control-helper>
+            </clr-input-container>
+
+            <clr-textarea-container>
+                <label>Description</label>
+                <textarea clrTextarea formControlName="description"></textarea>
+                <clr-control-error *clrIfError="'required'">
+                    Namespace description field is required.
+                </clr-control-error>
+                <clr-control-helper>
+                    Enter some meaningful description
+                </clr-control-helper>
+            </clr-textarea-container>
+
+            <button clrStepButton="next">next</button>
+        </clr-step-content>
+    </clr-stepper-panel>
+
+    <clr-stepper-panel formGroupName="resourceQuota">
+        <clr-step-title>Resource quota configuration</clr-step-title>
+        <clr-step-description>Choose the quota configuration for your namespace</clr-step-description>
+        <clr-step-content *clrIfExpanded>
+            <clr-radio-container>
+                <label>Namespace Resource Quota configuration options</label>
+                <clr-radio-wrapper>
+                    <input formControlName="choice" type="radio" clrRadio required value="{{NamespaceConfigurationChoice.Default}}" />
+                    <label>Default</label>
+                </clr-radio-wrapper>
+                <clr-radio-wrapper>
+                    <input formControlName="choice" type="radio" clrRadio required value="{{NamespaceConfigurationChoice.Custom}}" />
+                    <label>Custom</label>
+                </clr-radio-wrapper>
+                @if(namespaceForm.controls.resourceQuota.controls.choice.value === NamespaceConfigurationChoice.Default){
+                    <clr-control-helper>Choosing the default configuration will set unlimited quota for this namespace. A single namespace may exhaust the resources of the entire cluster.</clr-control-helper>
+                }
+                <clr-control-error>This field is required!</clr-control-error>
+            </clr-radio-container>
+            @if(namespaceForm.controls.resourceQuota.controls.choice.value === NamespaceConfigurationChoice.Custom){
+                <ngx-monaco-editor
+                    class="namespace-config-yaml-editor"
+                    [options]="editorOptions"
+                    [formControl]="namespaceForm.controls.resourceQuota.controls.resourceQuotaYaml"
+                >
+                </ngx-monaco-editor>
+            }
+            <button clrStepButton="next">next</button>
+
+        </clr-step-content>
+    </clr-stepper-panel>
+    <clr-stepper-panel formGroupName="limitRange">
+        <clr-step-title>Limit range configuration</clr-step-title>
+        <clr-step-description>Choose the Limit range configuration for your namespace</clr-step-description>
+        <clr-step-content *clrIfExpanded>
+            <clr-radio-container>
+                <label>Namespace Limit Range configuration options</label>
+                <clr-radio-wrapper>
+                    <input formControlName="choice" type="radio" clrRadio required value="{{NamespaceConfigurationChoice.Default}}" />
+                    <label>Default</label>
+                </clr-radio-wrapper>
+                <clr-radio-wrapper>
+                    <input formControlName="choice" type="radio" clrRadio required value="{{NamespaceConfigurationChoice.Custom}}" />
+                    <label>Custom</label>
+                </clr-radio-wrapper>
+                @if(namespaceForm.controls.limitRange.controls.choice.value === NamespaceConfigurationChoice.Default){
+                    <clr-control-helper>Choosing the default configuration will set unlimited range for each pod. A single pod may exhaust the resources of the entire namespace.</clr-control-helper>
+                }
+                <clr-control-error>This field is required!</clr-control-error>
+            </clr-radio-container>
+            @if(namespaceForm.controls.limitRange.controls.choice.value === NamespaceConfigurationChoice.Custom){
+                <ngx-monaco-editor
+                    class="namespace-config-yaml-editor"
+                    [options]="editorOptions"
+                    [formControl]="namespaceForm.controls.limitRange.controls.limitRangeYaml"
+                >
+                </ngx-monaco-editor>
+            }
+            <button clrStepButton="next">next</button>
+
+        </clr-step-content>
+    </clr-stepper-panel>
+</form>

@@ -24,6 +24,9 @@ import {
 import {
     ClusterNamespaceComponent
 } from './tenant-page/cluster-details/cluster-namespace/cluster-namespace.component';
+import {
+    CreateClusterNamespaceComponent
+} from './tenant-page/cluster-details/create-cluster-namespace/create-cluster-namespace.component';
 
 
 export const MULTIKUBE_ROUTE_PATHS = {
@@ -53,6 +56,7 @@ export const TENANT_ROUTE_PATHS = {
     CLUSTER_DETAILS: 'details',
     CLUSTER_DETAILS_CHILDREN: {
         DASHBOARD: "dashboard",
+        NAMESPACE_CREATE: "create-namespace",
         NAMESPACES: "namespaces",
         NAMESPACE_ID: "namespace_id",
     },
@@ -160,6 +164,10 @@ export const routes: Routes = [
                             {
                                 path: TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.DASHBOARD,
                                 component: TenantClusterDashboardComponent,
+                            },
+                            {
+                                path: TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_CREATE,
+                                component: CreateClusterNamespaceComponent,
                             },
                             {
                                 path: `${TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACES}/:${TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_ID}`,

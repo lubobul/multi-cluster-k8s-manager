@@ -1,6 +1,6 @@
 <div class="main-container">
     <div class="cluster-details-header">
-        <h3 class="cluster-details-title">{{cluster.name}}</h3>
+        <h3 class="cluster-details-title">{{cluster?.name}}</h3>
     </div>
 
     <div class="content-container">
@@ -10,14 +10,18 @@
 <!--        </clr-vertical-nav>-->
         <clr-vertical-nav >
             <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.DASHBOARD">
-                <cds-icon shape="dashboard"></cds-icon>
+                <cds-icon shape="dashboard" clrVerticalNavIcon></cds-icon>
                 Dashboard
             </a>
 
             <clr-vertical-nav-group [routerLinkActive]="['active']">
-                <cds-icon shape="namespace"></cds-icon>
+                <cds-icon shape="namespace" clrVerticalNavIcon></cds-icon>
                 Namespaces
                 <clr-vertical-nav-group-children>
+                    <a class="btn btn-sm btn-link-primary" [routerLinkActive]="['active']" routerLink="{{TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_CREATE}}">
+                        <cds-icon shape="plus" clrVerticalNavIcon></cds-icon>
+                        Create Namespace
+                    </a>
                     <a clrVerticalNavLink [routerLinkActive]="['active']" routerLink="{{TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACES + '/1'}}">Namespace 1</a>
                     <a clrVerticalNavLink [routerLinkActive]="['active']" routerLink="{{TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACES + '/2'}}">Namespace 2</a>
                 </clr-vertical-nav-group-children>
