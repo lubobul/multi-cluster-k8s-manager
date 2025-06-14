@@ -1,0 +1,13 @@
+:host{
+    width: 100%;
+}
+.host-container{
+    padding: 1rem;
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+
+    table{
+        margin: 0;
+    }
+}

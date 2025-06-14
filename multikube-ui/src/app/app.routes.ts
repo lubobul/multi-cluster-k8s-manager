@@ -27,6 +27,15 @@ import {
 import {
     CreateClusterNamespaceComponent
 } from './tenant-page/cluster-details/create-cluster-namespace/create-cluster-namespace.component';
+import {
+    NamespaceDetailsComponent
+} from './tenant-page/cluster-details/cluster-namespace/namespace-details/namespace-details.component';
+import {
+    NamespaceWorkloadsComponent
+} from './tenant-page/cluster-details/cluster-namespace/namespace-workloads/namespace-workloads.component';
+import {
+    NamespaceConfigurationComponent
+} from './tenant-page/cluster-details/cluster-namespace/namespace-configuration/namespace-configuration.component';
 
 
 export const MULTIKUBE_ROUTE_PATHS = {
@@ -59,6 +68,11 @@ export const TENANT_ROUTE_PATHS = {
         NAMESPACE_CREATE: "create-namespace",
         NAMESPACES: "namespaces",
         NAMESPACE_ID: "namespace_id",
+        NAMESPACE_DETAILS_CHILDREN: {
+            DETAILS: "details",
+            WORKLOADS: "workloads",
+            CONFIGURATION: "configuration",
+        },
     },
 };
 
@@ -171,7 +185,36 @@ export const routes: Routes = [
                             },
                             {
                                 path: `${TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACES}/:${TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_ID}`,
-                                component: ClusterNamespaceComponent,
+                                children: [
+                                    {
+                                        path: "",
+                                        redirectTo: "",
+                                        pathMatch: "full",
+                                    },
+                                    {
+                                        path: "",
+                                        component: ClusterNamespaceComponent,
+                                        children: [
+                                            {
+                                                path: "",
+                                                redirectTo: TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_DETAILS_CHILDREN.DETAILS,
+                                                pathMatch: "full",
+                                            },
+                                            {
+                                                path: TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_DETAILS_CHILDREN.DETAILS,
+                                                component: NamespaceDetailsComponent,
+                                            },
+                                            {
+                                                path: TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_DETAILS_CHILDREN.WORKLOADS,
+                                                component: NamespaceWorkloadsComponent,
+                                            },
+                                            {
+                                                path: TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_DETAILS_CHILDREN.CONFIGURATION,
+                                                component: NamespaceConfigurationComponent,
+                                            },
+                                        ]
+                                    },
+                                ]
                             },
                         ]
                     },
