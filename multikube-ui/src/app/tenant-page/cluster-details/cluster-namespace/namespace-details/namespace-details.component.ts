@@ -8,6 +8,7 @@ import {resolveErrorMessage} from '../../../../common/utils/util-functions';
 import {ClrAlertModule, ClrSpinnerModule} from '@clr/angular';
 import {NamespaceStatusComponent} from '../../../../common/namespace-status/namespace-status.component';
 import {DatePipe} from '@angular/common';
+import {TenantNamespaceDetailsService} from '../../../services/tenant-namespace-details.service';
 
 @Component({
   selector: 'app-namespace-details',
@@ -28,6 +29,7 @@ export class NamespaceDetailsComponent implements OnInit {
 
     constructor(
         private namespaceService: TenantNamespaceService,
+        private namespaceDetailsService: TenantNamespaceDetailsService,
         private activatedRoute: ActivatedRoute,
         private router: Router,
     ) {
@@ -35,14 +37,7 @@ export class NamespaceDetailsComponent implements OnInit {
 
     ngOnInit(): void {
         this.loading = true;
-        (this.activatedRoute.parent.params as Observable<Params>).pipe(
-            map((routeParameters) => {
-                return routeParameters[TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_ID];
-            }),
-            mergeMap((namespaceId) => {
-                return this.namespaceService.getNamespace(namespaceId);
-            })
-        ).subscribe({
+        this.namespaceDetailsService.namespace$.subscribe({
             next: (namespace) => {
                 this.namespace = namespace;
                 this.loading = false;

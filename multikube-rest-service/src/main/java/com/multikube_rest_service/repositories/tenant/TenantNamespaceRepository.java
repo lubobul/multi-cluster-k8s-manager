@@ -42,43 +42,22 @@ public interface TenantNamespaceRepository extends JpaRepository<TenantNamespace
     Optional<TenantNamespace> findByTenantIdAndId(Long tenantId, Long id);
 
     /**
-     * Finds all namespaces belonging to a specific tenant, with pagination.
-     *
-     * @param tenantId The ID of the tenant.
-     * @param pageable Pagination information.
-     * @return A Page of TenantNamespaces.
+     * Finds all namespaces for a tenant within a specific cluster.
      */
-    Page<TenantNamespace> findByTenantId(Long tenantId, Pageable pageable);
+    Page<TenantNamespace> findByTenantIdAndKubernetesClusterId(Long tenantId, Long clusterId, Pageable pageable);
 
     /**
-     * Finds namespaces for a tenant, filtered by a case-insensitive name match.
-     *
-     * @param tenantId The ID of the tenant.
-     * @param name The search string for the namespace name.
-     * @param pageable Pagination information.
-     * @return A Page of matching TenantNamespaces.
+     * Finds namespaces for a tenant within a specific cluster, filtered by name.
      */
-    Page<TenantNamespace> findByTenantIdAndNameContainingIgnoreCase(Long tenantId, String name, Pageable pageable);
+    Page<TenantNamespace> findByTenantIdAndKubernetesClusterIdAndNameContainingIgnoreCase(Long tenantId, Long clusterId, String name, Pageable pageable);
 
     /**
-     * Finds namespaces for a tenant, filtered by status.
-     *
-     * @param tenantId The ID of the tenant.
-     * @param status The status to filter by.
-     * @param pageable Pagination information.
-     * @return A Page of matching TenantNamespaces.
+     * Finds namespaces for a tenant within a specific cluster, filtered by status.
      */
-    Page<TenantNamespace> findByTenantIdAndStatus(Long tenantId, NamespaceStatus status, Pageable pageable);
+    Page<TenantNamespace> findByTenantIdAndKubernetesClusterIdAndStatus(Long tenantId, Long clusterId, NamespaceStatus status, Pageable pageable);
 
     /**
-     * Finds namespaces for a tenant, filtered by both a case-insensitive name and status.
-     *
-     * @param tenantId The ID of the tenant.
-     * @param name The search string for the namespace name.
-     * @param status The status to filter by.
-     * @param pageable Pagination information.
-     * @return A Page of matching TenantNamespaces.
+     * Finds namespaces for a tenant within a specific cluster, filtered by both name and status.
      */
-    Page<TenantNamespace> findByTenantIdAndNameContainingIgnoreCaseAndStatus(Long tenantId, String name, NamespaceStatus status, Pageable pageable);
-
+    Page<TenantNamespace> findByTenantIdAndKubernetesClusterIdAndNameContainingIgnoreCaseAndStatus(Long tenantId, Long clusterId, String name, NamespaceStatus status, Pageable pageable);
 }

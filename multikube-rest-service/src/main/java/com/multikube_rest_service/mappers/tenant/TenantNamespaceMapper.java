@@ -23,6 +23,8 @@ public interface TenantNamespaceMapper {
      */
     @Mapping(source = "kubernetesCluster.id", target = "clusterId")
     @Mapping(source = "kubernetesCluster.name", target = "clusterName")
+    @Mapping(target = "configurationsCount", expression = "java(entity.getConfigurations().size())")
+    @Mapping(target = "workloadsCount", expression = "java(entity.getWorkloads().size())")
     TenantNamespaceDto toDetailDto(TenantNamespace entity);
 
     /**
@@ -34,7 +36,5 @@ public interface TenantNamespaceMapper {
      */
     @Mapping(source = "kubernetesCluster.id", target = "clusterId")
     @Mapping(source = "kubernetesCluster.name", target = "clusterName")
-    @Mapping(target = "configurationsCount", expression = "java(entity.getConfigurations().size())")
-    @Mapping(target = "workloadsCount", expression = "java(entity.getWorkloads().size())")
     TenantNamespaceSummaryDto toSummaryDto(TenantNamespace entity);
 }

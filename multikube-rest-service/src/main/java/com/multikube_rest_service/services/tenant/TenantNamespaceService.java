@@ -140,16 +140,22 @@ public class TenantNamespaceService {
     }
 
     /**
-     * Retrieves a paginated list of namespaces for the authenticated tenant, supporting filtering.
-     * This method returns a lightweight summary DTO suitable for list views.
+     * Retrieves a paginated list of namespaces for the authenticated tenant within a specific cluster.
      *
-     * @param searchParams A map of query parameters, supporting 'name' and 'status'.
+     * @param clusterId    The ID of the cluster to scope the search to.
+     * @param searchParams Filters for 'name' and 'status'.
      * @param pageable     Pagination information.
      * @return A page of {@link TenantNamespaceSummaryDto} objects.
      */
     @Transactional(readOnly = true)
-    public Page<TenantNamespaceSummaryDto> getNamespaces(Map<String, String> searchParams, Pageable pageable) {
+    public Page<TenantNamespaceSummaryDto> getNamespaces(Long clusterId, Map<String, String> searchParams, Pageable pageable) {
         Long tenantId = SecurityContextHelper.getAuthenticatedTenantId();
+
+        // First, verify the tenant has access to this cluster to prevent unauthorized access.
+        if (!clusterAllocationRepository.existsByKubernetesClusterIdAndTenantId(clusterId, tenantId)) {
+            throw new SecurityException("Access denied: Cluster with ID " + clusterId + " is not allocated to your tenant.");
+        }
+
         String nameFilter = searchParams.getOrDefault("name", "").trim();
         String statusFilterString = searchParams.getOrDefault("status", "").trim();
 
@@ -165,14 +171,15 @@ public class TenantNamespaceService {
         Page<TenantNamespace> namespacePage;
         boolean hasNameFilter = StringUtils.hasText(nameFilter);
 
+        // Call the new repository methods that include the clusterId
         if (hasNameFilter && statusFilter != null) {
-            namespacePage = namespaceRepository.findByTenantIdAndNameContainingIgnoreCaseAndStatus(tenantId, nameFilter, statusFilter, pageable);
+            namespacePage = namespaceRepository.findByTenantIdAndKubernetesClusterIdAndNameContainingIgnoreCaseAndStatus(tenantId, clusterId, nameFilter, statusFilter, pageable);
         } else if (hasNameFilter) {
-            namespacePage = namespaceRepository.findByTenantIdAndNameContainingIgnoreCase(tenantId, nameFilter, pageable);
+            namespacePage = namespaceRepository.findByTenantIdAndKubernetesClusterIdAndNameContainingIgnoreCase(tenantId, clusterId, nameFilter, pageable);
         } else if (statusFilter != null) {
-            namespacePage = namespaceRepository.findByTenantIdAndStatus(tenantId, statusFilter, pageable);
+            namespacePage = namespaceRepository.findByTenantIdAndKubernetesClusterIdAndStatus(tenantId, clusterId, statusFilter, pageable);
         } else {
-            namespacePage = namespaceRepository.findByTenantId(tenantId, pageable);
+            namespacePage = namespaceRepository.findByTenantIdAndKubernetesClusterId(tenantId, clusterId, pageable);
         }
 
         return namespacePage.map(namespaceMapper::toSummaryDto);

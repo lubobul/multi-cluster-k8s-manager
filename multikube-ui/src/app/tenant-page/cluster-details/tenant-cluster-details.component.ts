@@ -10,7 +10,7 @@ import {catchError, mergeMap, tap} from 'rxjs';
 import {resolveErrorMessage} from '../../common/utils/util-functions';
 
 @Component({
-  selector: 'app-cluster-details',
+    selector: 'app-cluster-details',
     imports: [
         ClarityModule,
         RouterOutlet,
@@ -20,8 +20,8 @@ import {resolveErrorMessage} from '../../common/utils/util-functions';
     providers: [
         TenantClusterDetailsService
     ],
-  templateUrl: './tenant-cluster-details.component.html',
-  styleUrl: './tenant-cluster-details.component.scss'
+    templateUrl: './tenant-cluster-details.component.html',
+    styleUrl: './tenant-cluster-details.component.scss'
 })
 export class TenantClusterDetailsComponent implements OnInit {
     protected readonly TENANT_ROUTE_PATHS = TENANT_ROUTE_PATHS;
@@ -35,20 +35,22 @@ export class TenantClusterDetailsComponent implements OnInit {
     constructor(
         private clusterDetailsService: TenantClusterDetailsService,
         private namespaceService: TenantNamespaceService,
-        ) {
+    ) {
     }
 
     ngOnInit(): void {
-        this. loading = true;
+        this.loading = true;
         this.clusterDetailsService.cluster$.pipe(
             tap((cluster) => {
                 this.cluster = cluster;
             }),
             mergeMap((cluster) => {
-                return this.namespaceService.getAllNamespaceSummaries({
-                    page: 1,
-                    pageSize: 5,
-                });
+                return this.namespaceService.getAllNamespaceSummaries(
+                    cluster.id,
+                    {
+                        page: 1,
+                        pageSize: 5,
+                    });
             }),
             tap((namespaces) => {
                 this.namespaces = namespaces;

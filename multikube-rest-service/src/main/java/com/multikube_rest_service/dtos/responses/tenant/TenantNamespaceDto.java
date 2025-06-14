@@ -4,7 +4,6 @@ import com.multikube_rest_service.common.enums.NamespaceStatus;
 import lombok.Data;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 /**
  * DTO representing a detailed view of a TenantNamespace, including its
@@ -19,8 +18,8 @@ public class TenantNamespaceDto {
     private String statusDetails;
     private Long clusterId;
     private String clusterName;
-    private List<NamespaceConfigurationDto> configurations;
-    private List<NamespaceWorkloadDto> workloads;
+    private int configurationsCount;
+    private int workloadsCount;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 }

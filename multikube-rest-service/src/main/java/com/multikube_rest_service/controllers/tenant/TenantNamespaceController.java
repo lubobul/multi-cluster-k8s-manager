@@ -64,15 +64,17 @@ public class TenantNamespaceController {
     }
 
     /**
-     * Retrieves a paginated list of namespaces for the current tenant.
+     * Retrieves a paginated list of namespaces for the current tenant, scoped to a specific cluster.
      *
+     * @param clusterId The ID of the cluster for which to list namespaces.
      * @param searchParams Optional query parameters for filtering by 'name' or 'status'.
-     * @param pageable     Pagination information.
+     * @param pageable Pagination information.
      * @return A paginated list of namespace summaries.
      */
-    @Operation(summary = "Get a paginated list of namespaces",
-            description = "Retrieves a paginated list of lightweight namespace summaries belonging to the currently authenticated tenant.",
+    @Operation(summary = "Get a paginated list of namespaces for a cluster",
+            description = "Retrieves a paginated list of lightweight namespace summaries belonging to the currently authenticated tenant for a specific cluster.",
             parameters = {
+                    @Parameter(name = "clusterId", description = "The ID of the cluster to get namespaces for.", required = true, example = "1"),
                     @Parameter(name = "page", description = "Page number (zero-based).", example = "0"),
                     @Parameter(name = "size", description = "Number of items per page.", example = "10"),
                     @Parameter(name = "sort", description = "Sort order (e.g., 'name,asc')."),
@@ -81,12 +83,14 @@ public class TenantNamespaceController {
             })
     @GetMapping
     public ResponseEntity<RestResponsePage<TenantNamespaceSummaryDto>> getNamespaces(
+            @RequestParam Long clusterId,
             @Parameter(hidden = true) @RequestParam(required = false) Map<String, String> searchParams,
             @Parameter(hidden = true) Pageable pageable) {
-        Page<TenantNamespaceSummaryDto> namespacePage = namespaceService.getNamespaces(searchParams, pageable);
+        Page<TenantNamespaceSummaryDto> namespacePage = namespaceService.getNamespaces(clusterId, searchParams, pageable);
         return ResponseEntity.ok(new RestResponsePage<>(namespacePage.getContent(), namespacePage.getPageable(), namespacePage.getTotalElements()));
-
     }
+
+
 
     /**
      * Retrieves a single, detailed view of a namespace by its ID.

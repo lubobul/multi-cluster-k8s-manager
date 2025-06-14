@@ -18,7 +18,8 @@ export class TenantNamespacesApiService {
         return this.http.post<TenantNamespaceResponse>(this.apiUrl, cluster);
     }
 
-    getNamespaces(params: QueryParams | any): Observable<PaginatedResponse<TenantNamespaceSummaryResponse>> {
+    getNamespaces(clusterId: number, params: QueryParams | any): Observable<PaginatedResponse<TenantNamespaceSummaryResponse>> {
+        params.clusterId = clusterId;
         return this.http.get<PaginatedResponse<TenantNamespaceSummaryResponse>>(this.apiUrl, { params });
     }
 
