@@ -44,26 +44,27 @@ export enum SyncStatus {
     DRIFT_DETECTED = 'DRIFT_DETECTED',
 }
 
-export interface NamespaceWorkloadResponse {
+export interface K8sResource {
+    status: ResourceStatus;
+    syncStatus: SyncStatus;
+    statusDetails: string;
+}
+
+export interface NamespaceWorkloadResponse extends K8sResource {
     id: number;
     name: string;
     k8sName: string;
     k8sKind: string;
-    status: ResourceStatus;
-    syncStatus: SyncStatus;
-    statusDetails: string;
     createdAt: string | Date; // Use string for ISO format, Date for JS objects
     updatedAt: string | Date;
 }
 
-export interface NamespaceConfigurationResponse {
+export interface NamespaceConfigurationResponse extends K8sResource{
     id: number;
     name: string;
     k8sName: string;
     k8sKind: string;
-    status: ResourceStatus;
-    syncStatus: SyncStatus;
-    statusDetails: string;
+    yamlContent?: string;
     createdAt: string | Date; // Use string for ISO format, Date for JS objects
     updatedAt: string | Date;
 }

@@ -8,31 +8,31 @@ import {
     TenantNamespaceResponse,
     TenantNamespaceSummaryResponse
 } from '../rest/types/tenant/responses/TenantNamespace';
+import {K8sResource, ResourceStatus} from '../rest/types/tenant/responses/TenantNamespaceResources';
 
 @Component({
-    selector: 'namespace-status',
+    selector: 'k8s-resource-status',
     imports: [
         CdsModule,
         ClrSpinnerModule,
         ClarityModule
     ],
-    templateUrl: './namespace-status.component.html',
-    styleUrl: './namespace-status.component.scss',
+    templateUrl: './k8s-resource-status.component.html',
+    styleUrl: './k8s-resource-status.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NamespaceStatusComponent {
+export class k8sResourceStatusComponent {
 
     @Input()
-    namespace?: TenantNamespaceResponse;
+    k8sResource?: K8sResource;
 
-    get status(): NamespaceStatus {
-        if (!this.namespace){
-            return NamespaceStatus.UNKNOWN;
+    get status(): ResourceStatus {
+        if (!this.k8sResource) {
+            return ResourceStatus.PROCESSING;
         }
 
-        return this.namespace.status;
+        return this.k8sResource.status;
     }
 
-    protected readonly NamespaceStatus = NamespaceStatus;
-    protected readonly File = File;
+    protected readonly ResourceStatus = ResourceStatus;
 }

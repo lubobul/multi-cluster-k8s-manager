@@ -8,31 +8,31 @@ import {
     TenantNamespaceResponse,
     TenantNamespaceSummaryResponse
 } from '../rest/types/tenant/responses/TenantNamespace';
+import {K8sResource, ResourceStatus, SyncStatus} from '../rest/types/tenant/responses/TenantNamespaceResources';
 
 @Component({
-    selector: 'namespace-status',
+    selector: 'k8s-resource-sync-status',
     imports: [
         CdsModule,
         ClrSpinnerModule,
         ClarityModule
     ],
-    templateUrl: './namespace-status.component.html',
-    styleUrl: './namespace-status.component.scss',
+    templateUrl: './k8s-resource-sync-status.component.html',
+    styleUrl: './k8s-resource-sync-status.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NamespaceStatusComponent {
+export class k8sResourceSyncStatusComponent {
 
     @Input()
-    namespace?: TenantNamespaceResponse;
+    k8sResource?: K8sResource;
 
-    get status(): NamespaceStatus {
-        if (!this.namespace){
-            return NamespaceStatus.UNKNOWN;
+    get status(): SyncStatus {
+        if (!this.k8sResource) {
+            return SyncStatus.UNKNOWN;
         }
 
-        return this.namespace.status;
+        return this.k8sResource.syncStatus;
     }
 
-    protected readonly NamespaceStatus = NamespaceStatus;
-    protected readonly File = File;
+    protected readonly SyncStatus = SyncStatus;
 }

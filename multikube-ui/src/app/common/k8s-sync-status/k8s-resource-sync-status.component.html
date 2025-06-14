@@ -1,0 +1,31 @@
+@switch (status){
+    @case (SyncStatus.IN_SYNC){
+        <div class="status-row">
+            <cds-icon shape="success-standard" status="success" size="sm"></cds-icon>
+            <span class="status-text">In sync</span>
+        </div>
+    }
+
+    @case (SyncStatus.DRIFT_DETECTED){
+        <div class="status-row">
+            <cds-icon shape="warning-standard" status="warning" size="sm"></cds-icon>
+            <span class="status-text">Drifted</span>
+            <clr-signpost>
+                <button class="btn btn-link btn-icon" aria-label="Icon Button Trigger" clrSignpostTrigger>
+                    <cds-icon shape="info-standard" size="sm"></cds-icon>
+                </button>
+                <clr-signpost-content [clrPosition]="'right-middle'" *clrIfOpen>
+                    {{k8sResource?.statusDetails}}
+                </clr-signpost-content>
+            </clr-signpost>
+        </div>
+    }
+
+    @default {
+        <div class="status-row">
+            <cds-icon shape="unknown-status" size="md"></cds-icon>
+            <span class="status-text">Unknown</span>
+        </div>
+    }
+
+}

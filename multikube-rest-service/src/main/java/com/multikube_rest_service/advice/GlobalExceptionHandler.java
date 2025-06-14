@@ -25,4 +25,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<RestErrorResponse> handleUnauthorizedException(UnauthorizedException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new RestErrorResponse(ex.getMessage()));
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<RestErrorResponse> handleUnauthorizedException(IllegalStateException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new RestErrorResponse(ex.getMessage()));
+    }
 }

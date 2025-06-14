@@ -1,1 +1,67 @@
-<p>namespace-configuration works!</p>
+<div class="host-container">
+    @if (errorMessage) {
+        <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorClosed">
+            <clr-alert-item>
+                <span class="alert-text">{{ errorMessage }}</span>
+            </clr-alert-item>
+        </clr-alert>
+    }
+
+    <h5>Namespace configuration</h5>
+
+    <clr-datagrid
+        (clrDgRefresh)="refreshByGrid($event)"
+        [clrDgLoading]="loading"
+    >
+        <clr-dg-column [clrDgField]="'name'">Name</clr-dg-column>
+        <clr-dg-column>Resource name</clr-dg-column>
+        <clr-dg-column>Resource kind</clr-dg-column>
+        <clr-dg-column>Status</clr-dg-column>
+        <clr-dg-column>State</clr-dg-column>
+        <clr-dg-column>Created</clr-dg-column>
+        <clr-dg-column>Last Updated</clr-dg-column>
+        <clr-dg-placeholder>No Namespace configurations found.</clr-dg-placeholder>
+        <clr-dg-row *clrDgItems="let namespace of configurationsPage.content" [clrDgItem]="namespace">
+            <clr-dg-cell>{{ namespace.name }}</clr-dg-cell>
+            <clr-dg-cell>{{ namespace.k8sName }}</clr-dg-cell>
+            <clr-dg-cell>{{ namespace.k8sKind }}</clr-dg-cell>
+            <clr-dg-cell>
+                <k8s-resource-status [k8sResource]="namespace"></k8s-resource-status>
+            </clr-dg-cell>
+            <clr-dg-cell>
+                <k8s-resource-sync-status [k8sResource]="namespace"></k8s-resource-sync-status>
+            </clr-dg-cell>
+            <clr-dg-cell>{{ namespace.createdAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
+            <clr-dg-cell>{{ namespace.updatedAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
+        </clr-dg-row>
+        <ng-template [clrIfDetail]="gridNamespaceConfigDetailState" let-detail (clrIfDetailChange)="gridGetConfigurationDetails($event)">
+
+            <clr-dg-detail>
+                <clr-dg-detail-header>{{ gridNamespaceConfigDetailState.name }}</clr-dg-detail-header>
+                <clr-dg-detail-body>
+                    @if(loadingConfigYaml){
+                        <div class="loading-container">
+                            <clr-spinner clrInline>Loading...</clr-spinner>
+                            <h5>Loading yaml configuration...</h5>
+                        </div>
+                    } @else {
+                        <ngx-monaco-editor
+                            class="namespace-config-yaml-editor"
+                            [options]="editorOptions"
+                            [(ngModel)]="gridNamespaceConfigDetailState.yamlContent"
+                        >
+                        </ngx-monaco-editor>
+                    }
+                </clr-dg-detail-body>
+            </clr-dg-detail>
+        </ng-template>
+        <clr-dg-footer>
+            <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="configurationsPage.totalElements">
+                <clr-dg-page-size [clrPageSizeOptions]="[5, 10, 15]">Tenants per page</clr-dg-page-size>
+                {{ pagination.firstItem + 1 }} - {{ pagination.lastItem + 1 }} of
+                {{ pagination.totalItems }} tenants
+            </clr-dg-pagination>
+        </clr-dg-footer>
+    </clr-datagrid>
+</div>
+

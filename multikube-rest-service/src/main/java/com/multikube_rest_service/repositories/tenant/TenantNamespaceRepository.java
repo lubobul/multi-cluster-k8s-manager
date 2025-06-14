@@ -60,4 +60,13 @@ public interface TenantNamespaceRepository extends JpaRepository<TenantNamespace
      * Finds namespaces for a tenant within a specific cluster, filtered by both name and status.
      */
     Page<TenantNamespace> findByTenantIdAndKubernetesClusterIdAndNameContainingIgnoreCaseAndStatus(Long tenantId, Long clusterId, String name, NamespaceStatus status, Pageable pageable);
+    /**
+     * Checks if a namespace exists with a given ID and belongs to a specific tenant.
+     * This is a more efficient way to perform security checks than fetching the full entity.
+     *
+     * @param id The ID of the namespace.
+     * @param tenantId The ID of the tenant.
+     * @return true if a matching namespace exists, false otherwise.
+     */
+    boolean existsByIdAndTenantId(Long id, Long tenantId);
 }
