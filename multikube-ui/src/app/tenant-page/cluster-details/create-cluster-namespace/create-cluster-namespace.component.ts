@@ -9,9 +9,14 @@ import {
 } from '@clr/angular';
 import {EditorComponent} from 'ngx-monaco-editor-v2';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {ClusterService} from '../../../provider-page/services/cluster.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TenantClusterDetailsService} from '../../services/tenant-cluster-details.service';
+import {FormValidators} from '../../../common/utils/form-validators';
+import {TenantNamespaceService} from '../../services/tenant-namespace.service';
+import {CreateNamespaceRequest} from '../../../common/rest/types/tenant/requests/CreateNamespaceRequest';
+import {resolveErrorMessage} from '../../../common/utils/util-functions';
+import {TenantClusterResponse} from '../../../common/rest/types/tenant/responses/TenantClusterResponse';
+import {TENANT_ROUTE_PATHS} from '../../../app.routes';
 
 export enum NamespaceConfigurationChoice {
     Default = "Default",
@@ -35,6 +40,10 @@ export enum NamespaceConfigurationChoice {
     styleUrl: './create-cluster-namespace.component.scss'
 })
 export class CreateClusterNamespaceComponent implements OnInit {
+    loading = false;
+    errorMessage = "";
+    alertErrorClosed = true;
+    cluster: TenantClusterResponse;
 
     protected readonly NamespaceConfigurationChoice = NamespaceConfigurationChoice;
 
@@ -96,6 +105,7 @@ spec:
 
     constructor(
         private clusterDetailsService: TenantClusterDetailsService,
+        private namespaceService: TenantNamespaceService,
         private fb: FormBuilder,
         private router: Router,
         private activatedRoute: ActivatedRoute,
@@ -104,12 +114,24 @@ spec:
 
     ngOnInit(): void {
         this.buildForm();
+        this.loading = true;
+        this.clusterDetailsService.cluster$.subscribe({
+            next: (cluster) => {
+                this.cluster = cluster;
+                this.loading = false;
+            },
+            error: (err) => {
+                this.errorMessage = resolveErrorMessage(err);
+                this.alertErrorClosed = false;
+                this.loading = false;
+            }
+        });
     }
 
     buildForm(): void {
         this.namespaceForm = this.fb.group({
             details: this.fb.group({
-                name: ["", Validators.required],
+                name: ["", [Validators.required, FormValidators.dnsCompliantValidator()]],
                 description: [""],
             }),
             resourceQuota: this.fb.group({
@@ -121,5 +143,37 @@ spec:
                 limitRangeYaml: [this.limitRangeExample],
             })
         });
+    }
+
+    public createNamespace(): void{
+        this.loading = true;
+        this.namespaceService.createNamespace({
+            clusterId: this.cluster.id,
+            name: this.namespaceForm.controls.details.controls.name.value,
+            description: this.namespaceForm.controls.details.controls.description.value,
+            resourceQuotaYaml: this.namespaceForm.controls.resourceQuota.controls.choice.value === NamespaceConfigurationChoice.Custom ?
+                this.namespaceForm.controls.resourceQuota.controls.resourceQuotaYaml.value : undefined,
+            limitRangeYaml: this.namespaceForm.controls.limitRange.controls.choice.value === NamespaceConfigurationChoice.Custom ?
+                this.namespaceForm.controls.limitRange.controls.limitRangeYaml.value : undefined,
+        } as CreateNamespaceRequest).subscribe({
+            next: (namespace) => {
+                this.loading = false;
+                this.navigateToNamespaceDetails(namespace.id);
+            },
+            error: (err) => {
+                this.errorMessage = resolveErrorMessage(err);
+                this.alertErrorClosed = false;
+                this.loading = false;
+            }
+        });
+    }
+
+    private navigateToNamespaceDetails(namespaceId: number): void {
+        this.router.navigate(
+            [`../${TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACES}/${namespaceId}`,],
+            {
+                relativeTo: this.activatedRoute,
+            }
+        );
     }
 }

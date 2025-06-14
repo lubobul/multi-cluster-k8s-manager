@@ -1,15 +1,19 @@
 <div class="main-container">
     <div class="cluster-details-header">
-        <h3 class="cluster-details-title">{{cluster?.name}}</h3>
+        <h3 class="cluster-details-title">{{ cluster?.name }}</h3>
+        @if (loading) {
+            <clr-spinner clrInline>Loading...</clr-spinner>
+        }
     </div>
 
     <div class="content-container">
-<!--        <clr-vertical-nav>-->
-<!--            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.DASHBOARD">Dashboard</a>-->
-<!--            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACES">Namespaces</a>-->
-<!--        </clr-vertical-nav>-->
-        <clr-vertical-nav >
-            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.DASHBOARD">
+        <!--        <clr-vertical-nav>-->
+        <!--            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.DASHBOARD">Dashboard</a>-->
+        <!--            <a clrVerticalNavLink [routerLinkActive]="['active']" [routerLink]="TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACES">Namespaces</a>-->
+        <!--        </clr-vertical-nav>-->
+        <clr-vertical-nav>
+            <a clrVerticalNavLink [routerLinkActive]="['active']"
+               [routerLink]="TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.DASHBOARD">
                 <cds-icon shape="dashboard" clrVerticalNavIcon></cds-icon>
                 Dashboard
             </a>
@@ -18,16 +22,28 @@
                 <cds-icon shape="namespace" clrVerticalNavIcon></cds-icon>
                 Namespaces
                 <clr-vertical-nav-group-children>
-                    <a class="btn btn-sm btn-link-primary" [routerLinkActive]="['active']" routerLink="{{TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_CREATE}}">
+                    <a class="btn btn-sm btn-link-primary" [routerLinkActive]="['active']"
+                       routerLink="{{TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_CREATE}}">
                         <cds-icon shape="plus" clrVerticalNavIcon></cds-icon>
                         Create Namespace
                     </a>
-                    <a clrVerticalNavLink [routerLinkActive]="['active']" routerLink="{{TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACES + '/1'}}">Namespace 1</a>
-                    <a clrVerticalNavLink [routerLinkActive]="['active']" routerLink="{{TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACES + '/2'}}">Namespace 2</a>
+                    @for(namespace of namespaces; track namespace.id){
+                        <a clrVerticalNavLink [routerLinkActive]="['active']"
+                           routerLink="{{TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACES + '/' + namespace.id}}">
+                            {{namespace.name}}
+                        </a>
+                    }
                 </clr-vertical-nav-group-children>
             </clr-vertical-nav-group>
         </clr-vertical-nav>
         <div class="content-area">
+            @if (errorMessage) {
+                <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorClosed">
+                    <clr-alert-item>
+                        <span class="alert-text">{{ errorMessage }}</span>
+                    </clr-alert-item>
+                </clr-alert>
+            }
             <router-outlet></router-outlet>
         </div>
     </div>

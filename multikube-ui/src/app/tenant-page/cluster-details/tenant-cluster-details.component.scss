@@ -1,5 +1,10 @@
 .cluster-details-header{
+    display: flex;
     border-bottom: 1px solid var(--clr-color-neutral-400);
+    clr-spinner{
+        margin-left: 1rem;
+        margin-top: 0.5rem;
+    }
     .cluster-details-title{
         margin: 0.2rem 0 0.2rem 0.6rem;
         display: block;

@@ -2,6 +2,7 @@ package com.multikube_rest_service.controllers.provider;
 
 import com.multikube_rest_service.dtos.requests.provider.TenantCreateRequest;
 import com.multikube_rest_service.dtos.responses.TenantDto;
+import com.multikube_rest_service.rest.RestResponsePage;
 import com.multikube_rest_service.services.TenantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -93,11 +94,11 @@ public class TenantProviderController {
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     @GetMapping
-    public ResponseEntity<Page<TenantDto>> listTenants(
+    public ResponseEntity<RestResponsePage<TenantDto>> listTenants(
             @Parameter(description = "Filter string, e.g., 'name==some-tenant'. Supported key: 'name'.")
             @RequestParam(value = "filter", required = false) String filterString,
             @Parameter(hidden = true) Pageable pageable) {
         Page<TenantDto> tenants = tenantService.getTenants(filterString, pageable);
-        return ResponseEntity.ok(tenants);
+        return ResponseEntity.ok(new RestResponsePage<>(tenants.getContent(), tenants.getPageable(), tenants.getTotalElements()));
     }
 }

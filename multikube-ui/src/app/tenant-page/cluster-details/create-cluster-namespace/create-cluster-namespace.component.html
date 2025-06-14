@@ -1,5 +1,11 @@
-<form clrStepper [formGroup]="namespaceForm">
-
+@if (errorMessage) {
+    <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorClosed">
+        <clr-alert-item>
+            <span class="alert-text">{{ errorMessage }}</span>
+        </clr-alert-item>
+    </clr-alert>
+}
+<form clrStepper [formGroup]="namespaceForm" (ngSubmit)="createNamespace()">
     <clr-stepper-panel formGroupName="details">
         <clr-step-title>Namespace details</clr-step-title>
         <clr-step-description>Give your namespace name and description
@@ -10,6 +16,9 @@
                 <input clrInput formControlName="name"/>
                 <clr-control-error *clrIfError="'required'">
                     Namespace name field is required.
+                </clr-control-error>
+                <clr-control-error *clrIfError="'dnsIncompliant'">
+                    Namespace name must be DNS-compliant.
                 </clr-control-error>
                 <clr-control-helper>
                     Enter some meaningful name for this namespace
@@ -89,7 +98,7 @@
                 >
                 </ngx-monaco-editor>
             }
-            <button clrStepButton="next">next</button>
+            <button clrStepButton="submit">Create namespace</button>
 
         </clr-step-content>
     </clr-stepper-panel>

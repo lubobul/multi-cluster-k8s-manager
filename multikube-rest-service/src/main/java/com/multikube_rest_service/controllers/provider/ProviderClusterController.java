@@ -5,6 +5,7 @@ import com.multikube_rest_service.dtos.requests.provider.ClusterAllocationReques
 import com.multikube_rest_service.dtos.requests.provider.ClusterRegistrationRequest;
 import com.multikube_rest_service.dtos.responses.provider.ClusterDto;
 import com.multikube_rest_service.rest.RestMessageResponse;
+import com.multikube_rest_service.rest.RestResponsePage;
 import com.multikube_rest_service.services.provider.ProviderClusterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -96,14 +97,14 @@ public class ProviderClusterController {
     @Operation(summary = "List clusters for the provider with filtering")
     @ApiResponses(value = { /* Ensure these are complete */ })
     @GetMapping
-    public ResponseEntity<Page<ClusterDto>> getClusters(
+    public ResponseEntity<RestResponsePage<ClusterDto>> getClusters(
             @Parameter(description = "Filter string, e.g., 'name==my-cluster,status==ACTIVE'. Supported keys: 'name', 'status'.")
             @RequestParam(value = "filter", required = false) String filterString,
             @Parameter(hidden = true) Pageable pageable) { // Pageable is resolved by Spring
 
         Map<String, String> searchParams = FilterStringParser.parse(filterString);
         Page<ClusterDto> clusters = providerClusterService.getClusters(searchParams, pageable);
-        return ResponseEntity.ok(clusters);
+        return ResponseEntity.ok(new RestResponsePage<>(clusters.getContent(), clusters.getPageable(), clusters.getTotalElements()));
     }
 
     /**

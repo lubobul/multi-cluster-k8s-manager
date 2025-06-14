@@ -1,4 +1,4 @@
-import {FormGroup, ValidationErrors} from '@angular/forms';
+import {AbstractControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
 
 export const FormValidators = {
     /**
@@ -27,4 +27,25 @@ export const FormValidators = {
             return null;
         };
     },
+
+    dnsCompliantValidator: function (): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            // Get the value from the form control.
+            const value = control.value;
+
+            // Don't validate empty values, let the 'required' validator handle that.
+            if (!value) {
+                return null;
+            }
+
+            // The regex for DNS-compliant names (e.g., Kubernetes namespaces, services).
+            const dnsRegex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
+
+            // Test the value against the regex.
+            const isValid = dnsRegex.test(value);
+
+            // If the value is valid, return null. Otherwise, return the specific error object.
+            return isValid ? null : { dnsIncompliant: true };
+        };
+    }
 }

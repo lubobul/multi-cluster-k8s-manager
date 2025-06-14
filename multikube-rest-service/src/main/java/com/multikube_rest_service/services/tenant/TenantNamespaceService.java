@@ -4,8 +4,10 @@ import com.multikube_rest_service.auth.JwtUserDetails;
 import com.multikube_rest_service.common.SecurityContextHelper;
 import com.multikube_rest_service.common.enums.NamespaceStatus;
 import com.multikube_rest_service.common.enums.ResourceStatus;
+import com.multikube_rest_service.common.enums.SyncStatus;
 import com.multikube_rest_service.dtos.requests.tenant.CreateNamespaceRequest;
 import com.multikube_rest_service.dtos.responses.tenant.TenantNamespaceDto;
+import com.multikube_rest_service.dtos.responses.tenant.TenantNamespaceSummaryDto;
 import com.multikube_rest_service.entities.Tenant;
 import com.multikube_rest_service.entities.provider.KubernetesCluster;
 import com.multikube_rest_service.entities.tenant.TenantNamespace;
@@ -21,9 +23,13 @@ import com.multikube_rest_service.services.kubernetes.factories.KubernetesResour
 import com.multikube_rest_service.services.kubernetes.factories.KubernetesResourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.data.domain.Pageable;
+
+import java.util.Map;
 
 @Service
 public class TenantNamespaceService {
@@ -55,6 +61,28 @@ public class TenantNamespaceService {
         this.resourceFactory = resourceFactory;
     }
 
+    /**
+     * Creates a new namespace for the authenticated tenant. This is a transactional
+     * operation that orchestrates several actions:
+     * <ol>
+     * <li>Validates that the tenant has access to the target cluster and the namespace name is unique.</li>
+     * <li>Creates the actual namespace resource in the Kubernetes cluster.</li>
+     * <li>Applies a default, isolating NetworkPolicy.</li>
+     * <li>Creates a default admin Role and a RoleBinding for the creating user.</li>
+     * <li>Applies any optional ResourceQuota or LimitRange manifests provided in the request.</li>
+     * <li>Persists the final state of the namespace and all its configurations into the Multikube database.</li>
+     * </ol>
+     * If any Kubernetes operation fails after the namespace is created, the overall status is marked
+     * as FAILED_CREATION for auditing purposes.
+     *
+     * @param request The DTO containing the details for the new namespace, such as its name,
+     * description, target cluster ID, and optional YAML configurations.
+     * @return A comprehensive DTO (TenantNamespaceDto) representing the final state of the
+     * newly created namespace and its initial set of configuration resources.
+     * @throws SecurityException if the specified cluster is not allocated to the current tenant.
+     * @throws IllegalArgumentException if a namespace with the same name already exists in the target cluster.
+     * @throws ResourceNotFoundException if the target cluster ID does not exist.
+     */
     @Transactional
     public TenantNamespaceDto createNamespace(CreateNamespaceRequest request) {
         JwtUserDetails userDetails = SecurityContextHelper.getAuthenticatedUser();
@@ -111,6 +139,67 @@ public class TenantNamespaceService {
         return namespaceMapper.toDetailDto(namespaceRepository.save(savedNamespace));
     }
 
+    /**
+     * Retrieves a paginated list of namespaces for the authenticated tenant, supporting filtering.
+     * This method returns a lightweight summary DTO suitable for list views.
+     *
+     * @param searchParams A map of query parameters, supporting 'name' and 'status'.
+     * @param pageable     Pagination information.
+     * @return A page of {@link TenantNamespaceSummaryDto} objects.
+     */
+    @Transactional(readOnly = true)
+    public Page<TenantNamespaceSummaryDto> getNamespaces(Map<String, String> searchParams, Pageable pageable) {
+        Long tenantId = SecurityContextHelper.getAuthenticatedTenantId();
+        String nameFilter = searchParams.getOrDefault("name", "").trim();
+        String statusFilterString = searchParams.getOrDefault("status", "").trim();
+
+        NamespaceStatus statusFilter = null;
+        if (StringUtils.hasText(statusFilterString)) {
+            try {
+                statusFilter = NamespaceStatus.valueOf(statusFilterString.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                logger.warn("Invalid namespace status filter provided: '{}'. Ignoring filter.", statusFilterString);
+            }
+        }
+
+        Page<TenantNamespace> namespacePage;
+        boolean hasNameFilter = StringUtils.hasText(nameFilter);
+
+        if (hasNameFilter && statusFilter != null) {
+            namespacePage = namespaceRepository.findByTenantIdAndNameContainingIgnoreCaseAndStatus(tenantId, nameFilter, statusFilter, pageable);
+        } else if (hasNameFilter) {
+            namespacePage = namespaceRepository.findByTenantIdAndNameContainingIgnoreCase(tenantId, nameFilter, pageable);
+        } else if (statusFilter != null) {
+            namespacePage = namespaceRepository.findByTenantIdAndStatus(tenantId, statusFilter, pageable);
+        } else {
+            namespacePage = namespaceRepository.findByTenantId(tenantId, pageable);
+        }
+
+        return namespacePage.map(namespaceMapper::toSummaryDto);
+    }
+
+    /**
+     * Retrieves a single, detailed view of a namespace by its ID. It ensures the namespace
+     * belongs to the authenticated tenant before returning it.
+     *
+     * @param namespaceId The unique identifier of the namespace.
+     * @return A comprehensive DTO of the namespace, including its configurations and workloads.
+     * @throws ResourceNotFoundException if no namespace with the given ID is found for the current tenant.
+     */
+    @Transactional(readOnly = true)
+    public TenantNamespaceDto getNamespace(Long namespaceId) {
+        Long tenantId = SecurityContextHelper.getAuthenticatedTenantId();
+
+        // The repository method enforces security by checking both tenantId and namespaceId
+        TenantNamespace namespace = namespaceRepository.findByTenantIdAndId(tenantId, namespaceId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Namespace not found with ID: " + namespaceId + " for your tenant."));
+
+        // The mapper converts the entity to the detailed DTO, which will trigger
+        // the lazy loading of the configurations and workloads collections within the transaction.
+        return namespaceMapper.toDetailDto(namespace);
+    }
+
     private void createDefaultConfigurations(TenantNamespace namespace, String username) {
         logger.debug("Applying default configurations for namespace '{}'", namespace.getName());
         applyAndSaveConfiguration(namespace, resourceFactory.createDefaultNetworkPolicy(namespace.getName()));
@@ -138,9 +227,11 @@ public class TenantNamespaceService {
         try {
             kubernetesClientService.apply(namespace.getKubernetesCluster(), namespace.getName(), resource.yaml());
             config.setStatus(ResourceStatus.ACTIVE);
+            config.setSyncStatus(SyncStatus.IN_SYNC);
         } catch (Exception e) {
             logger.error("Failed to apply resource {}/{} in namespace '{}'", resource.k8sKind(), resource.k8sName(), namespace.getName(), e);
             config.setStatus(ResourceStatus.ERROR);
+            config.setSyncStatus(SyncStatus.IN_SYNC);
             config.setStatusDetails(e.getMessage());
         }
         namespace.getConfigurations().add(config);
