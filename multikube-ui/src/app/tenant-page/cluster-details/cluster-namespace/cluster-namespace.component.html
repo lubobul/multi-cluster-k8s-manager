@@ -1,1 +1,60 @@
-<p>cluster-namespaces works!</p>
+@if (errorMessage) {
+    <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorClosed">
+        <clr-alert-item>
+            <span class="alert-text">{{ errorMessage }}</span>
+        </clr-alert-item>
+    </clr-alert>
+}
+
+@if (loading) {
+    <div class="loading-container">
+        <clr-spinner clrInline>Loading...</clr-spinner>
+        <h5>Loading...</h5>
+    </div>
+} @else {
+    <clr-tabs>
+        <clr-tab>
+            <button clrTabLink>Details</button>
+            <clr-tab-content *clrIfActive>
+                <h4 class="namespace-header">{{namespace?.name}}</h4>
+                <table class="table table-vertical">
+                    <tbody>
+                    <tr>
+                        <th>Description</th>
+                        <td>{{ namespace.description }}</td>
+                    </tr>
+                    <tr>
+                        <th>Status</th>
+                        <td>
+                            <namespace-status [namespace]="namespace"></namespace-status>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Created</th>
+                        <td>{{ namespace.createdAt | date : "dd.MM, hh:mm" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Updated</th>
+                        <td>{{ namespace.updatedAt | date : "dd.MM, hh:mm" }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </clr-tab-content>
+        </clr-tab>
+        <clr-tab>
+            <button clrTabLink>Deployments</button>
+            <clr-tab-content *clrIfActive>
+                <p cds-text="body" cds-layout="m-t:md">Content for Management tab.</p>
+            </clr-tab-content>
+        </clr-tab>
+        <clr-tab>
+            <button clrTabLink>Cloud</button>
+            <clr-tab-content *clrIfActive>
+                <p cds-text="body" cds-layout="m-t:md">Content for Cloud tab.</p>
+            </clr-tab-content>
+        </clr-tab>
+    </clr-tabs>
+
+}
+
+

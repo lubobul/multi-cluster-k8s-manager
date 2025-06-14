@@ -98,6 +98,7 @@ export interface TenantNamespaceSummaryResponse {
     name: string;
     description: string;
     status: NamespaceStatus;
+    statusDetails: string;
     clusterId: number;
     clusterName: string;
 

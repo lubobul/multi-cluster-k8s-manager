@@ -23,11 +23,11 @@ export class TenantClusterDetailsService {
         (this.activatedRoute.params as Observable<Params>).pipe(
             map((routeParameters) => {
                 return routeParameters[TENANT_ROUTE_PATHS.CLUSTER_ID];
-            })
-        ).pipe(
+            }),
             mergeMap((clusterId) => {
                 return this.clusterService.getCluster(clusterId);
-            })).subscribe({
+            })
+        ).subscribe({
             next: (cluster) => {
                 this.clusterSubj.next(cluster);
             },

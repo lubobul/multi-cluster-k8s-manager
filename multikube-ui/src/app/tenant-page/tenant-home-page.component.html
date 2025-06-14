@@ -7,8 +7,8 @@
             </a>
         </div>
         <div class="header-nav">
-            <a routerLink="/" class="nav-link nav-text">Home</a>
-            <a routerLink="/" class="nav-link nav-text">About</a>
+            <a routerLink="/" class="nav-link nav-text">Dashboard</a>
+            <a class="nav-link nav-text" [routerLinkActive]="['active']" [routerLink]="TENANT_ROUTE_PATHS.KUBE_CLUSTERS">Kubernetes Clusters</a>
         </div>
 
         <div class="settings">
@@ -21,19 +21,8 @@
             </a>
         </div>
     </header>
-    <nav class="subnav">
-        <ul class="nav">
-            <li class="nav-item">
-                <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="TENANT_ROUTE_PATHS.KUBE_CLUSTERS">Kubernetes
-                    Clusters</a>
-            </li>
-<!--            <li class="nav-item">-->
-<!--                <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="CHAT_ROUTE_PATHS.TENANT_PROFILES">Tenants</a>-->
-<!--            </li>-->
-        </ul>
-    </nav>
     <div class="content-container">
-        <div class="content-area">
+        <div class="content-area no-margin no-padding">
             <div class="application-dynamic-content">
                 <div class="application-home-outlet">
                     <router-outlet></router-outlet>

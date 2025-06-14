@@ -20,6 +20,8 @@
 .tenant-name-title{
     margin-right: 0.8rem;
     align-content: center;
+    font-weight: 500;
+    font-size: 0.8rem;
 }
 
 .application-home-outlet{
@@ -32,6 +34,10 @@
 
 .no-margin{
     margin: 0;
+}
+
+.no-padding{
+    padding: 0;
 }
 
 label{

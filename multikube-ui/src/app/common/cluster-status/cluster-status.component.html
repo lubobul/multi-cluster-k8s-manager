@@ -1,7 +1,7 @@
 @switch (status){
     @case (ClusterStatus.ACTIVE){
         <div class="status-row">
-            <cds-icon shape="check-circle" status="success" size="md"></cds-icon>
+            <cds-icon shape="success-standard" status="success" size="sm"></cds-icon>
             <span class="status-text">Active</span>
         </div>
     }
@@ -15,7 +15,7 @@
 
     @case (ClusterStatus.ERROR){
         <div class="status-row">
-            <cds-icon shape="warning-standard" status="danger" size="md"></cds-icon>
+            <cds-icon shape="error-standard" status="danger" size="sm"></cds-icon>
             <span class="status-text">Error</span>
         </div>
     }
@@ -36,7 +36,7 @@
 
     @case (ClusterStatus.INACTIVE){
         <div class="status-row">
-            <cds-icon shape="warning-standard" status="warning" size="md"></cds-icon>
+            <cds-icon shape="warning-standard" status="warning" size="sm"></cds-icon>
             <span class="status-text">Inactive</span>
         </div>
     }

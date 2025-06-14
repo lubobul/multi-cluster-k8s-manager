@@ -7,6 +7,8 @@
             </a>
         </div>
         <div class="header-nav">
+            <a class="nav-link nav-text" [routerLinkActive]="['active']" [routerLink]="CHAT_ROUTE_PATHS.KUBE_CLUSTERS">Kubernetes Clusters</a>
+            <a class="nav-link nav-text" [routerLinkActive]="['active']" [routerLink]="CHAT_ROUTE_PATHS.TENANT_PROFILES">Tenants</a>
             <a href="http://localhost:8165/swagger-ui/index.html" target="_blank" class="nav-link nav-text">API Explorer</a>
         </div>
 
@@ -14,23 +16,11 @@
             <span class="tenant-name-title">{{currentUser?.tenant?.name}}</span>
             <a [routerLink]="CHAT_ROUTE_PATHS.PROFILE_SETTINGS" [routerLinkActive]="['active']"
                class="nav-link nav-icon">
-
                 <cds-icon shape="user"></cds-icon>
                 <span>{{ currentUser?.username }}</span>
             </a>
         </div>
     </header>
-    <nav class="subnav">
-        <ul class="nav">
-            <li class="nav-item">
-                <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="CHAT_ROUTE_PATHS.KUBE_CLUSTERS">Kubernetes
-                    Clusters</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="CHAT_ROUTE_PATHS.TENANT_PROFILES">Tenants</a>
-            </li>
-        </ul>
-    </nav>
     <div class="content-container">
         <div class="content-area">
             <div class="application-dynamic-content">

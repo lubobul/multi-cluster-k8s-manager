@@ -1,39 +1,39 @@
-@if (errorMessage) {
-    <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorClosed">
-        <clr-alert-item>
-            <span class="alert-text">{{ errorMessage }}</span>
-        </clr-alert-item>
-    </clr-alert>
-}
+<div class="host-container">
+    @if (errorMessage) {
+        <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorClosed">
+            <clr-alert-item>
+                <span class="alert-text">{{ errorMessage }}</span>
+            </clr-alert-item>
+        </clr-alert>
+    }
 
-@if (loading) {
-    <div class="loading-container">
-        <clr-spinner clrInline>Loading...</clr-spinner>
-        <h5>Loading...</h5>
-    </div>
-} @else {
-    <table class="table table-vertical">
-        <tbody>
-        <tr>
-            <th>Name</th>
-            <td>{{ cluster.name }}</td>
-        </tr>
-        <tr>
-            <th>Status</th>
-            <td>
-                <cluster-status [cluster]="cluster"></cluster-status>
-            </td>
-        </tr>
-        <tr>
-            <th>Created</th>
-            <td>{{ cluster.createdAt | date : "dd.MM, hh:mm" }}</td>
-        </tr>
-        <tr>
-            <th>Updated</th>
-            <td>{{ cluster.updatedAt | date : "dd.MM, hh:mm" }}</td>
-        </tr>
-        </tbody>
-    </table>
-}
-
-
+    @if (loading) {
+        <div class="loading-container">
+            <clr-spinner clrInline>Loading...</clr-spinner>
+            <h5>Loading...</h5>
+        </div>
+    } @else {
+        <table class="table table-vertical">
+            <tbody>
+            <tr>
+                <th>Description</th>
+                <td>{{ cluster.description }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>
+                    <cluster-status [cluster]="cluster"></cluster-status>
+                </td>
+            </tr>
+            <tr>
+                <th>Created</th>
+                <td>{{ cluster.createdAt | date : "dd.MM, hh:mm" }}</td>
+            </tr>
+            <tr>
+                <th>Updated</th>
+                <td>{{ cluster.updatedAt | date : "dd.MM, hh:mm" }}</td>
+            </tr>
+            </tbody>
+        </table>
+    }
+</div>

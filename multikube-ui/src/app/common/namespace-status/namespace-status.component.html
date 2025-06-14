@@ -1,0 +1,67 @@
+@switch (status){
+    @case (NamespaceStatus.ACTIVE){
+        <div class="status-row">
+            <cds-icon shape="success-standard" status="success" size="sm"></cds-icon>
+            <span class="status-text">Active</span>
+        </div>
+    }
+
+    @case (NamespaceStatus.FAILED_CREATION){
+        <div class="status-row">
+            <cds-icon shape="error-standard" status="danger" size="sm"></cds-icon>
+            <span class="status-text">Failed</span>
+            <clr-signpost>
+                <button class="btn btn-link btn-icon" aria-label="Icon Button Trigger" clrSignpostTrigger>
+                    <cds-icon shape="info-standard" size="sm"></cds-icon>
+                </button>
+                <clr-signpost-content [clrPosition]="'right-middle'" *clrIfOpen>
+                    {{namespace?.statusDetails}}
+                </clr-signpost-content>
+            </clr-signpost>
+        </div>
+    }
+
+    @case (NamespaceStatus.FAILED_DELETION){
+        <div class="status-row">
+            <cds-icon shape="error-standard" status="danger" size="sm"></cds-icon>
+            <span class="status-text">Failed</span>
+        </div>
+    }
+
+    @case (NamespaceStatus.DELETED){
+        <div class="status-row">
+            <cds-icon shape="warning-standard" status="warning" size="sm"></cds-icon>
+            <span class="status-text">Deleted</span>
+        </div>
+    }
+
+
+    @case (NamespaceStatus.DELETING){
+        <div class="status-row">
+            <clr-spinner clrInline></clr-spinner>
+            <span class="status-text">Deleting</span>
+        </div>
+    }
+
+    @case (NamespaceStatus.CREATING){
+        <div class="status-row">
+            <clr-spinner clrInline></clr-spinner>
+            <span class="status-text">Pending</span>
+        </div>
+    }
+
+    @case (NamespaceStatus.REQUESTED){
+        <div class="status-row">
+            <clr-spinner clrInline></clr-spinner>
+            <span class="status-text">Pending</span>
+        </div>
+    }
+
+    @default {
+        <div class="status-row">
+            <cds-icon shape="unknown-status" size="md"></cds-icon>
+            <span class="status-text">Unknown</span>
+        </div>
+    }
+
+}
