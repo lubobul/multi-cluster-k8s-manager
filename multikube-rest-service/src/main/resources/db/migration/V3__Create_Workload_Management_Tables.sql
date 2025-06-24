@@ -72,6 +72,7 @@ CREATE TABLE tenant_workloads
 
     -- Foreign key to the namespace this workload is deployed in.
     tenant_namespace_id BIGINT       NOT NULL,
+    created_by_user_id  BIGINT       NOT NULL,
 
     created_at          TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMP             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -79,5 +80,7 @@ CREATE TABLE tenant_workloads
     CONSTRAINT fk_workload_namespace FOREIGN KEY (tenant_namespace_id) REFERENCES tenant_namespaces (id) ON DELETE CASCADE,
 
     -- An instance's k8s_name must be unique for its kind within a namespace.
-    CONSTRAINT unique_workload_in_namespace UNIQUE (tenant_namespace_id, k8s_name, k8s_kind)
+    CONSTRAINT unique_workload_in_namespace UNIQUE (tenant_namespace_id, k8s_name, k8s_kind),
+    CONSTRAINT fk_workload_user FOREIGN KEY (created_by_user_id) REFERENCES users (id)
+
 );

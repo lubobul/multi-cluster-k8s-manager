@@ -2,6 +2,7 @@ package com.multikube_rest_service.entities.tenant;
 
 import com.multikube_rest_service.common.enums.ResourceStatus;
 import com.multikube_rest_service.common.enums.SyncStatus;
+import com.multikube_rest_service.entities.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,6 +56,10 @@ public class TenantWorkload {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tenant_namespace_id", nullable = false)
     private TenantNamespace tenantNamespace;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_user_id")
+    private User createdByUser;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
