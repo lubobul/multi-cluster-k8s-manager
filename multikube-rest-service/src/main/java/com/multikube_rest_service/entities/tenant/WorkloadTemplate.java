@@ -43,9 +43,6 @@ public class WorkloadTemplate {
     @JoinColumn(name = "template_catalog_id", nullable = false)
     private TemplateCatalog templateCatalog;
 
-    @OneToMany(mappedBy = "workloadTemplate", fetch = FetchType.LAZY)
-    private Set<TenantWorkload> workloadInstances = new HashSet<>();
-
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Timestamp createdAt;

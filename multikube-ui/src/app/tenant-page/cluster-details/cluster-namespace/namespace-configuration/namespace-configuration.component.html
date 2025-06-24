@@ -10,6 +10,7 @@
     <h5>Namespace configuration</h5>
 
     <clr-datagrid
+        class="configurations-grid"
         (clrDgRefresh)="refreshByGrid($event)"
         [clrDgLoading]="loading"
     >
@@ -37,7 +38,7 @@
         <ng-template [clrIfDetail]="gridNamespaceConfigDetailState" let-detail (clrIfDetailChange)="gridGetConfigurationDetails($event)">
 
             <clr-dg-detail>
-                <clr-dg-detail-header>{{ gridNamespaceConfigDetailState.name }}</clr-dg-detail-header>
+                <clr-dg-detail-header>{{ loadingConfigYaml ? "" : gridNamespaceConfigDetailState?.name }}</clr-dg-detail-header>
                 <clr-dg-detail-body>
                     @if(loadingConfigYaml){
                         <div class="loading-container">

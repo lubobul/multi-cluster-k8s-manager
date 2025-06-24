@@ -22,8 +22,8 @@ export const loginRedirectInterceptor: HttpInterceptorFn = (req, next) => {
                 // Unauthorized: Clear identity (if any was attempted to be set by a failing request)
                 // and redirect to login. AuthService.logout() handles this well if appropriate.
                 // Or, more directly if logout performs other actions not desired here:
-                // authService.clearUserIdentity(); // Assuming you add such a method or handle it
-                // router.navigate([`/${MULTIKUBE_ROUTE_PATHS.LOGIN}`]);
+                authService.clearUserIdentity();
+                router.navigate([`/${MULTIKUBE_ROUTE_PATHS.LOGIN}`]);
             } else if (error.status === 403) {
                 // Forbidden: User is authenticated but not authorized for the specific resource.
                 // You might want to navigate to an "access-denied" page or back to their dashboard.

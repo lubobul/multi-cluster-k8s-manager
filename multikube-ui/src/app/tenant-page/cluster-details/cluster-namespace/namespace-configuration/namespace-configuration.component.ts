@@ -80,6 +80,9 @@ export class NamespaceConfigurationComponent implements OnInit {
     loadingConfigYaml = false;
 
     public gridGetConfigurationDetails(config: NamespaceConfigurationResponse): void {
+        if(!config){
+            return;
+        }
         this.loadingConfigYaml = true;
         this.tenantNamespaceService.getNamespaceConfiguration(this.namespace.id, config.id)
             .subscribe({
