@@ -158,6 +158,7 @@ spec:
         } as CreateNamespaceRequest).subscribe({
             next: (namespace) => {
                 this.loading = false;
+                this.clusterDetailsService.updateClusterDetails();
                 this.navigateToNamespaceDetails(namespace.id);
             },
             error: (err) => {

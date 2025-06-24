@@ -10,11 +10,17 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 
+/**
+ * Represents an instance of a deployed workload in a namespace.
+ * This entity is self-contained and holds the final YAML content that was applied
+ * to the cluster, making it the "source of intent" for this specific instance.
+ * It is decoupled from the original template it may have been created from.
+ */
 @Entity
 @Getter
 @Setter
 @Table(name = "tenant_workloads", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"tenant_namespace_id", "k8s_name", "k8s_kind"})
+        @UniqueConstraint(columnNames = {"tenant_namespace_id", "k8s_name", "k8s_kind"})
 })
 public class TenantWorkload {
 
@@ -43,7 +49,7 @@ public class TenantWorkload {
     private String statusDetails;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "sync_status", nullable = false)
     private SyncStatus syncStatus = SyncStatus.UNKNOWN;
 
     @ManyToOne(fetch = FetchType.LAZY)
