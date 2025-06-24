@@ -19,7 +19,7 @@ public interface TemplateCatalogMapper {
      * @param entity The source TemplateCatalog entity.
      * @return The mapped TemplateCatalogDto.
      */
-    @Mapping(target = "isSystemDefault", expression = "java(entity.getTenant() == null)")
+    @Mapping(target = "systemDefault", expression = "java(entity.getTenant() == null)")
     @Mapping(target = "templatesCount", expression = "java(entity.getWorkloadTemplates().size())")
     TemplateCatalogDto toDto(TemplateCatalog entity);
 }

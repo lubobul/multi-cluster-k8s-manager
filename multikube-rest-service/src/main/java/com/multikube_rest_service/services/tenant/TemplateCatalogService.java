@@ -6,7 +6,6 @@ import com.multikube_rest_service.dtos.requests.tenant.CreateTemplateCatalogRequ
 import com.multikube_rest_service.dtos.responses.tenant.TemplateCatalogDto;
 import com.multikube_rest_service.entities.Tenant;
 import com.multikube_rest_service.entities.tenant.TemplateCatalog;
-import com.multikube_rest_service.exceptions.DataConflictException;
 import com.multikube_rest_service.exceptions.ResourceNotFoundException;
 import com.multikube_rest_service.mappers.tenant.TemplateCatalogMapper;
 import com.multikube_rest_service.repositories.TenantRepository;

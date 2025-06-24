@@ -28,15 +28,6 @@ public interface TemplateCatalogRepository extends JpaRepository<TemplateCatalog
     Page<TemplateCatalog> findByTenantIdOrSystemDefault(@Param("tenantId") Long tenantId, Pageable pageable);
 
     /**
-     * Finds a paginated list of catalogs that belong exclusively to the specified tenant.
-     *
-     * @param tenantId The ID of the tenant.
-     * @param pageable Pagination information.
-     * @return A Page of the tenant's private template catalogs.
-     */
-    Page<TemplateCatalog> findByTenantId(Long tenantId, Pageable pageable);
-
-    /**
      * Finds a catalog by its ID, ensuring it is either a system-default catalog or owned by the specified tenant.
      *
      * @param id The ID of the catalog.
@@ -56,4 +47,22 @@ public interface TemplateCatalogRepository extends JpaRepository<TemplateCatalog
      * @return true if a catalog with that name exists for the tenant, false otherwise.
      */
     boolean existsByTenantIdAndName(Long tenantId, String name);
+
+    /**
+     * Checks if a catalog with a given ID exists and belongs to a specific tenant.
+     * This is an efficient query for security checks.
+     *
+     * @param id The ID of the catalog.
+     * @param tenantId The ID of the tenant to check ownership against.
+     * @return true if the catalog exists and is owned by the tenant, false otherwise.
+     */
+    boolean existsByIdAndTenantId(Long id, Long tenantId);
+
+    /**
+     * Checks if a catalog with a given ID exists and is a system-default catalog (has no tenant owner).
+     *
+     * @param id The ID of the catalog.
+     * @return true if the catalog exists and has a null tenantId, false otherwise.
+     */
+    boolean existsByIdAndTenantIsNull(Long id);
 }

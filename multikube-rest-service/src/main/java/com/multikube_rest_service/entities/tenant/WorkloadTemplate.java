@@ -8,8 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
+// No longer importing Set or HashSet
 
 /**
  * Represents a reusable workload template (e.g., for a microservice, a database, etc.).

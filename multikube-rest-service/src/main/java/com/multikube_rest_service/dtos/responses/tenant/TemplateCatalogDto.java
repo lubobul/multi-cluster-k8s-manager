@@ -12,6 +12,6 @@ public class TemplateCatalogDto {
     private Long id;
     private String name;
     private String description;
-    private boolean isSystemDefault;
-    private int templatesCount; // Replaces the List<...>
+    private boolean systemDefault;
+    private int templatesCount;
 }
