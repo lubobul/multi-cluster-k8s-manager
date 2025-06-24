@@ -6,10 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * DTO for requesting the creation of a new workload template within a catalog.
+ * DTO for requesting the creation of a new workload template.
  */
 @Data
 public class CreateWorkloadTemplateRequest {
+
+    @NotNull(message = "A parent catalog ID must be provided.")
+    private Long catalogId;
 
     @NotBlank(message = "Template name cannot be blank.")
     private String name;
