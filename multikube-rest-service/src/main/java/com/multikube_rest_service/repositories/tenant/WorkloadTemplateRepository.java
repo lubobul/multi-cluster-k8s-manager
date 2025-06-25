@@ -52,4 +52,13 @@ public interface WorkloadTemplateRepository extends JpaRepository<WorkloadTempla
      * @return true if a template with that name exists in the catalog, false otherwise.
      */
     boolean existsByTemplateCatalogIdAndName(Long templateCatalogId, String name);
+
+    /**
+     * Finds a paginated list of all workload templates belonging to a specific template catalog.
+     *
+     * @param templateCatalogId The ID of the parent TemplateCatalog.
+     * @param pageable          Pagination information.
+     * @return A Page of workload templates.
+     */
+    Page<WorkloadTemplate> findByTemplateCatalogId(Long templateCatalogId, Pageable pageable);
 }

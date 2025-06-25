@@ -4,12 +4,16 @@ import com.multikube_rest_service.auth.JwtUserDetails;
 import com.multikube_rest_service.common.SecurityContextHelper;
 import com.multikube_rest_service.dtos.requests.tenant.CreateTemplateCatalogRequest;
 import com.multikube_rest_service.dtos.responses.tenant.TemplateCatalogDto;
+import com.multikube_rest_service.dtos.responses.tenant.WorkloadTemplateSummaryDto;
 import com.multikube_rest_service.entities.Tenant;
 import com.multikube_rest_service.entities.tenant.TemplateCatalog;
+import com.multikube_rest_service.entities.tenant.WorkloadTemplate;
 import com.multikube_rest_service.exceptions.ResourceNotFoundException;
 import com.multikube_rest_service.mappers.tenant.TemplateCatalogMapper;
+import com.multikube_rest_service.mappers.tenant.WorkloadTemplateMapper;
 import com.multikube_rest_service.repositories.TenantRepository;
 import com.multikube_rest_service.repositories.tenant.TemplateCatalogRepository;
+import com.multikube_rest_service.repositories.tenant.WorkloadTemplateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -28,14 +32,22 @@ public class TemplateCatalogService {
     private final TemplateCatalogRepository catalogRepository;
     private final TenantRepository tenantRepository;
     private final TemplateCatalogMapper catalogMapper;
+    private final WorkloadTemplateRepository templateRepository;
+    private final WorkloadTemplateMapper templateMapper;
+
 
     public TemplateCatalogService(
             TemplateCatalogRepository catalogRepository,
             TenantRepository tenantRepository,
-            TemplateCatalogMapper catalogMapper) {
+            TemplateCatalogMapper catalogMapper,
+            WorkloadTemplateRepository templateRepository,
+            WorkloadTemplateMapper templateMapper
+    ) {
         this.catalogRepository = catalogRepository;
         this.tenantRepository = tenantRepository;
         this.catalogMapper = catalogMapper;
+        this.templateRepository = templateRepository;
+        this.templateMapper = templateMapper;
     }
 
     /**
@@ -50,6 +62,28 @@ public class TemplateCatalogService {
         Long tenantId = SecurityContextHelper.getAuthenticatedTenantId();
         Page<TemplateCatalog> catalogPage = catalogRepository.findByTenantIdOrSystemDefault(tenantId, pageable);
         return catalogPage.map(catalogMapper::toDto);
+    }
+
+    /**
+     * Retrieves a paginated list of all workload template summaries for a specific catalog.
+     * Ensures the current tenant has access to the parent catalog.
+     *
+     * @param catalogId The ID of the parent template catalog.
+     * @param pageable  Pagination information.
+     * @return A Page of WorkloadTemplateSummaryDto objects.
+     */
+    @Transactional(readOnly = true)
+    public Page<WorkloadTemplateSummaryDto> getTemplatesForCatalog(Long catalogId, Pageable pageable) {
+        Long tenantId = SecurityContextHelper.getAuthenticatedTenantId();
+
+        // Security Check: Ensure the user has access to the parent catalog.
+        if (!catalogRepository.findByIdAndAccessibleByTenant(catalogId, tenantId).isPresent()) {
+            throw new ResourceNotFoundException("Template Catalog not found with ID: " + catalogId);
+        }
+
+        // We use the WorkloadTemplateRepository to find the templates for the given catalogId.
+        Page<WorkloadTemplate> templatePage = templateRepository.findByTemplateCatalogId(catalogId, pageable);
+        return templatePage.map(templateMapper::toSummaryDto);
     }
 
     /**

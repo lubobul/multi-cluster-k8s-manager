@@ -3,6 +3,7 @@ package com.multikube_rest_service.services.tenant;
 import com.multikube_rest_service.auth.JwtUserDetails;
 import com.multikube_rest_service.common.SecurityContextHelper;
 import com.multikube_rest_service.common.enums.ResourceStatus;
+import com.multikube_rest_service.common.enums.RoleType;
 import com.multikube_rest_service.dtos.requests.tenant.CreateWorkloadRequest;
 import com.multikube_rest_service.dtos.responses.tenant.TenantWorkloadDto;
 import com.multikube_rest_service.dtos.responses.tenant.TenantWorkloadSummaryDto;
@@ -168,7 +169,7 @@ public class TenantWorkloadService {
 
         // Step 2: Granular Permission Check
         boolean isTenantAdmin = userDetails.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_TENANT_ADMIN"));
+                .anyMatch(auth -> auth.getAuthority().equals(RoleType.TENANT_ADMIN.toString()));
 
         boolean isCreator = workload.getCreatedByUser() != null &&
                 workload.getCreatedByUser().getId().equals(userDetails.getUserId());
@@ -177,7 +178,7 @@ public class TenantWorkloadService {
             throw new SecurityException("Access denied: You must be an admin or the creator to delete this workload.");
         }
 
-        // Step 3: Proceed with deletion logic
+        //TODO Step 3: Proceed with deletion logic
         // This would involve calling kubernetesClientService.delete(...)
         // For now, we will just delete the record from our database.
 
