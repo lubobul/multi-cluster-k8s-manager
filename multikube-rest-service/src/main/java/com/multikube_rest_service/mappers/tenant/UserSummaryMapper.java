@@ -8,6 +8,6 @@ import org.mapstruct.Mapper;
  * Maps {@link User} entities to {@link UserSummaryDto} objects.
  */
 @Mapper(componentModel = "spring")
-public interface UserMapper {
+public interface UserSummaryMapper {
     UserSummaryDto toSummaryDto(User user);
 }

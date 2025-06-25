@@ -1,0 +1,81 @@
+<div class="host-container">
+    @if (errorMessage) {
+        <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorClosed">
+            <clr-alert-item>
+                <span class="alert-text">{{ errorMessage }}</span>
+            </clr-alert-item>
+        </clr-alert>
+    }
+
+    <h4>Template Catalogs</h4>
+
+    <button (click)="openCreateCatalogModal()" class="btn btn-link-primary">
+        <cds-icon shape="plus"></cds-icon>
+        Create catalog
+    </button>
+
+    <clr-datagrid
+        class="configurations-grid"
+        (clrDgRefresh)="refreshByGrid($event)"
+        [clrDgLoading]="loading"
+    >
+        <clr-dg-column [clrDgField]="'name'">Name</clr-dg-column>
+        <clr-dg-column>Description</clr-dg-column>
+        <clr-dg-column>Templates</clr-dg-column>
+        <clr-dg-column>Is System scoped</clr-dg-column>
+        <clr-dg-placeholder>No Catalogs configurations found.</clr-dg-placeholder>
+        <clr-dg-row *clrDgItems="let catalog of catalogsPage.content" [clrDgItem]="catalog">
+            <clr-dg-cell>{{ catalog.name }}</clr-dg-cell>
+            <clr-dg-cell>{{ catalog.description }}</clr-dg-cell>
+            <clr-dg-cell>{{ catalog.templatesCount }}</clr-dg-cell>
+            <clr-dg-cell>{{ catalog.systemDefault ? "Yes" : "No" }}</clr-dg-cell>
+        </clr-dg-row>
+        <clr-dg-footer>
+            <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="catalogsPage.totalElements">
+                <clr-dg-page-size [clrPageSizeOptions]="[5, 10, 15]">Tenants per page</clr-dg-page-size>
+                {{ pagination.firstItem + 1 }} - {{ pagination.lastItem + 1 }} of
+                {{ pagination.totalItems }} tenants
+            </clr-dg-pagination>
+        </clr-dg-footer>
+    </clr-datagrid>
+</div>
+
+<clr-side-panel [(clrSidePanelOpen)]="createCatalogModalOpened" [clrSidePanelSize]="'xl'">
+    <div class="side-panel-title">Create template catalog
+    </div>
+    <div class="side-panel-body">
+
+        <form [formGroup]="catalogForm">
+            <clr-input-container>
+                <label>Name</label>
+                <input clrInput formControlName="name"/>
+                <clr-control-error *clrIfError="'required'">
+                    Cluster name field is required.
+                </clr-control-error>
+                <clr-control-helper>
+                    Enter some meaningful name to remember this catalog with
+                </clr-control-helper>
+            </clr-input-container>
+
+            <clr-textarea-container>
+                <label>Description</label>
+                <textarea clrTextarea formControlName="description"></textarea>
+                <clr-control-error *clrIfError="'required'">
+                    Cluster description field is required.
+                </clr-control-error>
+                <clr-control-helper>
+                    Enter some meaningful description
+                </clr-control-helper>
+            </clr-textarea-container>
+        </form>
+    </div>
+    <div class="side-panel-footer">
+        <button type="button" class="btn btn-outline" (click)="createCatalogModalOpened = false">Cancel
+        </button>
+        <button [disabled]="loading || catalogForm.invalid" class="btn btn-primary"
+                (click)="createCatalog()">
+            Create Catalog
+        </button>
+    </div>
+</clr-side-panel>
+

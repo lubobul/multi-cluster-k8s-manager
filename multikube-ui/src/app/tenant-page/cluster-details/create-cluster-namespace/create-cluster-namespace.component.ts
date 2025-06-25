@@ -24,7 +24,7 @@ export enum NamespaceConfigurationChoice {
 }
 
 @Component({
-    selector: 'app-cluster-namespaces',
+    selector: 'cluster-namespaces',
     imports: [
         ClarityModule,
         ClrAccordionModule,
