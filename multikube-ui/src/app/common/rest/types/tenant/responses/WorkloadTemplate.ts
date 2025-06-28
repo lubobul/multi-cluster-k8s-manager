@@ -1,3 +1,5 @@
+import {EntityReference} from '../../ReferenceType';
+
 /**
  * Represents the type of a workload template.
  * This should match the TemplateType enum in the backend.
@@ -40,7 +42,7 @@ export interface WorkloadTemplate {
     /**
      * The ID of the parent catalog this template belongs to.
      */
-    catalogId: number;
+    catalog: EntityReference;
 
     /**
      * The timestamp of when the template was created, as an ISO 8601 string.

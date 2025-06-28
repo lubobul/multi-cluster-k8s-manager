@@ -15,7 +15,7 @@ public class WorkloadTemplateDto {
     private String description;
     private TemplateType templateType;
     private String yamlContent; // Included for detail view
-    private Long catalogId;
+    private CatalogSummaryDto catalog;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 }

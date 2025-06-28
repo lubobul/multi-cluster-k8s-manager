@@ -14,7 +14,7 @@ public class WorkloadTemplateSummaryDto {
     private String name;
     private String description;
     private TemplateType templateType;
-    private Long catalogId;
+    private CatalogSummaryDto catalog;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 }

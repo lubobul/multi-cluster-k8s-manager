@@ -7,8 +7,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 /**
- * Maps {@link WorkloadTemplate} entities to their corresponding
- * detailed ({@link WorkloadTemplateDto}) and summary ({@link WorkloadTemplateSummaryDto}) DTOs.
+ * Maps {@link WorkloadTemplate} entities to their corresponding DTOs,
+ * including nested information about the parent catalog.
  */
 @Mapper(componentModel = "spring")
 public interface WorkloadTemplateMapper {
@@ -18,7 +18,7 @@ public interface WorkloadTemplateMapper {
      * @param entity The source WorkloadTemplate entity.
      * @return The detailed WorkloadTemplateDto.
      */
-    @Mapping(source = "templateCatalog.id", target = "catalogId")
+    @Mapping(source = "templateCatalog", target = "catalog")
     WorkloadTemplateDto toDto(WorkloadTemplate entity);
 
     /**
@@ -26,6 +26,6 @@ public interface WorkloadTemplateMapper {
      * @param entity The source WorkloadTemplate entity.
      * @return The lightweight WorkloadTemplateSummaryDto.
      */
-    @Mapping(source = "templateCatalog.id", target = "catalogId")
+    @Mapping(source = "templateCatalog", target = "catalog")
     WorkloadTemplateSummaryDto toSummaryDto(WorkloadTemplate entity);
 }

@@ -32,7 +32,7 @@
             <clr-dg-cell>{{ template.name }}</clr-dg-cell>
             <clr-dg-cell>{{ template.description }}</clr-dg-cell>
             <clr-dg-cell>{{ template.templateType == TemplateType.YAML ? "Native" : "Helm" }}</clr-dg-cell>
-            <clr-dg-cell>{{ template.catalogId }}</clr-dg-cell>
+            <clr-dg-cell>{{ template.catalog.name }}</clr-dg-cell>
             <clr-dg-cell>{{ template.createdAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
         </clr-dg-row>
         <ng-template [clrIfDetail]="gridWorkloadTemplateDetailState" let-detail (clrIfDetailChange)="gridGetTemplateDetails($event)">
