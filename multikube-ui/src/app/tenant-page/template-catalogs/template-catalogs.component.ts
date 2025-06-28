@@ -60,7 +60,6 @@ export class TemplateCatalogsComponent implements OnInit {
     catalogForm: FormGroup<{
         name: FormControl<string>,
         description: FormControl<string>,
-
     }>;
 
     constructor(

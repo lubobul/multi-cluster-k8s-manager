@@ -1,3 +1,30 @@
 .host-container{
     padding: 0 1rem 1rem 1rem;
 }
+.workload-yaml-editor{
+    height: 25rem;
+}
+
+:host ::ng-deep clr-dg-detail-body{
+    .clr-dg-detail-body-wrapper{
+        height: 100%;
+    }
+}
+
+.workload-yaml-editor{
+    height: 100%;
+}
+
+.loading-container{
+    display: flex;
+    margin-left: 1.2rem;
+    align-items: center;
+}
+
+.templates-grid{
+    min-height: 25rem;
+}
+
+.workload-template-yaml-editor{
+    height: 100%;
+}

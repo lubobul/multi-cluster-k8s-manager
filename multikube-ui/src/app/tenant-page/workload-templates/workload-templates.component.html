@@ -15,8 +15,8 @@
     </button>
 
     <clr-datagrid
-        class="configurations-grid"
-        (clrDgRefresh)="refreshByGrid($event)"
+        class="templates-grid"
+        (clrDgRefresh)="refreshByTemplatesGrid($event)"
         [clrDgLoading]="loading"
     >
         <clr-dg-column [clrDgField]="'name'">Name</clr-dg-column>
@@ -31,10 +31,31 @@
             </clr-dg-action-overflow>
             <clr-dg-cell>{{ template.name }}</clr-dg-cell>
             <clr-dg-cell>{{ template.description }}</clr-dg-cell>
-            <clr-dg-cell>{{ template.templateType == TemplateType.YAML ? "Native" : "Helm"  }}</clr-dg-cell>
+            <clr-dg-cell>{{ template.templateType == TemplateType.YAML ? "Native" : "Helm" }}</clr-dg-cell>
             <clr-dg-cell>{{ template.catalogId }}</clr-dg-cell>
             <clr-dg-cell>{{ template.createdAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
         </clr-dg-row>
+        <ng-template [clrIfDetail]="gridWorkloadTemplateDetailState" let-detail (clrIfDetailChange)="gridGetTemplateDetails($event)">
+
+            <clr-dg-detail>
+                <clr-dg-detail-header>{{ loadingTemplateYaml ? "" : gridWorkloadTemplateDetailState?.name }}</clr-dg-detail-header>
+                <clr-dg-detail-body>
+                    @if(loadingTemplateYaml){
+                        <div class="loading-container">
+                            <clr-spinner clrInline>Loading...</clr-spinner>
+                            <h5>Loading yaml configuration...</h5>
+                        </div>
+                    } @else {
+                        <ngx-monaco-editor
+                            class="workload-template-yaml-editor"
+                            [options]="templateViewEditorOptions"
+                            [(ngModel)]="gridWorkloadTemplateDetailState.yamlContent"
+                        >
+                        </ngx-monaco-editor>
+                    }
+                </clr-dg-detail-body>
+            </clr-dg-detail>
+        </ng-template>
         <clr-dg-footer>
             <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="templatesPage.totalElements">
                 <clr-dg-page-size [clrPageSizeOptions]="[5, 10, 15]">Tenants per page</clr-dg-page-size>
@@ -46,39 +67,135 @@
 </div>
 
 <clr-side-panel [(clrSidePanelOpen)]="createCatalogModalOpened" [clrSidePanelSize]="'lg'">
-    <div class="side-panel-title">Create template catalog
+    <div class="side-panel-title">Create workload template
     </div>
     <div class="side-panel-body">
+        <form clrStepper [formGroup]="templateForm" (ngSubmit)="createTemplate()">
+            <clr-stepper-panel formGroupName="details">
+                <clr-step-title>Template details</clr-step-title>
+                <clr-step-description>Give your template name and description
+                </clr-step-description>
+                <clr-step-content *clrIfExpanded>
+                    <clr-input-container>
+                        <label>Name</label>
+                        <input clrInput formControlName="name"/>
+                        <clr-control-error *clrIfError="'required'">
+                            Template name field is required.
+                        </clr-control-error>
+                        <clr-control-helper>
+                            Enter some meaningful name for this namespace
+                        </clr-control-helper>
+                    </clr-input-container>
 
-        <form [formGroup]="templateForm">
-            <clr-input-container>
-                <label>Name</label>
-                <input clrInput formControlName="name"/>
-                <clr-control-error *clrIfError="'required'">
-                    Cluster name field is required.
-                </clr-control-error>
-                <clr-control-helper>
-                    Enter some meaningful name to remember this catalog with
-                </clr-control-helper>
-            </clr-input-container>
+                    <clr-textarea-container>
+                        <label>Description</label>
+                        <textarea clrTextarea formControlName="description"></textarea>
+                        <clr-control-helper>
+                            Enter some meaningful description
+                        </clr-control-helper>
+                    </clr-textarea-container>
 
-            <clr-textarea-container>
-                <label>Description</label>
-                <textarea clrTextarea formControlName="description"></textarea>
-                <clr-control-error *clrIfError="'required'">
-                    Cluster description field is required.
-                </clr-control-error>
-                <clr-control-helper>
-                    Enter some meaningful description
-                </clr-control-helper>
-            </clr-textarea-container>
+                    <clr-radio-container>
+                        <label>Kubernetes workload type</label>
+                        <clr-radio-wrapper>
+                            <input formControlName="type" type="radio" clrRadio required value="{{TemplateType.YAML}}"/>
+                            <label>Kubernetes Native</label>
+                        </clr-radio-wrapper>
+                        <clr-radio-wrapper>
+                            <input formControlName="type" type="radio" clrRadio required
+                                   value="{{TemplateType.HELM_CHART}}"/>
+                            <label>Helm chart deployment</label>
+                        </clr-radio-wrapper>
+                        @if (templateForm.controls.details.controls.type.value === TemplateType.YAML) {
+                            <clr-control-helper>Kubernetes native resource (Deployment, StatefulSet, etc.)
+                            </clr-control-helper>
+                        } @else {
+                            <clr-control-helper>Helm chart deployment.</clr-control-helper>
+                        }
+                        <clr-control-error>This field is required!</clr-control-error>
+                    </clr-radio-container>
+
+                    <button clrStepButton="next">next</button>
+                </clr-step-content>
+            </clr-stepper-panel>
+
+            <clr-stepper-panel formGroupName="catalogSelection">
+                <clr-step-title>Template catalog</clr-step-title>
+                <clr-step-description>Choose catalog for your template</clr-step-description>
+                <clr-step-content *clrIfExpanded>
+                    <clr-datagrid
+                        class="templates-grid"
+                        (clrDgRefresh)="refreshByCatalogsGrid($event)"
+                        [clrDgLoading]="loading"
+                        [(clrDgSingleSelected)]="selectedCatalog"
+                        (clrDgSingleSelectedChange)="catalogSelected($event)"
+                    >
+                        <clr-dg-column [clrDgField]="'name'">Name</clr-dg-column>
+                        <clr-dg-column>Description</clr-dg-column>
+                        <clr-dg-column>Templates</clr-dg-column>
+                        <clr-dg-column>Is System scoped</clr-dg-column>
+                        <clr-dg-placeholder>No Catalogs found.</clr-dg-placeholder>
+                        <clr-dg-row *clrDgItems="let catalog of catalogsPage.content" [clrDgItem]="catalog">
+                            <clr-dg-cell>{{ catalog.name }}</clr-dg-cell>
+                            <clr-dg-cell>{{ catalog.description }}</clr-dg-cell>
+                            <clr-dg-cell>{{ catalog.templatesCount }}</clr-dg-cell>
+                            <clr-dg-cell>{{ catalog.systemDefault ? "Yes" : "No" }}</clr-dg-cell>
+                        </clr-dg-row>
+                        <clr-dg-footer>
+                            <clr-dg-pagination #pagination [clrDgPageSize]="5"
+                                               [clrDgTotalItems]="catalogsPage.totalElements">
+                                <clr-dg-page-size [clrPageSizeOptions]="[5, 10, 15]">Tenants per page</clr-dg-page-size>
+                                {{ pagination.firstItem + 1 }} - {{ pagination.lastItem + 1 }} of
+                                {{ pagination.totalItems }} tenants
+                            </clr-dg-pagination>
+                        </clr-dg-footer>
+                    </clr-datagrid>
+                    @if(this.templateForm.invalid && templateForm.controls.catalogSelection.controls.catalogId?.errors?.["required"]){
+                        <div class="clr-error">
+                            <span class="clr-subtext">
+                                Selecting a catalog is required.
+                            </span>
+                        </div>
+                    }
+
+                    <button clrStepButton="next">next</button>
+
+                </clr-step-content>
+            </clr-stepper-panel>
+            <clr-stepper-panel formGroupName="yamlConfig">
+                <clr-step-title>
+                    @if (templateForm.controls.details.controls.type.value === TemplateType.YAML) {
+                        Kubernetes resource definition
+                    } @else {
+                        Helm chart definition
+                    }
+                </clr-step-title>
+                <clr-step-description>
+                    @if (templateForm.controls.details.controls.type.value === TemplateType.YAML) {
+                        Enter kubernetes yaml resource definition
+                    } @else {
+                        Enter Helm chart yaml definition
+                    }
+                </clr-step-description>
+                <clr-step-content *clrIfExpanded>
+                    <ngx-monaco-editor
+                        class="workload-yaml-editor"
+                        [options]="editorOptions"
+                        [formControl]="templateForm.controls.yamlConfig.controls.yaml"
+                    >
+                    </ngx-monaco-editor>
+
+                    <button clrStepButton="submit">Create template</button>
+
+                </clr-step-content>
+            </clr-stepper-panel>
         </form>
     </div>
     <div class="side-panel-footer">
         <button type="button" class="btn btn-outline" (click)="createCatalogModalOpened = false">Cancel
         </button>
         <button [disabled]="loading || templateForm.invalid" class="btn btn-primary"
-                (click)="createCatalog()">
+                (click)="createTemplate()">
             Create Catalog
         </button>
     </div>
