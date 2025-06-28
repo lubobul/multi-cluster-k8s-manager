@@ -7,11 +7,11 @@
         </clr-alert>
     }
 
-    <h4>Template Catalogs</h4>
+    <h4>Workload Templates</h4>
 
     <button (click)="openCreateCatalogModal()" class="btn btn-link-primary">
         <cds-icon shape="plus"></cds-icon>
-        Create catalog
+        Create template
     </button>
 
     <clr-datagrid
@@ -21,20 +21,22 @@
     >
         <clr-dg-column [clrDgField]="'name'">Name</clr-dg-column>
         <clr-dg-column>Description</clr-dg-column>
-        <clr-dg-column>Templates</clr-dg-column>
-        <clr-dg-column>Is System scoped</clr-dg-column>
-        <clr-dg-placeholder>No Catalogs found.</clr-dg-placeholder>
-        <clr-dg-row *clrDgItems="let catalog of catalogsPage.content" [clrDgItem]="catalog">
+        <clr-dg-column>Type</clr-dg-column>
+        <clr-dg-column>Catalog</clr-dg-column>
+        <clr-dg-column>Created</clr-dg-column>
+        <clr-dg-placeholder>No Templates found.</clr-dg-placeholder>
+        <clr-dg-row *clrDgItems="let template of templatesPage.content" [clrDgItem]="template">
             <clr-dg-action-overflow>
-                <button (click)="deleteCatalog(catalog.id)" class="action-item">Delete</button>
+                <button (click)="deleteTemplate(template.id)" class="action-item">Delete</button>
             </clr-dg-action-overflow>
-            <clr-dg-cell>{{ catalog.name }}</clr-dg-cell>
-            <clr-dg-cell>{{ catalog.description }}</clr-dg-cell>
-            <clr-dg-cell>{{ catalog.templatesCount }}</clr-dg-cell>
-            <clr-dg-cell>{{ catalog.systemDefault ? "Yes" : "No" }}</clr-dg-cell>
+            <clr-dg-cell>{{ template.name }}</clr-dg-cell>
+            <clr-dg-cell>{{ template.description }}</clr-dg-cell>
+            <clr-dg-cell>{{ template.templateType == TemplateType.YAML ? "Native" : "Helm"  }}</clr-dg-cell>
+            <clr-dg-cell>{{ template.catalogId }}</clr-dg-cell>
+            <clr-dg-cell>{{ template.createdAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
         </clr-dg-row>
         <clr-dg-footer>
-            <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="catalogsPage.totalElements">
+            <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="templatesPage.totalElements">
                 <clr-dg-page-size [clrPageSizeOptions]="[5, 10, 15]">Tenants per page</clr-dg-page-size>
                 {{ pagination.firstItem + 1 }} - {{ pagination.lastItem + 1 }} of
                 {{ pagination.totalItems }} tenants
@@ -48,7 +50,7 @@
     </div>
     <div class="side-panel-body">
 
-        <form [formGroup]="catalogForm">
+        <form [formGroup]="templateForm">
             <clr-input-container>
                 <label>Name</label>
                 <input clrInput formControlName="name"/>
@@ -75,7 +77,7 @@
     <div class="side-panel-footer">
         <button type="button" class="btn btn-outline" (click)="createCatalogModalOpened = false">Cancel
         </button>
-        <button [disabled]="loading || catalogForm.invalid" class="btn btn-primary"
+        <button [disabled]="loading || templateForm.invalid" class="btn btn-primary"
                 (click)="createCatalog()">
             Create Catalog
         </button>

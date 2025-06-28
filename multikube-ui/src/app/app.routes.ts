@@ -37,6 +37,9 @@ import {
     NamespaceConfigurationComponent
 } from './tenant-page/cluster-details/cluster-namespace/namespace-configuration/namespace-configuration.component';
 import {TemplateCatalogsComponent} from './tenant-page/template-catalogs/template-catalogs.component';
+import {
+    WorkloadTemplatesComponent
+} from './tenant-page/workload-templates/workload-templates.component';
 
 
 export const MULTIKUBE_ROUTE_PATHS = {
@@ -76,6 +79,7 @@ export const TENANT_ROUTE_PATHS = {
         },
     },
     TEMPLATE_CATALOGS: 'template-catalogs',
+    WORKLOAD_TEMPLATES: "workload-templates",
 };
 
 export const routes: Routes = [
@@ -225,6 +229,10 @@ export const routes: Routes = [
             {
                 path: TENANT_ROUTE_PATHS.TEMPLATE_CATALOGS, // e.g., 'provider/kubernetes-clusters'
                 component: TemplateCatalogsComponent
+            },
+            {
+                path: TENANT_ROUTE_PATHS.WORKLOAD_TEMPLATES, // e.g., 'provider/kubernetes-clusters'
+                component: WorkloadTemplatesComponent
             },
             {
                 path: MULTIKUBE_ROUTE_PATHS.PROFILE_SETTINGS, // e.g., 'tenant/profile-settings'

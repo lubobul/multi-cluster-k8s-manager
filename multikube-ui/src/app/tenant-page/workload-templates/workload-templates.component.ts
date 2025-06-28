@@ -1,54 +1,52 @@
 import {Component, OnInit} from '@angular/core';
+import {CdsIconModule} from '@cds/angular';
 import {
-    ClrAccordionModule,
-    ClrAlertModule, ClrCommonFormsModule,
-    ClrDatagridModule,
-    ClrDatagridStateInterface,
-    ClrIconModule, ClrInputModule, ClrSidePanelModule,
-    ClrSpinnerModule, ClrStepperModule, ClrTextareaModule, ClrVerticalNavModule
+    ClrAlertModule,
+    ClrCommonFormsModule,
+    ClrDatagridModule, ClrDatagridStateInterface,
+    ClrIconModule,
+    ClrInputModule,
+    ClrSidePanelModule, ClrTextareaModule
 } from '@clr/angular';
-import {EditorComponent} from 'ngx-monaco-editor-v2';
+import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {BehaviorSubject, debounceTime, filter, mergeMap} from 'rxjs';
 import {PaginatedResponse} from '../../common/rest/types/responses/paginated-response';
-import {QueryRequest, QueryRequestSortType} from '../../common/rest/types/requests/query-request';
-import {buildRestGridFilter, resolveErrorMessage} from '../../common/utils/util-functions';
 import {TemplateCatalog} from '../../common/rest/types/tenant/responses/TemplateCatalog';
-import {TenantCatalogService} from '../services/tenant-catalog.service';
-import {CdsModule} from '@cds/angular';
+import {QueryRequest, QueryRequestSortType} from '../../common/rest/types/requests/query-request';
+import {TenantTemplateService} from '../services/tenant-template.service';
+import {buildRestGridFilter, resolveErrorMessage} from '../../common/utils/util-functions';
 import {CreateCatalogRequest} from '../../common/rest/types/tenant/requests/CreateCatalogRequest';
-import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {TemplateType, WorkloadTemplate} from '../../common/rest/types/tenant/responses/WorkloadTemplate';
+import {CreateWorkloadTemplateRequest} from '../../common/rest/types/tenant/requests/CreateTemplateRequest';
+import {DatePipe} from '@angular/common';
 
 @Component({
-    selector: 'app-template-catalogs',
+  selector: 'workload-templates',
     imports: [
+        CdsIconModule,
         ClrAlertModule,
-        ClrDatagridModule,
-        ClrSpinnerModule,
-        ClrIconModule,
-        ClrVerticalNavModule,
-        CdsModule,
-        ClrAccordionModule,
         ClrCommonFormsModule,
+        ClrDatagridModule,
+        ClrIconModule,
         ClrInputModule,
         ClrSidePanelModule,
-        ClrStepperModule,
         ClrTextareaModule,
-        FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        DatePipe
     ],
-    templateUrl: './template-catalogs.component.html',
-    styleUrl: './template-catalogs.component.scss'
+  templateUrl: './workload-templates.component.html',
+  styleUrl: './workload-templates.component.scss'
 })
-export class TemplateCatalogsComponent implements OnInit {
+export class WorkloadTemplatesComponent implements OnInit {
     private onDataGridRefresh = new BehaviorSubject<ClrDatagridStateInterface>(null);
     errorMessage = "";
     alertErrorClosed = true;
     loading = true;
-    catalogsPage: PaginatedResponse<TemplateCatalog> = {
+    templatesPage: PaginatedResponse<WorkloadTemplate> = {
         pageSize: 0,
         content: [],
         totalPages: 0,
-    } as unknown as PaginatedResponse<TemplateCatalog>;
+    } as unknown as PaginatedResponse<WorkloadTemplate>;
 
     createCatalogModalOpened = false;
 
@@ -57,14 +55,13 @@ export class TemplateCatalogsComponent implements OnInit {
         pageSize: 5,
     };
 
-    catalogForm: FormGroup<{
+    templateForm: FormGroup<{
         name: FormControl<string>,
         description: FormControl<string>,
-
     }>;
 
     constructor(
-        private catalogService: TenantCatalogService,
+        private templateService: TenantTemplateService,
         private fb: FormBuilder,
     ) {
     }
@@ -73,7 +70,7 @@ export class TemplateCatalogsComponent implements OnInit {
         this.loading = true;
         this.subscribeToConfigurationsGrid();
 
-        this.catalogForm = this.fb.group({
+        this.templateForm = this.fb.group({
             name: ['', Validators.required],
             description: ['', Validators.required],
         })
@@ -94,10 +91,10 @@ export class TemplateCatalogsComponent implements OnInit {
                     } : undefined,
                     filter: buildRestGridFilter(state.filters)
                 }
-                return this.catalogService.getCatalogs(this.restQuery);
+                return this.templateService.getTemplates(this.restQuery);
             })).subscribe({
             next: (response) => {
-                this.catalogsPage = response;
+                this.templatesPage = response;
                 this.loading = false;
 
             }, error: (error) => {
@@ -115,10 +112,10 @@ export class TemplateCatalogsComponent implements OnInit {
         this.createCatalogModalOpened = true;
     }
 
-    public deleteCatalog(catalogId: number): void {
+    public deleteTemplate(templateId: number): void {
         this.loading = true;
         this.createCatalogModalOpened = false;
-        this.catalogService.deleteCatalog(catalogId).subscribe({
+        this.templateService.deleteTemplate(templateId).subscribe({
             next: (response) => {
                 this.refreshByGrid({});
             }, error: (error) => {
@@ -131,10 +128,10 @@ export class TemplateCatalogsComponent implements OnInit {
     public createCatalog(): void {
         this.loading = true;
         this.createCatalogModalOpened = false;
-        this.catalogService.createCatalog({
-            name: this.catalogForm.controls.name.value,
-            description: this.catalogForm.controls.description.value,
-        } as CreateCatalogRequest).subscribe({
+        this.templateService.createTemplate({
+            name: this.templateForm.controls.name.value,
+            description: this.templateForm.controls.description.value,
+        } as CreateWorkloadTemplateRequest).subscribe({
             next: (response) => {
                 this.refreshByGrid({});
             }, error: (error) => {
@@ -143,4 +140,6 @@ export class TemplateCatalogsComponent implements OnInit {
             }
         })
     }
+
+    protected readonly TemplateType = TemplateType;
 }
