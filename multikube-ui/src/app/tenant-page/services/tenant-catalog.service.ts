@@ -33,4 +33,8 @@ export class TenantCatalogService {
         return this.clustersApiService.getCatalog(catalogId);
     }
 
+    deleteCatalog(catalogId: number): Observable<void> {
+        return this.clustersApiService.deleteCatalog(catalogId);
+    }
+
 }

@@ -25,6 +25,9 @@
         <clr-dg-column>Is System scoped</clr-dg-column>
         <clr-dg-placeholder>No Catalogs configurations found.</clr-dg-placeholder>
         <clr-dg-row *clrDgItems="let catalog of catalogsPage.content" [clrDgItem]="catalog">
+            <clr-dg-action-overflow>
+                <button (click)="deleteCatalog(catalog.id)" class="action-item">Delete</button>
+            </clr-dg-action-overflow>
             <clr-dg-cell>{{ catalog.name }}</clr-dg-cell>
             <clr-dg-cell>{{ catalog.description }}</clr-dg-cell>
             <clr-dg-cell>{{ catalog.templatesCount }}</clr-dg-cell>
@@ -40,7 +43,7 @@
     </clr-datagrid>
 </div>
 
-<clr-side-panel [(clrSidePanelOpen)]="createCatalogModalOpened" [clrSidePanelSize]="'xl'">
+<clr-side-panel [(clrSidePanelOpen)]="createCatalogModalOpened" [clrSidePanelSize]="'lg'">
     <div class="side-panel-title">Create template catalog
     </div>
     <div class="side-panel-body">

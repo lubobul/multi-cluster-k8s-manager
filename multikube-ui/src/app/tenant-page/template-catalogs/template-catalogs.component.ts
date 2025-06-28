@@ -116,6 +116,19 @@ export class TemplateCatalogsComponent implements OnInit {
         this.createCatalogModalOpened = true;
     }
 
+    public deleteCatalog(catalogId: number): void {
+        this.loading = true;
+        this.createCatalogModalOpened = false;
+        this.catalogService.deleteCatalog(catalogId).subscribe({
+            next: (response) => {
+                this.refreshByGrid({});
+            }, error: (error) => {
+                this.errorMessage = resolveErrorMessage(error);
+                this.alertErrorClosed = false;
+            }
+        })
+    }
+
     public createCatalog(): void {
         this.loading = true;
         this.createCatalogModalOpened = false;

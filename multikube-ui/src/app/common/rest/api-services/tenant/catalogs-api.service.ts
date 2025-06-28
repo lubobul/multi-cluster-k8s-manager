@@ -26,4 +26,8 @@ export class TenantCatalogsApiService {
     getCatalog(catalogId: number): Observable<TemplateCatalog> {
         return this.http.get<TemplateCatalog>(`${this.apiUrl}/${catalogId}`);
     }
+
+    deleteCatalog(catalogId: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${catalogId}`);
+    }
 }
