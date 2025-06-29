@@ -31,15 +31,15 @@ import {
     NamespaceDetailsComponent
 } from './tenant-page/cluster-details/cluster-namespace/namespace-details/namespace-details.component';
 import {
-    NamespaceWorkloadsComponent
-} from './tenant-page/cluster-details/cluster-namespace/namespace-workloads/namespace-workloads.component';
-import {
     NamespaceConfigurationComponent
 } from './tenant-page/cluster-details/cluster-namespace/namespace-configuration/namespace-configuration.component';
 import {TemplateCatalogsComponent} from './tenant-page/template-catalogs/template-catalogs.component';
 import {
     WorkloadTemplatesComponent
 } from './tenant-page/workload-templates/workload-templates.component';
+import {
+    WorkloadsComponent
+} from './tenant-page/cluster-details/cluster-namespace/namespace-workloads/workloads.component';
 
 
 export const MULTIKUBE_ROUTE_PATHS = {
@@ -212,7 +212,7 @@ export const routes: Routes = [
                                             },
                                             {
                                                 path: TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_DETAILS_CHILDREN.WORKLOADS,
-                                                component: NamespaceWorkloadsComponent,
+                                                component: WorkloadsComponent,
                                             },
                                             {
                                                 path: TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_DETAILS_CHILDREN.CONFIGURATION,

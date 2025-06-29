@@ -230,6 +230,7 @@ public class TenantNamespaceService {
         config.setK8sName(resource.k8sName());
         config.setName(resource.k8sName());
         config.setYamlContent(resource.yaml());
+        config.setSyncStatus(SyncStatus.UNKNOWN);
 
         try {
             kubernetesClientService.apply(namespace.getKubernetesCluster(), namespace.getName(), resource.yaml());
@@ -238,7 +239,6 @@ public class TenantNamespaceService {
         } catch (Exception e) {
             logger.error("Failed to apply resource {}/{} in namespace '{}'", resource.k8sKind(), resource.k8sName(), namespace.getName(), e);
             config.setStatus(ResourceStatus.ERROR);
-            config.setSyncStatus(SyncStatus.IN_SYNC);
             config.setStatusDetails(e.getMessage());
         }
         namespace.getConfigurations().add(config);

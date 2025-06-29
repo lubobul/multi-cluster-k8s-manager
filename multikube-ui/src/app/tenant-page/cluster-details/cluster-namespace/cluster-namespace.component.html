@@ -6,22 +6,33 @@
           - routerLinkActive="active" tells Clarity which tab link is currently active
             based on the browser's URL. This makes the tab look selected.
         -->
-        <button clrTabLink [routerLink]="TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_DETAILS_CHILDREN.DETAILS" routerLinkActive="active">Details</button>
+        <button clrTabLink [routerLink]="TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_DETAILS_CHILDREN.DETAILS"
+                routerLinkActive="active">Details
+        </button>
     </clr-tab>
 
     <!-- Deployments Tab -->
     <clr-tab>
-        <button clrTabLink [routerLink]="TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_DETAILS_CHILDREN.WORKLOADS" routerLinkActive="active">Workloads</button>
+        <button clrTabLink
+                [routerLink]="TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_DETAILS_CHILDREN.WORKLOADS"
+                routerLinkActive="active">Workloads
+        </button>
     </clr-tab>
 
     <!-- Cloud Tab -->
     <clr-tab>
-        <button clrTabLink [routerLink]="TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_DETAILS_CHILDREN.CONFIGURATION" routerLinkActive="active">Configuration</button>
+        <button clrTabLink
+                [routerLink]="TENANT_ROUTE_PATHS.CLUSTER_DETAILS_CHILDREN.NAMESPACE_DETAILS_CHILDREN.CONFIGURATION"
+                routerLinkActive="active">Configuration
+        </button>
     </clr-tab>
 </clr-tabs>
 
 <div class="namespace-details-container no-padding no-margin">
-    <h4 class="namespace-header">{{ namespace?.name }}</h4>
+    <h4 class="namespace-header">
+        <cds-icon shape="namespace" [size]="'md'"></cds-icon>
+        {{ namespace?.name }}
+    </h4>
 
     <router-outlet></router-outlet>
 </div>

@@ -4,6 +4,7 @@ import com.multikube_rest_service.common.encryption.KubeconfigEncryptor;
 import com.multikube_rest_service.entities.provider.KubernetesCluster;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
+import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.apis.NetworkingV1Api;
 import io.kubernetes.client.openapi.apis.RbacAuthorizationV1Api;
@@ -57,6 +58,8 @@ public class KubernetesClientServiceImpl implements KubernetesClientService {
             applyResourceQuota(apiClient, namespace, (V1ResourceQuota) obj);
         } else if (obj instanceof V1LimitRange) {
             applyLimitRange(apiClient, namespace, (V1LimitRange) obj);
+        } else if (obj instanceof V1Deployment) { // <-- ADD THIS NEW CONDITION
+            applyDeployment(apiClient, namespace, (V1Deployment) obj);
         } else {
             logger.warn("Unsupported Kind for apply: {}", obj.getClass().getSimpleName());
             throw new IllegalArgumentException("Unsupported Kind for apply: " + obj.getClass().getSimpleName());
@@ -132,6 +135,23 @@ public class KubernetesClientServiceImpl implements KubernetesClientService {
                 logger.debug("LimitRange {} already exists in namespace {}. Replacing.", limitRange.getMetadata().getName(), namespace);
                 coreApi.replaceNamespacedLimitRange(limitRange.getMetadata().getName(), namespace, limitRange).execute();
             } else {
+                throw e;
+            }
+        }
+    }
+
+    private void applyDeployment(ApiClient apiClient, String namespace, V1Deployment deployment) throws ApiException {
+        AppsV1Api appsApi = new AppsV1Api(apiClient);
+        try {
+            // Attempt to create the deployment
+            appsApi.createNamespacedDeployment(namespace, deployment).execute();
+        } catch (ApiException e) {
+            if (e.getCode() == 409) { // 409 Conflict means it already exists
+                logger.debug("Deployment {} already exists in namespace {}. Replacing.", deployment.getMetadata().getName(), namespace);
+                // If it exists, replace it
+                appsApi.replaceNamespacedDeployment(deployment.getMetadata().getName(), namespace, deployment).execute();
+            } else {
+                // If it's another error, re-throw it
                 throw e;
             }
         }

@@ -116,7 +116,7 @@ spec:
         image: nginx:1.21-alpine
         ports:
         # The port that the container exposes.
-        - containerPort: 80`
+        - containerPort: 80`;
 
     selectedCatalog: TemplateCatalog;
 

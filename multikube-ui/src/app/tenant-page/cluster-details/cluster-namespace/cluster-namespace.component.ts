@@ -12,6 +12,7 @@ import {ActivatedRoute, Params, Router, RouterLink, RouterLinkActive, RouterOutl
 import {TENANT_ROUTE_PATHS} from '../../../app.routes';
 import {NamespaceStatusComponent} from '../../../common/namespace-status/namespace-status.component';
 import {TenantNamespaceDetailsService} from '../../services/tenant-namespace-details.service';
+import {CdsModule} from '@cds/angular';
 
 @Component({
     selector: 'app-cluster-namespaces',
@@ -21,7 +22,8 @@ import {TenantNamespaceDetailsService} from '../../services/tenant-namespace-det
         ClarityModule,
         RouterLink,
         RouterLinkActive,
-        RouterOutlet
+        RouterOutlet,
+        CdsModule
     ],
     providers: [
         TenantNamespaceDetailsService,

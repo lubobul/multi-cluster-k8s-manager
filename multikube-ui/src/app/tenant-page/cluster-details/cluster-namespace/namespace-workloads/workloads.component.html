@@ -1,0 +1,237 @@
+<div class="host-container">
+    @if (errorMessage) {
+        <clr-alert class="danger-alert" [clrAlertType]="'danger'" [(clrAlertClosed)]="alertErrorClosed">
+            <clr-alert-item>
+                <span class="alert-text">{{ errorMessage }}</span>
+            </clr-alert-item>
+        </clr-alert>
+    }
+
+    <h5>Workloads</h5>
+
+    <button (click)="openCreateWorkloadModal()" class="btn btn-link-primary">
+        <cds-icon shape="plus"></cds-icon>
+        Create workload
+    </button>
+
+    <clr-datagrid
+        class="workloads-grid"
+        (clrDgRefresh)="refreshByWorkloadsGrid($event)"
+        [clrDgLoading]="loading"
+    >
+        <clr-dg-column [clrDgField]="'name'">Name</clr-dg-column>
+        <clr-dg-column>Resource name</clr-dg-column>
+        <clr-dg-column>Resource kind</clr-dg-column>
+        <clr-dg-column>Status</clr-dg-column>
+        <clr-dg-column>State</clr-dg-column>
+        <clr-dg-column>Created</clr-dg-column>
+        <clr-dg-column>Last Updated</clr-dg-column>
+        <clr-dg-placeholder>No Workloads found.</clr-dg-placeholder>
+        <clr-dg-row *clrDgItems="let workload of workloadsPage.content" [clrDgItem]="workload">
+            <clr-dg-action-overflow>
+                <button (click)="deleteWorkload(workload.id)" class="action-item">Delete</button>
+            </clr-dg-action-overflow>
+            <clr-dg-cell>{{ workload.name }}</clr-dg-cell>
+            <clr-dg-cell>{{ workload.k8sName }}</clr-dg-cell>
+            <clr-dg-cell>{{ workload.k8sKind }}</clr-dg-cell>
+            <clr-dg-cell>
+                <k8s-resource-status [k8sResource]="workload"></k8s-resource-status>
+            </clr-dg-cell>
+            <clr-dg-cell>
+                <k8s-resource-sync-status [k8sResource]="workload"></k8s-resource-sync-status>
+            </clr-dg-cell>
+            <clr-dg-cell>{{ namespace.createdAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
+            <clr-dg-cell>{{ namespace.updatedAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
+        </clr-dg-row>
+        <ng-template [clrIfDetail]="gridWorkloadDetailState" let-detail
+                     (clrIfDetailChange)="gridGetWorkloadDetails($event)">
+
+            <clr-dg-detail>
+                <clr-dg-detail-header>{{ loadingWorkloadYaml ? "" : gridWorkloadDetailState?.name }}</clr-dg-detail-header>
+                <clr-dg-detail-body>
+                    @if (loadingWorkloadYaml) {
+                        <div class="loading-container">
+                            <clr-spinner clrInline>Loading...</clr-spinner>
+                            <h5>Loading yaml configuration...</h5>
+                        </div>
+                    } @else {
+                        <ngx-monaco-editor
+                            class="workload-yaml-editor"
+                            [options]="templateViewEditorOptions"
+                            [(ngModel)]="gridWorkloadDetailState.yamlContent"
+                        >
+                        </ngx-monaco-editor>
+                    }
+                </clr-dg-detail-body>
+            </clr-dg-detail>
+        </ng-template>
+        <clr-dg-footer>
+            <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="workloadsPage.totalElements">
+                <clr-dg-page-size [clrPageSizeOptions]="[5, 10, 15]">Tenants per page</clr-dg-page-size>
+                {{ pagination.firstItem + 1 }} - {{ pagination.lastItem + 1 }} of
+                {{ pagination.totalItems }} tenants
+            </clr-dg-pagination>
+        </clr-dg-footer>
+    </clr-datagrid>
+</div>
+
+<clr-side-panel [(clrSidePanelOpen)]="createWorkloadModalOpened" [clrSidePanelSize]="'xl'">
+    <div class="side-panel-title">Create workload
+    </div>
+    <div class="side-panel-body">
+        <form clrStepper [formGroup]="workloadForm" (ngSubmit)="createWorkload()">
+            <clr-stepper-panel formGroupName="details">
+                <clr-step-title>Workload details</clr-step-title>
+                <clr-step-description>Give your workload name and description
+                </clr-step-description>
+                <clr-step-content *clrIfExpanded>
+                    <clr-input-container>
+                        <label>Name</label>
+                        <input clrInput formControlName="name"/>
+                        <clr-control-error *clrIfError="'required'">
+                            Workload name field is required.
+                        </clr-control-error>
+                        <clr-control-helper>
+                            Enter some meaningful name for this workload
+                        </clr-control-helper>
+                    </clr-input-container>
+
+                    <clr-textarea-container>
+                        <label>Description</label>
+                        <textarea clrTextarea formControlName="description"></textarea>
+                        <clr-control-helper>
+                            Enter some meaningful description
+                        </clr-control-helper>
+                    </clr-textarea-container>
+
+                    <clr-radio-container>
+                        <label>Kubernetes workload type</label>
+                        <clr-radio-wrapper>
+                            <input formControlName="type" type="radio" clrRadio required
+                                   value="{{WorkloadType.FromTemplate}}"/>
+                            <label>From template</label>
+                        </clr-radio-wrapper>
+                        <clr-radio-wrapper>
+                            <input formControlName="type" type="radio" clrRadio required
+                                   value="{{WorkloadType.FromScratch}}"/>
+                            <label>From scratch</label>
+                        </clr-radio-wrapper>
+                        @if (workloadForm.controls.details.controls.type.value === WorkloadType.FromTemplate) {
+                            <clr-control-helper>Select a predefined workload template.
+                            </clr-control-helper>
+                        } @else {
+                            <clr-control-helper>Define your workload from scratch.</clr-control-helper>
+                        }
+                        <clr-control-error>This field is required!</clr-control-error>
+                    </clr-radio-container>
+
+                    <button clrStepButton="next">next</button>
+                </clr-step-content>
+            </clr-stepper-panel>
+
+            @if (workloadForm.controls.details.controls.type.value === WorkloadType.FromTemplate) {
+                <clr-stepper-panel formGroupName="templateSelection">
+                    <clr-step-title>Workload template</clr-step-title>
+                    <clr-step-description>Choose template for your workload</clr-step-description>
+                    <clr-step-content *clrIfExpanded>
+                        <clr-datagrid
+                            class="templates-grid"
+                            (clrDgRefresh)="refreshByTemplatesGrid($event)"
+                            (clrDgSingleSelectedChange)="workloadTemplateSelected($event)"
+                            [(clrDgSingleSelected)]="selectedWorkloadTemplate"
+                            [clrDgLoading]="templatesGridLoading"
+                        >
+                            <clr-dg-column [clrDgField]="'name'">Name</clr-dg-column>
+                            <clr-dg-column>Description</clr-dg-column>
+                            <clr-dg-column>Type</clr-dg-column>
+                            <clr-dg-column>Catalog</clr-dg-column>
+                            <clr-dg-column>Created</clr-dg-column>
+                            <clr-dg-placeholder>No Templates found.</clr-dg-placeholder>
+                            <clr-dg-row *clrDgItems="let template of templatesPage.content" [clrDgItem]="template">
+                                <clr-dg-cell>{{ template.name }}</clr-dg-cell>
+                                <clr-dg-cell>{{ template.description }}</clr-dg-cell>
+                                <clr-dg-cell>{{ template.templateType == TemplateType.YAML ? "Native" : "Helm" }}</clr-dg-cell>
+                                <clr-dg-cell>{{ template.catalog.name }}</clr-dg-cell>
+                                <clr-dg-cell>{{ template.createdAt | date : "dd.MM, hh:mm" }}</clr-dg-cell>
+                            </clr-dg-row>
+                            <ng-template [clrIfDetail]="gridWorkloadTemplateDetailState" let-detail
+                                         (clrIfDetailChange)="gridGetTemplateDetails($event)">
+
+                                <clr-dg-detail>
+                                    <clr-dg-detail-header>{{ loadingTemplateYaml ? "" : gridWorkloadTemplateDetailState?.name }}</clr-dg-detail-header>
+                                    <clr-dg-detail-body>
+                                        @if (loadingTemplateYaml) {
+                                            <div class="loading-container">
+                                                <clr-spinner clrInline>Loading...</clr-spinner>
+                                                <h5>Loading yaml configuration...</h5>
+                                            </div>
+                                        } @else {
+                                            <ngx-monaco-editor
+                                                class="workload-yaml-editor"
+                                                [options]="templateViewEditorOptions"
+                                                [formControl]="workloadForm.controls.yamlConfig.controls.yaml"
+                                            >
+                                            </ngx-monaco-editor>
+                                        }
+                                    </clr-dg-detail-body>
+                                </clr-dg-detail>
+                            </ng-template>
+                            <clr-dg-footer>
+                                <clr-dg-pagination #pagination [clrDgPageSize]="5"
+                                                   [clrDgTotalItems]="templatesPage.totalElements">
+                                    <clr-dg-page-size [clrPageSizeOptions]="[5, 10, 15]">Tenants per page
+                                    </clr-dg-page-size>
+                                    {{ pagination.firstItem + 1 }} - {{ pagination.lastItem + 1 }} of
+                                    {{ pagination.totalItems }} tenants
+                                </clr-dg-pagination>
+                            </clr-dg-footer>
+                        </clr-datagrid>
+
+                        @if (this.workloadForm.invalid && workloadForm.controls.templateSelection.controls.templateId?.errors?.["required"]) {
+                            <div class="clr-error">
+                            <span class="clr-subtext">
+                                Selecting a catalog is required.
+                            </span>
+                            </div>
+                        }
+
+
+                        <button clrStepButton="next">next</button>
+
+                    </clr-step-content>
+                </clr-stepper-panel>
+            }
+            <clr-stepper-panel formGroupName="yamlConfig">
+                <clr-step-title>
+                    @if (workloadForm.controls.details.controls.type.value === WorkloadType.FromTemplate) {
+                        Creating workload from template
+                    } @else {
+                        Creating workload from scratch
+                    }
+                </clr-step-title>
+                <clr-step-description>
+                    @if (workloadForm.controls.details.controls.type.value === WorkloadType.FromTemplate) {
+                        Leave or edit template yaml
+                    } @else {
+                        Define your workload from scratch
+                    }
+                </clr-step-description>
+                <clr-step-content *clrIfExpanded>
+                    <ngx-monaco-editor
+                        class="templates-yaml-editor"
+                        [options]="editorOptions"
+                        [formControl]="workloadForm.controls.yamlConfig.controls.yaml"
+                    >
+                    </ngx-monaco-editor>
+
+                    <button clrStepButton="submit">Create workload</button>
+                </clr-step-content>
+            </clr-stepper-panel>
+        </form>
+    </div>
+    <div class="side-panel-footer">
+        <button type="button" class="btn btn-outline" (click)="createWorkloadModalOpened = false">Cancel
+        </button>
+    </div>
+</clr-side-panel>
+

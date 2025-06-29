@@ -64,10 +64,10 @@ export class NamespaceConfigurationComponent implements OnInit {
 
     ngOnInit(): void {
         this.loading = true;
-        this.subscribeToConfigurationsGrid();
         this.namespaceDetailsService.namespace$.subscribe({
             next: (namespace) => {
                 this.namespace = namespace;
+                this.subscribeToConfigurationsGrid();
             },
             error: (err) => {
                 this.errorMessage = resolveErrorMessage(err);

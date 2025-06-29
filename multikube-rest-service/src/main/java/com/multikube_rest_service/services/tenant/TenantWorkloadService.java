@@ -4,6 +4,7 @@ import com.multikube_rest_service.auth.JwtUserDetails;
 import com.multikube_rest_service.common.SecurityContextHelper;
 import com.multikube_rest_service.common.enums.ResourceStatus;
 import com.multikube_rest_service.common.enums.RoleType;
+import com.multikube_rest_service.common.enums.SyncStatus;
 import com.multikube_rest_service.dtos.requests.tenant.CreateWorkloadRequest;
 import com.multikube_rest_service.dtos.responses.tenant.TenantWorkloadDto;
 import com.multikube_rest_service.dtos.responses.tenant.TenantWorkloadSummaryDto;
@@ -130,11 +131,14 @@ public class TenantWorkloadService {
         workload.setTenantNamespace(namespace);
         workload.setCreatedByUser(creator); // Track who created the workload
         workload.setStatus(ResourceStatus.PROCESSING);
+        workload.setSyncStatus(SyncStatus.UNKNOWN);
 
         try {
             logger.info("Applying workload {}/{} in namespace '{}'", resource.k8sKind(), resource.k8sName(), namespace.getName());
             kubernetesClientService.apply(namespace.getKubernetesCluster(), namespace.getName(), request.getYamlContent());
             workload.setStatus(ResourceStatus.ACTIVE);
+            workload.setSyncStatus(SyncStatus.IN_SYNC);
+
         } catch (Exception e) {
             logger.error("Failed to apply workload {}/{} in namespace '{}'", resource.k8sKind(), resource.k8sName(), namespace.getName(), e);
             workload.setStatus(ResourceStatus.ERROR);
